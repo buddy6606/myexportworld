@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 1. Global State & Sample Data ---
   let inquiries = [];
-  
+
   // Sample seed data to showcase the admin dashboard immediately
   const sampleInquiries = [
     {
@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('myexportworld_inquiries', JSON.stringify(inquiries));
     }
   };
-  
+
   loadInquiries();
 
   // --- Daily Blog Database & Sample Data ---
   let blogPosts = [];
-  
+
   const sampleBlogPosts = [
     {
       id: "seed_freight",
@@ -233,13 +233,398 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadBlogPosts();
 
+  // --- 8. Dynamic Products Database & Loader ---
+  let products = [];
+
+  const sampleProducts = [
+    {
+      id: "prod_turmeric_finger",
+      title: "Dried Turmeric Finger",
+      hsCode: "09103020",
+      category: "turmeric",
+      badge: "Double Polished",
+      image: "images/turmeric_finger.jpg",
+      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin, rich in curcumin content.",
+      specs: [
+        { name: "Curcumin", value: "Min 3.5%" },
+        { name: "Origin", value: "Nizamabad / Sangli, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Purity", value: "Min 99%" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+    {
+      id: "prod_turmeric_powder",
+      title: "Turmeric Powder",
+      hsCode: "09103030",
+      category: "turmeric",
+      badge: "Ultra-Fine Ground",
+      image: "images/turmeric_powder.jpg",
+      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma, essential oils, and curcumin concentration.",
+      specs: [
+        { name: "Curcumin", value: "Min 3.8%" },
+        { name: "Origin", value: "Erode / Nizamabad, India" },
+        { name: "Mesh Size", value: "60 - 80 mesh" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_turmeric_fresh",
+      title: "Fresh Turmeric",
+      hsCode: "09103010",
+      category: "turmeric",
+      badge: "Organic Harvest",
+      image: "images/turmeric_fresh.jpg",
+      description: "Harvested fresh organic turmeric rhizomes, raw and unprocessed. Retains full therapeutic attributes, juice content, and fresh spice flavor.",
+      specs: [
+        { name: "State", value: "Fresh Raw Rhizomes" },
+        { name: "Origin", value: "Sangli / Erode, India" },
+        { name: "Packing", value: "Crates / Jute Bags" },
+        { name: "Organic Status", value: "100% Organic" },
+        { name: "Curcumin", value: "3% - 4%" }
+      ]
+    },
+    {
+      id: "prod_psyllium_husk",
+      title: "Psyllium Husk Whole",
+      hsCode: "12119032",
+      category: "psyllium",
+      badge: "99% Ultra-Pure",
+      image: "images/psyllium_husk.png",
+      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber. Used widely in food processing and pharmaceuticals.",
+      specs: [
+        { name: "Purity Grade", value: "99% (Swell Index 45ml/g)" },
+        { name: "Origin", value: "Gujarat / Rajasthan, India" },
+        { name: "Packing", value: "15 / 25 kg Paper Bags" },
+        { name: "Swell Volume", value: "Min 40 ml / gram" },
+        { name: "Light Stuff", value: "Max 1%" }
+      ]
+    },
+    {
+      id: "prod_psyllium_powder",
+      title: "Psyllium Husk Powder",
+      hsCode: "12119033",
+      category: "psyllium",
+      badge: "Milled Fiber",
+      image: "images/psyllium_powder.png",
+      description: "Fine ground psyllium husk powder, ideal for easy blending into dietary supplements, bakery products, and pharmaceutical formulations.",
+      specs: [
+        { name: "Purity Grade", value: "98% (40-60 mesh)" },
+        { name: "Origin", value: "Gujarat, India" },
+        { name: "Packing", value: "25 kg Multi-layer Paper Bags" },
+        { name: "Mesh Size", value: "40 - 100 mesh" },
+        { name: "Swell Volume", value: "Min 35 ml / gram" }
+      ]
+    },
+    {
+      id: "prod_cumin_seeds",
+      title: "Cumin Seeds",
+      hsCode: "09093120",
+      category: "cumin",
+      badge: "Sortex Cleaned",
+      image: "images/cumin_seeds.png",
+      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds. Rich in essential oils and thymol content.",
+      specs: [
+        { name: "Purity", value: "Min 99%" },
+        { name: "Origin", value: "Gujarat / Rajasthan, India" },
+        { name: "Packing", value: "25 / 50 kg Jute Bags" },
+        { name: "Extraneous Matter", value: "Max 1%" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_cumin_powder",
+      title: "Cumin Powder",
+      hsCode: "09093200",
+      category: "cumin",
+      badge: "Aromatic Ground",
+      image: "images/cumin_powder.png",
+      description: "Pure ground cumin spice, milled under cold processing to preserve natural volatile oils, rich earthy flavor, and warming aroma.",
+      specs: [
+        { name: "Volatile Oil", value: "Min 1.5%" },
+        { name: "Origin", value: "Gujarat, India" },
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 8%" }
+      ]
+    },
+    {
+      id: "prod_red_chilli",
+      title: "Dry Red Chilli",
+      hsCode: "09042211",
+      category: "chilli",
+      badge: "Stemless Grade-A",
+      image: "images/chilli_whole.png",
+      description: "Premium sun-dried whole red chilli pods, stemless, featuring vibrant deep red color and hot pungency rating. Selected carefully from Guntur origins.",
+      specs: [
+        { name: "Variety", value: "Guntur S17 / Teja" },
+        { name: "Origin", value: "Andhra Pradesh, India" },
+        { name: "Pungency", value: "75,000 - 100,000 SHU" },
+        { name: "Color Value", value: "Min 100 ASTA" },
+        { name: "Moisture", value: "Max 11%" }
+      ]
+    },
+    {
+      id: "prod_chilli_powder",
+      title: "Red Chilli Powder",
+      hsCode: "09042212",
+      category: "chilli",
+      badge: "Vibrant Pungent",
+      image: "images/chilli_powder.png",
+      description: "Finely ground premium red chilli powder, delivering consistent heat and rich red coloring. Hygienically processed without artificial colorings.",
+      specs: [
+        { name: "Pungency", value: "60,000 - 80,000 SHU" },
+        { name: "Origin", value: "Guntur, India" },
+        { name: "Packing", value: "20 / 25 kg PP Bags" },
+        { name: "Purity", value: "100% Natural" },
+        { name: "Moisture", value: "Max 9.5%" }
+      ]
+    }
+  ];
+
+  const loadProducts = () => {
+    const stored = localStorage.getItem('myexportworld_products');
+    if (stored) {
+      products = JSON.parse(stored);
+      
+      // Migrate old titles / suffixes if they exist in localStorage
+      let modified = false;
+      products.forEach(p => {
+        if (p.title === "Cumin Seeds (Jeera)") {
+          p.title = "Cumin Seeds";
+          modified = true;
+        }
+        if (p.title === "Dry Red Chilli (Whole)") {
+          p.title = "Dry Red Chilli";
+          modified = true;
+        }
+        if (p.description && p.description.includes("(Jeera)")) {
+          p.description = p.description.replace(" (Jeera)", "");
+          modified = true;
+        }
+      });
+      if (modified) {
+        localStorage.setItem('myexportworld_products', JSON.stringify(products));
+      }
+
+      const hasHoney = products.some(p => p.category === 'honey');
+      const hasCumin = products.some(p => p.category === 'cumin');
+      const hasChilli = products.some(p => p.category === 'chilli');
+      
+      if (hasHoney || !hasCumin || !hasChilli) {
+        let cleanProducts = products.filter(p => p.category !== 'honey');
+        
+        if (!hasCumin) {
+          const cuminSeeds = sampleProducts.find(p => p.id === 'prod_cumin_seeds');
+          const cuminPowder = sampleProducts.find(p => p.id === 'prod_cumin_powder');
+          if (cuminSeeds) cleanProducts.push(cuminSeeds);
+          if (cuminPowder) cleanProducts.push(cuminPowder);
+        }
+        if (!hasChilli) {
+          const chilliWhole = sampleProducts.find(p => p.id === 'prod_red_chilli');
+          const chilliPowder = sampleProducts.find(p => p.id === 'prod_chilli_powder');
+          if (chilliWhole) cleanProducts.push(chilliWhole);
+          if (chilliPowder) cleanProducts.push(chilliPowder);
+        }
+        
+        products = cleanProducts;
+        localStorage.setItem('myexportworld_products', JSON.stringify(products));
+      }
+    } else {
+      products = [...sampleProducts];
+      localStorage.setItem('myexportworld_products', JSON.stringify(products));
+    }
+  };
+
+  loadProducts();
+
+
+  // Populate Specific Product Dropdown in Inquiry Form with dynamic category filtering
+  const populateProductDropdown = (categoryFilter = 'all') => {
+    const productDropdown = document.getElementById('productSelected');
+    if (!productDropdown) return;
+
+    productDropdown.innerHTML = '<option value="" disabled selected>-- Select a Commodity --</option>';
+
+    products.forEach(prod => {
+      let match = false;
+      if (categoryFilter === 'all') {
+        match = true;
+      } else if (categoryFilter.toLowerCase() === 'spices') {
+        match = ['turmeric', 'cumin', 'chilli'].includes(prod.category.toLowerCase());
+      } else {
+        match = prod.category.toLowerCase() === categoryFilter.toLowerCase();
+      }
+
+      if (match) {
+        const opt = document.createElement('option');
+        opt.value = `${prod.title} (${prod.hsCode})`;
+        opt.textContent = `${prod.title} (${prod.hsCode})`;
+        productDropdown.appendChild(opt);
+      }
+    });
+
+    const fallbackOpt = document.createElement('option');
+    fallbackOpt.value = "Other Agricultural Inquiry";
+    fallbackOpt.textContent = "Other / Bulk Spices Inquiry";
+    productDropdown.appendChild(fallbackOpt);
+  };
+
+  populateProductDropdown();
+
+  // Dynamically populate Product Category select inside Sourcing center
+  const populateProductCategorySelect = () => {
+    const productCategorySelect = document.getElementById('productCategory');
+    if (!productCategorySelect) return;
+
+    // Get unique categories from active products list
+    const categories = new Set();
+    categories.add("Spices");
+    categories.add("Psyllium");
+
+    products.forEach(p => {
+      const cat = p.category;
+      if (cat && !['turmeric', 'cumin', 'chilli', 'psyllium'].includes(cat.toLowerCase())) {
+        const formattedCat = cat.charAt(0).toUpperCase() + cat.slice(1);
+        categories.add(formattedCat);
+      }
+    });
+
+    productCategorySelect.innerHTML = '<option value="all">All Categories</option>';
+    categories.forEach(cat => {
+      const opt = document.createElement('option');
+      if (cat === "Spices") {
+        opt.value = "Spices";
+        opt.textContent = "Spices (Turmeric, Cumin, Chilli)";
+      } else if (cat === "Psyllium") {
+        opt.value = "Psyllium";
+        opt.textContent = "Dietary Fiber (Psyllium)";
+      } else {
+        opt.value = cat;
+        opt.textContent = cat;
+      }
+      productCategorySelect.appendChild(opt);
+    });
+  };
+
+  populateProductCategorySelect();
+
+  // Filter products when category changes
+  const productCategorySelect = document.getElementById('productCategory');
+  if (productCategorySelect) {
+    productCategorySelect.addEventListener('change', (e) => {
+      populateProductDropdown(e.target.value);
+    });
+  }
+
+  // Render Public Catalog Items
+  const renderPublicProducts = () => {
+    const gridsWrapper = document.querySelector('#catalogLevel3 .grids-wrapper');
+    if (!gridsWrapper || !gridTurmeric || !gridPsyllium || !gridCumin || !gridChilli) return;
+
+    gridTurmeric.innerHTML = '';
+    gridPsyllium.innerHTML = '';
+    gridCumin.innerHTML = '';
+    gridChilli.innerHTML = '';
+
+    // Remove any previously generated custom category sections
+    document.querySelectorAll('.commodity-section-custom').forEach(el => el.remove());
+
+    products.forEach(prod => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+
+      let specRowsHTML = '';
+      if (prod.specs && Array.isArray(prod.specs)) {
+        prod.specs.forEach(spec => {
+          if (spec.name && spec.value) {
+            specRowsHTML += `
+              <li class="spec-row">
+                <span class="spec-name">${escapeHTML(spec.name)}</span>
+                <span class="spec-value">${escapeHTML(spec.value)}</span>
+              </li>
+            `;
+          }
+        });
+      }
+
+      card.innerHTML = `
+        <div class="product-img-wrapper">
+          <img src="${escapeHTML(prod.image)}" alt="${escapeHTML(prod.title)}" class="product-img" onerror="this.src='images/logo.png';">
+          ${prod.badge ? `<span class="product-badge">${escapeHTML(prod.badge)}</span>` : ''}
+        </div>
+        <div class="product-info">
+          <span class="hs-code-tag">HS CODE: ${escapeHTML(prod.hsCode)}</span>
+          <h3 class="product-title">${escapeHTML(prod.title)}</h3>
+          <p class="product-desc">${escapeHTML(prod.description)}</p>
+          <ul class="product-specs">
+            ${specRowsHTML}
+          </ul>
+          <div class="product-actions">
+            <button class="btn btn-primary quick-inquire-btn" data-product="${escapeHTML(prod.title)} (${escapeHTML(prod.hsCode)})">Inquire Now</button>
+          </div>
+        </div>
+      `;
+
+      if (prod.category === 'turmeric') {
+        gridTurmeric.appendChild(card);
+      } else if (prod.category === 'psyllium') {
+        gridPsyllium.appendChild(card);
+      } else if (prod.category === 'cumin') {
+        gridCumin.appendChild(card);
+      } else if (prod.category === 'chilli') {
+        gridChilli.appendChild(card);
+      } else {
+        // Render Custom Commodity Group Grid
+        const categoryId = `section_custom_${prod.category.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+        let customSection = document.getElementById(categoryId);
+        if (!customSection) {
+          customSection = document.createElement('div');
+          customSection.className = 'commodity-section commodity-section-custom';
+          customSection.id = categoryId;
+          
+          const catTitle = prod.category.charAt(0).toUpperCase() + prod.category.slice(1);
+          customSection.innerHTML = `
+            <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+              <i class="fa-solid fa-cubes-stacked" style="color: var(--accent-yellow);"></i> ${escapeHTML(catTitle)}
+            </h3>
+            <div class="sub-products-grid" id="grid_${categoryId}"></div>
+          `;
+          gridsWrapper.appendChild(customSection);
+        }
+        const customGrid = document.getElementById(`grid_${categoryId}`);
+        if (customGrid) {
+          customGrid.appendChild(card);
+        }
+      }
+    });
+
+    const checkEmptyGrid = (grid) => {
+      if (grid.children.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: span 3; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-light); width: 100%;">
+            <i class="fa-solid fa-wheat-awn" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
+            <h4 style="font-size: 1.4rem; color: var(--primary-blue-dark); margin-bottom: 0.5rem;">No commodities in this category</h4>
+            <p style="color: var(--text-muted);">Please check back later or contact us directly.</p>
+          </div>
+        `;
+      }
+    };
+    checkEmptyGrid(gridTurmeric);
+    checkEmptyGrid(gridPsyllium);
+    checkEmptyGrid(gridCumin);
+    checkEmptyGrid(gridChilli);
+  };
+
   // --- 8. Dynamic Products Nested Catalog Explorer ---
   const level1 = document.getElementById('catalogLevel1');
   const level2 = document.getElementById('catalogLevel2');
   const level3 = document.getElementById('catalogLevel3');
   const gridTurmeric = document.getElementById('gridTurmeric');
   const gridPsyllium = document.getElementById('gridPsyllium');
-  const gridHoney = document.getElementById('gridHoney');
+  const gridCumin = document.getElementById('gridCumin');
+  const gridChilli = document.getElementById('gridChilli');
 
   // Breadcrumbs elements
   const breadHome = document.getElementById('breadHome');
@@ -265,124 +650,75 @@ document.addEventListener('DOMContentLoaded', () => {
     if (breadHome) breadHome.classList.add('active');
   };
 
-  const navigateToLevel2 = () => {
+  const navigateToLevel3 = () => {
     if (!level1 || !level2 || !level3) return;
-    // Show L2, Hide L1 & L3
-    level1.classList.add('hidden');
-    level2.classList.remove('hidden');
-    level3.classList.add('hidden');
-
-    // Hide all L3 grids
-    if (gridTurmeric) gridTurmeric.classList.add('hidden');
-    if (gridPsyllium) gridPsyllium.classList.add('hidden');
-    if (gridHoney) gridHoney.classList.add('hidden');
-
-    // Update breadcrumbs
-    if (breadHome) breadHome.classList.remove('active');
-    if (breadCategory) {
-      breadCategory.classList.remove('hidden');
-      breadCategory.classList.add('active');
-    }
-    if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
-    if (breadCommodity) breadCommodity.classList.add('hidden');
-  };
-
-  const navigateToLevel3 = (commodityName) => {
-    if (!level1 || !level2 || !level3) return;
-    // Show L3, Hide L1 & L2
+    // Show L3 directly, Hide L1 & L2
     level1.classList.add('hidden');
     level2.classList.add('hidden');
     level3.classList.remove('hidden');
 
     if (breadHome) breadHome.classList.remove('active');
     if (breadCategory) {
-      breadCategory.classList.remove('active');
+      breadCategory.textContent = "Spices";
       breadCategory.classList.remove('hidden');
+      breadCategory.classList.add('active');
     }
-    if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
-    
-    // Set active commodity grid & breadcrumb subtext
-    if (commodityName === 'turmeric') {
-      if (gridTurmeric) gridTurmeric.classList.remove('hidden');
-      if (gridPsyllium) gridPsyllium.classList.add('hidden');
-      if (gridHoney) gridHoney.classList.add('hidden');
-      if (breadCommodity) breadCommodity.textContent = "Turmeric";
-    } else if (commodityName === 'psyllium') {
-      if (gridPsyllium) gridPsyllium.classList.remove('hidden');
-      if (gridTurmeric) gridTurmeric.classList.add('hidden');
-      if (gridHoney) gridHoney.classList.add('hidden');
-      if (breadCommodity) breadCommodity.textContent = "Psyllium Husk";
-    } else if (commodityName === 'honey') {
-      if (gridHoney) gridHoney.classList.remove('hidden');
-      if (gridTurmeric) gridTurmeric.classList.add('hidden');
-      if (gridPsyllium) gridPsyllium.classList.add('hidden');
-      if (breadCommodity) breadCommodity.textContent = "Organic Honey";
-    }
+    if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
+    if (breadCommodity) breadCommodity.classList.add('hidden');
 
-    if (breadCommodity) {
-      breadCommodity.classList.remove('hidden');
-      breadCommodity.classList.add('active');
-    }
+    // Show all commodity sections
+    const sectionTurmeric = document.getElementById('sectionTurmeric');
+    const sectionPsyllium = document.getElementById('sectionPsyllium');
+    const sectionCumin = document.getElementById('sectionCumin');
+    const sectionChilli = document.getElementById('sectionChilli');
+
+    if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
+    if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
+    if (sectionCumin) sectionCumin.classList.remove('hidden');
+    if (sectionChilli) sectionChilli.classList.remove('hidden');
+    document.querySelectorAll('.commodity-section-custom').forEach(sec => sec.classList.remove('hidden'));
+
+    // Render active products dynamically
+    renderPublicProducts();
   };
 
   // Event bindings
   // L1 Card/Action clicks
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
-  if (btnExploreAgri) btnExploreAgri.addEventListener('click', navigateToLevel2);
+  if (btnExploreAgri) {
+    btnExploreAgri.addEventListener('click', () => {
+      window.location.hash = 'product-details';
+    });
+  }
   if (categoryCardAgri) {
     categoryCardAgri.addEventListener('click', (e) => {
       // Prevent double trigger if action button was clicked directly
       if (e.target.id !== 'btnExploreAgri' && !e.target.closest('#btnExploreAgri')) {
-        navigateToLevel2();
-      }
-    });
-  }
-
-  // L2 Back/Selection clicks
-  const btnBackToLevel1 = document.getElementById('btnBackToLevel1');
-  if (btnBackToLevel1) btnBackToLevel1.addEventListener('click', navigateToLevel1);
-
-  const btnSelectTurmeric = document.getElementById('btnSelectTurmeric');
-  const spotlightCardTurmeric = document.getElementById('spotlightCardTurmeric');
-  if (btnSelectTurmeric) btnSelectTurmeric.addEventListener('click', () => navigateToLevel3('turmeric'));
-  if (spotlightCardTurmeric) {
-    spotlightCardTurmeric.addEventListener('click', (e) => {
-      if (e.target.id !== 'btnSelectTurmeric' && !e.target.closest('#btnSelectTurmeric')) {
-        navigateToLevel3('turmeric');
-      }
-    });
-  }
-
-  const btnSelectPsyllium = document.getElementById('btnSelectPsyllium');
-  const spotlightCardPsyllium = document.getElementById('spotlightCardPsyllium');
-  if (btnSelectPsyllium) btnSelectPsyllium.addEventListener('click', () => navigateToLevel3('psyllium'));
-  if (spotlightCardPsyllium) {
-    spotlightCardPsyllium.addEventListener('click', (e) => {
-      if (e.target.id !== 'btnSelectPsyllium' && !e.target.closest('#btnSelectPsyllium')) {
-        navigateToLevel3('psyllium');
-      }
-    });
-  }
-
-  const btnSelectHoney = document.getElementById('btnSelectHoney');
-  const spotlightCardHoney = document.getElementById('spotlightCardHoney');
-  if (btnSelectHoney) btnSelectHoney.addEventListener('click', () => navigateToLevel3('honey'));
-  if (spotlightCardHoney) {
-    spotlightCardHoney.addEventListener('click', (e) => {
-      if (e.target.id !== 'btnSelectHoney' && !e.target.closest('#btnSelectHoney')) {
-        navigateToLevel3('honey');
+        window.location.hash = 'product-details';
       }
     });
   }
 
   // L3 Back clicks
   const btnBackToLevel2 = document.getElementById('btnBackToLevel2');
-  if (btnBackToLevel2) btnBackToLevel2.addEventListener('click', navigateToLevel2);
+  if (btnBackToLevel2) {
+    btnBackToLevel2.addEventListener('click', () => {
+      window.location.hash = 'product';
+    });
+  }
 
   // Breadcrumb action binds
-  if (breadHome) breadHome.addEventListener('click', navigateToLevel1);
-  if (breadCategory) breadCategory.addEventListener('click', navigateToLevel2);
+  if (breadHome) {
+    breadHome.addEventListener('click', () => {
+      window.location.hash = 'product';
+    });
+  }
+  if (breadCategory) {
+    breadCategory.addEventListener('click', () => {
+      window.location.hash = 'product';
+    });
+  }
 
   // Set default view state on load
   navigateToLevel1();
@@ -418,18 +754,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Intercept navigation to product view and default back to Level 1
     if (viewName === 'product') {
-      navigateToLevel1();
+      if (window.location.hash !== '#product-details') {
+        navigateToLevel1();
+      }
     }
 
     // Intercept navigation to blog view and ensure grid is shown (reader hidden)
     if (viewName === 'blog') {
-      const blogGrid = document.getElementById('blogCardGrid');
-      const blogSingleView = document.getElementById('blogSingleView');
-      if (blogGrid) blogGrid.style.display = 'grid';
-      if (blogSingleView) blogSingleView.style.display = 'none';
-      renderBlogGrid('all');
+      if (window.location.hash !== '#blog-article') {
+        const blogGrid = document.getElementById('blogCardGrid');
+        const blogSingleView = document.getElementById('blogSingleView');
+        if (blogGrid) blogGrid.style.display = 'grid';
+        if (blogSingleView) blogSingleView.style.display = 'none';
+        renderBlogGrid('all');
+      }
     }
-    
+
     // Close mobile nav menu if open
     if (mobileNavMenu.classList.contains('open')) {
       mobileNavMenu.classList.remove('open');
@@ -437,13 +777,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Attach event listeners to all links with data-view attributes
+  // Hash-based routing handler
+  const handleHashChange = () => {
+    const hash = window.location.hash.substring(1) || 'home';
+    const validViews = ['home', 'product', 'about', 'certificates', 'blog', 'contact', 'inquiry', 'product-details', 'blog-article'];
+    if (validViews.includes(hash)) {
+      if (hash === 'product-details') {
+        switchView('product');
+        navigateToLevel3();
+      } else if (hash === 'blog-article') {
+        switchView('blog');
+        // Show the article reader if we have a cached post
+        if (currentBlogPost && blogGrid && blogSingleView) {
+          blogGrid.style.display = 'none';
+          blogSingleView.style.display = 'block';
+        }
+      } else {
+        switchView(hash);
+      }
+    } else {
+      switchView('home');
+    }
+  };
+
+  window.addEventListener('hashchange', handleHashChange);
+
+  // Attach event listeners to all links with data-view attributes to update the URL hash
+  const mainViews = ['home', 'product', 'about', 'certificates', 'blog', 'contact', 'inquiry'];
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetView = link.getAttribute('data-view');
       if (targetView) {
-        switchView(targetView);
+        const currentHash = window.location.hash.substring(1) || 'home';
+        // If navigating from home to a main view, push (so back returns to home)
+        // If navigating between main views, replace (so back still goes to home)
+        if (currentHash === 'home' || currentHash === targetView) {
+          window.location.hash = targetView;
+        } else {
+          history.replaceState(null, '', '#' + targetView);
+          handleHashChange();
+        }
       }
     });
   });
@@ -478,20 +852,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 3. Dynamic Products Inquiries Integration ---
-  const quickInquireButtons = document.querySelectorAll('.quick-inquire-btn');
   const productDropdown = document.getElementById('productSelected');
 
-  quickInquireButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.quick-inquire-btn');
+    if (btn) {
       const productName = btn.getAttribute('data-product');
       if (productDropdown && productName) {
+        // Ensure option exists in dropdown, if not add it temporarily
+        let optionExists = Array.from(productDropdown.options).some(opt => opt.value === productName);
+        if (!optionExists) {
+          const opt = document.createElement('option');
+          opt.value = productName;
+          opt.textContent = productName;
+          productDropdown.appendChild(opt);
+        }
+        
         // Pre-fill dropdown
         productDropdown.value = productName;
         // Redirect to inquiry tab
-        switchView('inquiry');
+        window.location.hash = 'inquiry';
         showToast(`Selected: ${productName}`, "success");
       }
-    });
+    }
   });
 
   // --- 4. Inquiry Form Management ---
@@ -521,12 +904,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Format Date-Time string
       const now = new Date();
-      const timestamp = now.getFullYear() + '-' + 
-                        String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(now.getDate()).padStart(2, '0') + ' ' + 
-                        String(now.getHours()).padStart(2, '0') + ':' + 
-                        String(now.getMinutes()).padStart(2, '0') + ':' + 
-                        String(now.getSeconds()).padStart(2, '0');
+      const timestamp = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
 
       // Construct New Submission object
       const newInquiry = {
@@ -548,9 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inquiryCardWrapper.style.display = 'none';
       inquirySuccessView.style.display = 'block';
       showToast("Quote Inquiry Logged!", "success");
-      
-      // Update admin table if open
-      renderAdminTable();
+
     });
   }
 
@@ -563,102 +944,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- 5. Secret Administrative Modal Panel ---
-  const adminTriggerBtn = document.getElementById('adminTriggerBtn');
-  const logoClick = document.getElementById('logoClick');
-  const adminOverlay = document.getElementById('adminOverlay');
-  const adminCloseBtn = document.getElementById('adminCloseBtn');
-  const adminTableBody = document.getElementById('adminTableBody');
-  const adminStatTotal = document.getElementById('adminStatTotal');
-  const adminExportBtn = document.getElementById('adminExportBtn');
-  const adminClearBtn = document.getElementById('adminClearBtn');
-
-  const openAdminPanel = () => {
-    // Optional passcode prompt to make it feel extremely premium and authentic
-    const code = prompt("Enter Administrative Access Key (Hint: 1234):");
-    if (code === "1234" || code === "") {
-      renderAdminTable();
-      if (typeof renderAdminBlogTable === 'function') {
-        renderAdminBlogTable();
-      }
-      adminOverlay.classList.add('open');
-      showToast("Admin Desk Unlocked", "success");
-    } else if (code !== null) {
-      showToast("Access Denied: Invalid Security Key", "warning");
-    }
-  };
-
-  if (adminTriggerBtn) {
-    adminTriggerBtn.addEventListener('click', openAdminPanel);
-  }
-
-  // Double Click Logo to enter admin desk as a secret shortcut
-  if (logoClick) {
-    logoClick.addEventListener('dblclick', () => {
-      openAdminPanel();
-    });
-  }
-
-  if (adminCloseBtn) {
-    adminCloseBtn.addEventListener('click', () => {
-      adminOverlay.classList.remove('open');
-    });
-  }
-
-  // Close admin when clicking on gray backdrop
-  if (adminOverlay) {
-    adminOverlay.addEventListener('click', (e) => {
-      if (e.target === adminOverlay) {
-        adminOverlay.classList.remove('open');
-      }
-    });
-  }
-
-  // Render inquiries data inside administrative table
-  const renderAdminTable = () => {
-    if (!adminTableBody) return;
-    
-    // Update count stat
-    if (adminStatTotal) {
-      adminStatTotal.textContent = inquiries.length;
-    }
-
-    adminTableBody.innerHTML = '';
-
-    if (inquiries.length === 0) {
-      adminTableBody.innerHTML = `
-        <tr>
-          <td colspan="8">
-            <div class="admin-empty-state">
-              <i class="fa-regular fa-folder-open"></i>
-              <p>No active inquiries logged inside local database.</p>
-            </div>
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    inquiries.forEach(inq => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><strong>${inq.timestamp}</strong></td>
-        <td>${escapeHTML(inq.companyName)}</td>
-        <td>${escapeHTML(inq.buyerName)}</td>
-        <td><a href="tel:${inq.contactNo}" style="color:var(--primary-blue-light);font-weight:600;"><i class="fa-solid fa-phone"></i> ${escapeHTML(inq.contactNo)}</a></td>
-        <td><a href="mailto:${inq.buyerEmail}" style="color:var(--primary-blue-light);font-weight:600;"><i class="fa-regular fa-envelope"></i> ${escapeHTML(inq.buyerEmail)}</a></td>
-        <td>${escapeHTML(inq.buyerAddress)}</td>
-        <td><span class="hs-code-tag" style="margin-bottom:0; font-size:0.75rem;">${escapeHTML(inq.productSelected)}</span></td>
-        <td style="max-width:250px; font-size:0.85rem; line-height:1.4; color:var(--text-muted);">${escapeHTML(inq.buyerQuestion)}</td>
-      `;
-      adminTableBody.appendChild(row);
-    });
-  };
-
   // Helper utility to safely escape raw strings against XSS inside client-side renders
   const escapeHTML = (str) => {
     if (!str) return '';
-    return str.replace(/[&<>'"]/g, 
+    return str.replace(/[&<>'"]/g,
       tag => ({
         '&': '&amp;',
         '<': '&lt;',
@@ -669,89 +958,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   };
 
-  // Clear all admin data from LocalStorage
-  if (adminClearBtn) {
-    adminClearBtn.addEventListener('click', () => {
-      const confirmClear = confirm("Are you sure you want to clear ALL inquiries from this device? This action cannot be undone.");
-      if (confirmClear) {
-        inquiries = [];
-        localStorage.removeItem('myexportworld_inquiries');
-        renderAdminTable();
-        showToast("Inquiry Database Wiped", "warning");
-      }
-    });
-  }
-
-  // --- 6. Direct Excel Spreadsheet CSV Exporter ---
-  if (adminExportBtn) {
-    adminExportBtn.addEventListener('click', () => {
-      if (inquiries.length === 0) {
-        showToast("No data to export.", "warning");
-        return;
-      }
-
-      // Construct CSV content columns
-      const headers = ["Timestamp", "Company Name", "Contact Name", "Contact No", "Email Address", "Address/Port", "Product Category", "Requirements"];
-      
-      const csvRows = [];
-      csvRows.push(headers.join(",")); // Headers row
-
-      inquiries.forEach(inq => {
-        const rowData = [
-          inq.timestamp,
-          inq.companyName,
-          inq.buyerName,
-          inq.contactNo,
-          inq.buyerEmail,
-          inq.buyerAddress,
-          inq.productSelected,
-          inq.buyerQuestion
-        ];
-
-        // Format cell content strictly to escape quotes and handle commas safely for proper MS Excel loading
-        const escapedRowData = rowData.map(value => {
-          if (value === null || value === undefined) return '""';
-          let strValue = String(value);
-          // Escape existing double quotes by doubling them
-          strValue = strValue.replace(/"/g, '""');
-          // Wrap inside double quotes if values contain commas, quotes, or newlines
-          if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n') || strValue.includes('\r')) {
-            return `"${strValue}"`;
-          }
-          return `"${strValue}"`;
-        });
-
-        csvRows.push(escapedRowData.join(","));
-      });
-
-      const csvString = csvRows.join("\r\n");
-      
-      // UTF-8 Byte Order Mark (BOM) to force Microsoft Excel to load encoding perfectly
-      const BOM = "\uFEFF"; 
-      const blob = new Blob([BOM + csvString], { type: "text/csv;charset=utf-8;" });
-      
-      // Create hidden downloader anchor element
-      const link = document.createElement("a");
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `MY_EXPORT_WORLD_Inquiries_Database_${getFormattedDate()}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        showToast("Excel spreadsheet downloaded successfully!", "success");
-      }
-    });
-  }
-
-  // Get short formatted current date for filename exports
-  const getFormattedDate = () => {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  };
-
   // --- 7. Toast Alerts Notification System ---
   const showToast = (message, type = "info") => {
     const container = document.getElementById('toastContainer');
@@ -759,7 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
+
     // Choose icon based on alert type
     let iconClass = "fa-info-circle";
     if (type === "success") iconClass = "fa-circle-check";
@@ -772,13 +978,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.appendChild(toast);
 
-    // Fade and slide out after 4 seconds
+    // Fade and slide out after 2 seconds
     setTimeout(() => {
       toast.style.animation = "toastSlideOut 0.4s ease forwards";
       toast.addEventListener('animationend', () => {
         toast.remove();
       });
-    }, 4000);
+    }, 2000);
   };
 
   // Add toast exit keyframes dynamically to style.css or let JS handle it, but wait: we can define it directly
@@ -797,91 +1003,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const blogArticleContent = document.getElementById('blogArticleContent');
   const btnBlogBack = document.getElementById('btnBlogBack');
   const adminBlogForm = document.getElementById('adminBlogForm');
+  let currentBlogPost = null;
   const blogFilterButtons = document.querySelectorAll('.blog-filter-btn');
 
-  // Admin Tab Toggling
-  const tabBtnInquiries = document.getElementById('tabBtnInquiries');
-  const tabBtnBlog = document.getElementById('tabBtnBlog');
-  const adminContentInquiries = document.getElementById('adminContentInquiries');
-  const adminContentBlog = document.getElementById('adminContentBlog');
 
-  if (tabBtnInquiries && tabBtnBlog && adminContentInquiries && adminContentBlog) {
-    tabBtnInquiries.addEventListener('click', () => {
-      tabBtnInquiries.classList.add('active');
-      tabBtnBlog.classList.remove('active');
-      adminContentInquiries.classList.add('active');
-      adminContentBlog.classList.remove('active');
-      adminContentInquiries.style.display = 'block';
-      adminContentBlog.style.display = 'none';
-    });
-
-    tabBtnBlog.addEventListener('click', () => {
-      tabBtnBlog.classList.add('active');
-      tabBtnInquiries.classList.remove('active');
-      adminContentBlog.classList.add('active');
-      adminContentInquiries.classList.remove('active');
-      adminContentBlog.style.display = 'block';
-      adminContentInquiries.style.display = 'none';
-      renderAdminBlogTable();
-    });
-  }
-
-  // Render Table of Active Insights in the Editorial Panel with Remove controls
-  const renderAdminBlogTable = () => {
-    const adminBlogTableBody = document.getElementById('adminBlogTableBody');
-    if (!adminBlogTableBody) return;
-    
-    adminBlogTableBody.innerHTML = '';
-    
-    if (blogPosts.length === 0) {
-      adminBlogTableBody.innerHTML = `
-        <tr>
-          <td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-muted);">
-            No articles published. Grid is empty.
-          </td>
-        </tr>
-      `;
-      return;
-    }
-    
-    blogPosts.forEach(post => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><strong>${escapeHTML(post.title)}</strong></td>
-        <td><span class="hs-code-tag" style="margin-bottom:0; font-size:0.75rem;">${escapeHTML(post.category)}</span></td>
-        <td>${escapeHTML(post.readTime)}</td>
-        <td>${escapeHTML(post.dateFormatted || 'Recent')}</td>
-        <td>
-          <button class="btn btn-secondary btn-delete-blog" data-post-id="${post.id}" style="border-color: var(--accent-red); color: var(--accent-red); padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: var(--radius-sm);">
-            <i class="fa-regular fa-trash-can"></i> Remove
-          </button>
-        </td>
-      `;
-      adminBlogTableBody.appendChild(row);
-    });
-
-    // Bind remove button clicks
-    const deleteButtons = adminBlogTableBody.querySelectorAll('.btn-delete-blog');
-    deleteButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const postId = btn.getAttribute('data-post-id');
-        const confirmDelete = confirm("Are you sure you want to delete this insight? This action will remove it live from your website.");
-        if (confirmDelete) {
-          // Remove from local array
-          blogPosts = blogPosts.filter(p => p.id !== postId);
-          
-          // Sync with LocalStorage
-          localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
-          
-          // Refresh both the admin table AND the public blog grid!
-          renderAdminBlogTable();
-          renderBlogGrid('all');
-          
-          showToast("Article Removed Live!", "warning");
-        }
-      });
-    });
-  };
 
   // Render Grid
   const renderBlogGrid = (filterCategory = 'all') => {
@@ -907,7 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(post => {
       const card = document.createElement('div');
       card.className = 'blog-card';
-      
+
       // Determine correct badge classes
       let badgeClass = 'badge-logistics';
       if (post.category.includes('Customs')) badgeClass = 'badge-customs';
@@ -933,7 +1058,11 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      card.addEventListener('click', () => openArticleReader(post));
+      card.addEventListener('click', () => {
+        currentBlogPost = post;
+        openArticleReader(post);
+        window.location.hash = 'blog-article';
+      });
       blogGrid.appendChild(card);
     });
   };
@@ -941,7 +1070,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Open Single View Reader
   const openArticleReader = (post) => {
     if (!blogGrid || !blogSingleView || !blogArticleContent) return;
-    
+
     // Hide grid, show single reader view
     blogGrid.style.display = 'none';
     blogSingleView.style.display = 'block';
@@ -991,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (productDropdown) {
           productDropdown.value = "General Sourcing / Logistics Request";
         }
-        switchView('inquiry');
+        window.location.hash = 'inquiry';
         showToast("Welcome to Sourcing Center", "success");
       });
     }
@@ -1003,189 +1132,48 @@ document.addEventListener('DOMContentLoaded', () => {
   // Back button event listener
   if (btnBlogBack) {
     btnBlogBack.addEventListener('click', () => {
-      if (blogGrid && blogSingleView) {
-        blogGrid.style.display = 'grid';
-        blogSingleView.style.display = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.location.hash = 'blog';
     });
   }
 
-  // Filter toolbar button active toggle
-  blogFilterButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      blogFilterButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.getAttribute('data-blog-category');
-      renderBlogGrid(cat);
-    });
-  });
+  // Dynamically populate Category Filter Toolbar
+  const renderBlogFilters = () => {
+    const filterToolbar = document.querySelector('.blog-filter-toolbar');
+    if (!filterToolbar) return;
 
-  // Dynamic Cover & Thumbnail show/hide listeners for Custom URL Option
-  const blogImageSelect = document.getElementById('blogImage');
-  const blogImageCustom = document.getElementById('blogImageCustom');
-  const blogThumbnailSelect = document.getElementById('blogThumbnail');
-  const blogThumbnailCustom = document.getElementById('blogThumbnailCustom');
-
-  if (blogImageSelect && blogImageCustom) {
-    blogImageSelect.addEventListener('change', () => {
-      if (blogImageSelect.value === 'custom') {
-        blogImageCustom.style.display = 'block';
-        blogImageCustom.setAttribute('required', 'true');
-      } else {
-        blogImageCustom.style.display = 'none';
-        blogImageCustom.removeAttribute('required');
-        blogImageCustom.value = '';
+    // Default categories
+    const categories = new Set(["Logistics & Shipping", "Customs & Compliance", "Trade Finance & Laws"]);
+    
+    // Add custom ones from active blog posts
+    blogPosts.forEach(post => {
+      if (post.category && !categories.has(post.category)) {
+        categories.add(post.category);
       }
     });
-  }
 
-  if (blogThumbnailSelect && blogThumbnailCustom) {
-    blogThumbnailSelect.addEventListener('change', () => {
-      if (blogThumbnailSelect.value === 'custom') {
-        blogThumbnailCustom.style.display = 'block';
-        blogThumbnailCustom.setAttribute('required', 'true');
-      } else {
-        blogThumbnailCustom.style.display = 'none';
-        blogThumbnailCustom.removeAttribute('required');
-        blogThumbnailCustom.value = '';
-      }
+    filterToolbar.innerHTML = '<button class="blog-filter-btn active" data-blog-category="all">All Insights</button>';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'blog-filter-btn';
+      btn.setAttribute('data-blog-category', cat);
+      btn.textContent = cat;
+      filterToolbar.appendChild(btn);
     });
-  }
 
-  // Admin Publisher Form Submission Handlers
-  if (adminBlogForm) {
-    adminBlogForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const title = document.getElementById('blogTitle').value.trim();
-      const category = document.getElementById('blogCategory').value;
-      const readTime = document.getElementById('blogReadTime').value.trim();
-      
-      // Cover Image resolution
-      let coverImage = blogImageSelect ? blogImageSelect.value : '';
-      if (coverImage === 'custom' && blogImageCustom) {
-        coverImage = blogImageCustom.value.trim();
-      }
-
-      // Thumbnail Image resolution
-      let thumbnailImage = blogThumbnailSelect ? blogThumbnailSelect.value : '';
-      if (thumbnailImage === 'custom' && blogThumbnailCustom) {
-        thumbnailImage = blogThumbnailCustom.value.trim();
-      } else if (!thumbnailImage) {
-        thumbnailImage = coverImage;
-      }
-
-      const teaserSummary = document.getElementById('blogSummary').value.trim();
-      const rawBody = document.getElementById('blogBody').value.trim();
-
-      if (!title || !category || !readTime || !coverImage || !thumbnailImage || !teaserSummary || !rawBody) {
-        showToast("Please fill all mandatory article fields.", "warning");
-        return;
-      }
-
-      // Dynamic Article Paragraph formatting helper
-      const formatBodyToHTML = (text) => {
-        if (text.includes('<p>') || text.includes('<h3>') || text.includes('<ul>')) {
-          return text; // Preserve rich HTML if inputted
-        }
-        return text
-          .split(/\n\s*\n/)
-          .map(para => `<p>${escapeHTML(para.trim()).replace(/\n/g, '<br>')}</p>`)
-          .join('');
-      };
-
-      const dateFormatted = getFormattedArticleDate();
-      
-      const newPost = {
-        id: "post_" + Date.now(),
-        timestamp: new Date().toISOString(),
-        dateFormatted,
-        title,
-        category,
-        coverImage,
-        thumbnailImage,
-        readTime,
-        teaserSummary,
-        bodyContent: formatBodyToHTML(rawBody)
-      };
-
-      // Add to beginning of database
-      blogPosts.unshift(newPost);
-      localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
-
-      // Reset Form fields and hide custom fields
-      adminBlogForm.reset();
-      if (blogImageCustom) {
-        blogImageCustom.style.display = 'none';
-        blogImageCustom.removeAttribute('required');
-      }
-      if (blogThumbnailCustom) {
-        blogThumbnailCustom.style.display = 'none';
-        blogThumbnailCustom.removeAttribute('required');
-      }
-
-      // Close Administrative Desk Overlay
-      const adminOverlay = document.getElementById('adminOverlay');
-      if (adminOverlay) {
-        adminOverlay.classList.remove('open');
-      }
-
-      // Switch active view directly to Blog view and render
-      switchView('blog');
-      renderBlogGrid('all');
-      renderAdminBlogTable();
-
-      showToast("Daily Sourcing Insight Published Live!", "success");
+    // Re-bind events to the new buttons
+    const newFilterButtons = filterToolbar.querySelectorAll('.blog-filter-btn');
+    newFilterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        newFilterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.getAttribute('data-blog-category');
+        renderBlogGrid(cat);
+      });
     });
-  }
-
-  // Get nice formatted publication date: "May 29, 2026"
-  const getFormattedArticleDate = () => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const d = new Date();
-    return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
   };
 
-  // Bind direct Write Daily Blog button trigger
-  const btnBlogPublishDesk = document.getElementById('btnBlogPublishDesk');
-  if (btnBlogPublishDesk) {
-    btnBlogPublishDesk.addEventListener('click', () => {
-      // Trigger admin panel passcode check
-      const code = prompt("Enter Administrative Access Key (Hint: 1234):");
-      if (code === "1234" || code === "") {
-        renderAdminTable();
-        renderAdminBlogTable();
-        
-        // Show Administrative Desk Modal
-        const adminOverlay = document.getElementById('adminOverlay');
-        if (adminOverlay) {
-          adminOverlay.classList.add('open');
-        }
-        
-        // Switch Administrative Desk workspace tab to "Publish Daily Blog" active state
-        const tabBtnBlog = document.getElementById('tabBtnBlog');
-        const tabBtnInquiries = document.getElementById('tabBtnInquiries');
-        const adminContentBlog = document.getElementById('adminContentBlog');
-        const adminContentInquiries = document.getElementById('adminContentInquiries');
-        
-        if (tabBtnBlog && tabBtnInquiries && adminContentBlog && adminContentInquiries) {
-          tabBtnBlog.classList.add('active');
-          tabBtnInquiries.classList.remove('active');
-          adminContentBlog.classList.add('active');
-          adminContentInquiries.classList.remove('active');
-          adminContentBlog.style.display = 'block';
-          adminContentInquiries.style.display = 'none';
-        }
-        
-        showToast("Editorial Desk Unlocked!", "success");
-      } else if (code !== null) {
-        showToast("Access Denied: Invalid Security Key", "warning");
-      }
-    });
-  }
-
   // Set default view render of blog cards if view loads
+  renderBlogFilters();
   renderBlogGrid('all');
 
   // --- 10. Animated Stats Counter Engine (Intersection Observer) ---
@@ -1281,5 +1269,40 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // Prevent leaving the site directly without confirmation ONLY if form is dirty
+  window.addEventListener('beforeunload', (e) => {
+    const companyName = document.getElementById('companyName')?.value.trim() || '';
+    const buyerName = document.getElementById('buyerName')?.value.trim() || '';
+    const contactNo = document.getElementById('contactNo')?.value.trim() || '';
+    const buyerEmail = document.getElementById('buyerEmail')?.value.trim() || '';
+    const buyerAddress = document.getElementById('buyerAddress')?.value.trim() || '';
+    const buyerQuestion = document.getElementById('buyerQuestion')?.value.trim() || '';
+
+    // If any input is filled, warn the user
+    if (companyName || buyerName || contactNo || buyerEmail || buyerAddress || buyerQuestion) {
+      e.preventDefault();
+      e.returnValue = 'You have unsaved changes in your inquiry form. Are you sure you want to leave?';
+      return e.returnValue;
+    }
+  });
+
+
+
+  // --- Logo Click Navigation ---
+  const logoClick = document.getElementById('logoClick');
+  if (logoClick) {
+    logoClick.addEventListener('click', () => {
+      window.location.hash = 'home';
+    });
+  }
+
+  // Execute initial routing on load
+  // Ensure #home is always the base entry in browser history
+  // so pressing Back from any main view returns to Home
+  if (!window.location.hash || window.location.hash === '#') {
+    history.replaceState(null, '', '#home');
+  }
+  handleHashChange();
 
 });

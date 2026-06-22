@@ -442,7 +442,7 @@
           <div class="category-breadcrumb" id="productBreadcrumbs">
             <span class="breadcrumb-item cursor-pointer" id="breadHome">Catalog</span>
             <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="breadcrumb-item cursor-pointer active" id="breadCategory">Agriculture</span>
+            <span class="breadcrumb-item cursor-pointer active" id="breadCategory">Spices</span>
             <span class="breadcrumb-separator hidden" id="breadCommoditySep"><i class="fa-solid fa-chevron-right"></i></span>
             <span class="breadcrumb-item active hidden" id="breadCommodity">Turmeric</span>
           </div>
@@ -466,7 +466,7 @@
                 </div>
                 <div class="cat-card-info">
                   <span class="cat-card-badge">Primary Sourcing</span>
-                  <h3 class="cat-card-title">Agriculture & Spices</h3>
+                  <h3 class="cat-card-title">Spices</h3>
                   <p class="cat-card-desc">
                     Sourcing directly from deep farming clusters of India. Bypassing intermediates to guarantee absolute compliance, high active values, and premium standards.
                   </p>
@@ -548,21 +548,41 @@
                 </div>
               </div>
 
-              <!-- Commodity 3: Honey -->
-              <div class="commodity-spotlight-card amber" id="spotlightCardHoney">
+              <!-- Commodity 3: Cumin Seeds & Powder -->
+              <div class="commodity-spotlight-card gold" id="spotlightCardCumin">
                 <div class="spotlight-bg-gradient"></div>
                 <div class="spotlight-content">
-                  <span class="spotlight-tag">100% Pure Natural</span>
-                  <h3 class="spotlight-title">Organic Honey</h3>
+                  <span class="spotlight-tag">Aromatic Seed & Ground</span>
+                  <h3 class="spotlight-title">Cumin Seeds & Powder</h3>
                   <p class="spotlight-desc">
-                    Premium pure natural honey varieties featuring rich amber transparency, standard moisture metrics, and organic certifications. Sourced directly from Sundarbans and Himalayan foothills.
+                    Premium Sortex-cleaned whole seeds and aromatic ground powders. High essential oil concentration and pure earthy flavor profile. Machine-cleaned and packed in durable export bags.
                   </p>
                   <ul class="spotlight-features">
-                    <li><i class="fa-solid fa-circle-check"></i> Raw Wild Forest & Acacia</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Standard Low Moisture (Max 18%)</li>
-                    <li><i class="fa-solid fa-circle-check"></i> NMR Tested & Certified</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Min 99% Sortex Purity</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Min 1.5% Volatile Oil Content</li>
+                    <li><i class="fa-solid fa-circle-check"></i> 100% Pure & Natural</li>
                   </ul>
-                  <button class="btn btn-primary spotlight-action" id="btnSelectHoney">
+                  <button class="btn btn-primary spotlight-action" id="btnSelectCumin">
+                    Explore Sub-products <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Commodity 4: Red Chilli & Powder -->
+              <div class="commodity-spotlight-card red" id="spotlightCardChilli">
+                <div class="spotlight-bg-gradient"></div>
+                <div class="spotlight-content">
+                  <span class="spotlight-tag">Vibrant Pungency</span>
+                  <h3 class="spotlight-title">Red Chilli & Powder</h3>
+                  <p class="spotlight-desc">
+                    Stemless sun-dried whole red chilli pods and finely milled heat-consistent powders. Selected from prestigious Guntur agricultural clusters.
+                  </p>
+                  <ul class="spotlight-features">
+                    <li><i class="fa-solid fa-circle-check"></i> Stemless Grade-A Quality</li>
+                    <li><i class="fa-solid fa-circle-check"></i> 75,000 - 100,000 SHU Pungency</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Deep Red ASTA Color Value</li>
+                  </ul>
+                  <button class="btn btn-primary spotlight-action" id="btnSelectChilli">
                     Explore Sub-products <i class="fa-solid fa-chevron-right"></i>
                   </button>
                 </div>
@@ -577,306 +597,43 @@
           <div class="catalog-level catalog-level-3 hidden" id="catalogLevel3">
             <div class="catalog-navigation-bar">
               <button class="btn-back" id="btnBackToLevel2">
-                <i class="fa-solid fa-arrow-left-long"></i> Back to Commodities
+                <i class="fa-solid fa-arrow-left-long"></i> Back to Categories
               </button>
             </div>
 
             <!-- Grids Wrapper -->
-            <div class="grids-wrapper">
+            <div class="grids-wrapper" style="display: flex; flex-direction: column; gap: 4rem;">
 
-              <!-- Grid 3A: Turmeric Sub-products -->
-              <div class="sub-products-grid hidden" id="gridTurmeric">
-                
-                <!-- Product 1: Turmeric Powder -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/turmeric_powder.jpg" alt="Premium Turmeric Powder" class="product-img">
-                    <span class="product-badge">Top Exporter Spec</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 09103030</span>
-                    <h3 class="product-title">Turmeric Powder</h3>
-                    <p class="product-desc">
-                      Meticulously ground from the finest double-polished dried turmeric fingers. Known for its rich golden-orange color, high curcumin content, and therapeutic qualities. Perfect for culinary formulations, nutraceuticals, and cosmetic applications worldwide.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Curcumin Value</span>
-                        <span class="spec-value">Min 3.5% - 4.5%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Moisture Content</span>
-                        <span class="spec-value">Max 8%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Total Ash</span>
-                        <span class="spec-value">Max 6.5%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">25kg / 50kg Multi-layer Kraft / PP Bags</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Erode (Tamil Nadu) / Nizamabad (Telangana)</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Turmeric Powder (09103030)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Product 2: Turmeric Finger Dried -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/turmeric_finger.jpg" alt="Dried Turmeric Finger" class="product-img">
-                    <span class="product-badge">Double Polished</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 09103020</span>
-                    <h3 class="product-title">Turmeric Finger (Dried)</h3>
-                    <p class="product-desc">
-                      Premium selected cured rhizomes meticulously dried and polished. Highly demanded across pharmaceutical and food-processing verticals globally. Free from extraneous matter, pests, and chemical coloring. Highly durable for long-term shipping.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Polishing Grade</span>
-                        <span class="spec-value">Double Polished (Super Clean)</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Moisture Content</span>
-                        <span class="spec-value">Max 9%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Flexibility / Broken</span>
-                        <span class="spec-value">Max 2%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">25kg / 50kg Heavy-Duty Jute Bags</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Sangli (Maharashtra) / Nizamabad (Telangana)</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Turmeric Finger Dried (09103020)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Product 3: Fresh Turmeric -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/turmeric_fresh.jpg" alt="Fresh Turmeric Rhizomes" class="product-img">
-                    <span class="product-badge">Cold Chain Dispatched</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 09103010</span>
-                    <h3 class="product-title">Fresh Turmeric</h3>
-                    <p class="product-desc">
-                      Whole, organic, and hand-selected fresh turmeric rhizomes harvested under sustainable practices. Shipped inside temperature-monitored reefers to preserve active volatile oils, distinct intense aroma, and fresh crisp texture. Ideal for extracting essential juices.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Product Form</span>
-                        <span class="spec-value">Whole Fresh Rhizomes</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Moisture Content</span>
-                        <span class="spec-value">Natural Fresh state (Harvest moisture)</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Cleanliness Standard</span>
-                        <span class="spec-value">Pressure-washed, completely soil-free</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">20kg / 25kg Aerated Mesh Bags / Cartons</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Gandhinagar (Gujarat) / Andhra Pradesh</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Fresh Turmeric (09103010)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
-
+              <!-- Section: Turmeric -->
+              <div class="commodity-section" id="sectionTurmeric">
+                <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                  <i class="fa-solid fa-wheat-awn" style="color: var(--accent-yellow);"></i> Turmeric (Haldi)
+                </h3>
+                <div class="sub-products-grid" id="gridTurmeric"></div>
               </div>
 
-              <!-- Grid 3B: Psyllium Sub-products -->
-              <div class="sub-products-grid hidden" id="gridPsyllium">
-                
-                <!-- Product 4: Psyllium Husk (Whole) -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/psyllium_husk.png" alt="Premium Whole Psyllium Husk" class="product-img">
-                    <span class="product-badge">99% Pure Husk</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 12119032</span>
-                    <h3 class="product-title">Psyllium Husk (Whole)</h3>
-                    <p class="product-desc">
-                      Premium whole seed husks of Plantago ovata. Outstanding soluble dietary fiber that acts as an excellent bulk-forming dietary supplement. Free from chemical bleaching or contaminants. Promotes healthy digestion and colon health globally.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Purity Standard</span>
-                        <span class="spec-value">99% / 98% / 95% USP Purity</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Swell Volume</span>
-                        <span class="spec-value">Min 40 ml / gram</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Moisture Content</span>
-                        <span class="spec-value">Max 11%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">15kg/25kg Multi-wall Kraft Bags / PP Bags</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Sidhpur (Gujarat) / Rajasthan border clusters</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Psyllium Husk Whole (12119032)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Product 5: Psyllium Husk Powder -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/psyllium_powder.png" alt="Fine Milled Psyllium Husk Powder" class="product-img">
-                    <span class="product-badge">Ultra-Fine Milled</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 12119033</span>
-                    <h3 class="product-title">Psyllium Husk Powder</h3>
-                    <p class="product-desc">
-                      Super-fine milled psyllium husk powder (available in 40 mesh to 100 mesh densities). Easy to dissolve and blend into functional beverages, gluten-free baking formulations, pharmaceutical binders, and fiber drinks. Fully pasteurized and clean state.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Mesh Size Density</span>
-                        <span class="spec-value">40 Mesh / 60 Mesh / 100 Mesh USP</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Purity Standard</span>
-                        <span class="spec-value">99% / 98% Purity</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Swell Volume</span>
-                        <span class="spec-value">Min 45 ml / gram</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">20kg / 25kg Kraft Bags with Inner PE Liners</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Gandhinagar (Gujarat) processing centers</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Psyllium Husk Powder (12119033)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
-
+              <!-- Section: Psyllium Husk -->
+              <div class="commodity-section" id="sectionPsyllium">
+                <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                  <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i> Psyllium Husk (Isabgol)
+                </h3>
+                <div class="sub-products-grid" id="gridPsyllium"></div>
               </div>
 
-              <!-- Grid 3C: Honey Sub-products -->
-              <div class="sub-products-grid hidden" id="gridHoney">
-                
-                <!-- Product 6: Natural Raw Honey -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/raw_honey.png" alt="Natural Raw Honey (Wild Forest)" class="product-img">
-                    <span class="product-badge">100% Wild Forest</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 04090000</span>
-                    <h3 class="product-title">Natural Raw Honey</h3>
-                    <p class="product-desc">
-                      100% pure, raw, unfiltered forest honey sourced directly from wild bee hives in the Sundarbans and deep Himalayan woods. Rich in natural pollens, vitamins, and antioxidants. Never pasteurized or micro-filtered to preserve active healthy enzymes.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Moisture Content</span>
-                        <span class="spec-value">Max 18% (Premium Low Moisture)</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Fructose/Glucose</span>
-                        <span class="spec-value">Ratio min 1.0 (Standard multi-flora)</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">HMF Metric</span>
-                        <span class="spec-value">Max 40 mg/kg</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">300kg Food Grade Steel Drums / custom jars</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Sundarbans Mangroves / Himalayan Foothills</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Natural Raw Honey (04090000)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
+              <!-- Section: Cumin -->
+              <div class="commodity-section" id="sectionCumin">
+                <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                  <i class="fa-solid fa-seedling" style="color: var(--accent-yellow);"></i> Cumin Seeds & Powder
+                </h3>
+                <div class="sub-products-grid" id="gridCumin"></div>
+              </div>
 
-                <!-- Product 7: Acacia Honey -->
-                <div class="product-card">
-                  <div class="product-img-wrapper">
-                    <img src="images/acacia_honey.png" alt="Premium Organic Acacia Honey" class="product-img">
-                    <span class="product-badge">Premium Single-Flora</span>
-                  </div>
-                  <div class="product-info">
-                    <span class="hs-code-tag">HS CODE: 04090000</span>
-                    <h3 class="product-title">Acacia Honey</h3>
-                    <p class="product-desc">
-                      Ultra-pure single-flora Acacia honey with an elegant, transparent light amber hue and mild floral flavor. Stays liquid naturally for extended durations due to its exceptionally high natural fructose concentration. Sourced from organic acacia orchards.
-                    </p>
-                    <ul class="product-specs">
-                      <li class="spec-row">
-                        <span class="spec-name">Color Value</span>
-                        <span class="spec-value">Pfund Scale max 15mm (Extra Light Amber)</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Moisture Content</span>
-                        <span class="spec-value">Max 17.5%</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Diastase Activity</span>
-                        <span class="spec-value">Min 8 Schade units</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Packing Options</span>
-                        <span class="spec-value">25kg HDPE Carboys / 300kg Steel Drums</span>
-                      </li>
-                      <li class="spec-row">
-                        <span class="spec-name">Origin Sourcing</span>
-                        <span class="spec-value">Northern Himalayan Orchards, India</span>
-                      </li>
-                    </ul>
-                    <div class="product-actions">
-                      <button class="btn btn-primary quick-inquire-btn" data-product="Acacia Honey (04090000)">Inquire Now</button>
-                    </div>
-                  </div>
-                </div>
-
+              <!-- Section: Red Chilli -->
+              <div class="commodity-section" id="sectionChilli">
+                <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                  <i class="fa-solid fa-pepper-hot" style="color: var(--accent-red);"></i> Red Chilli & Powder
+                </h3>
+                <div class="sub-products-grid" id="gridChilli"></div>
               </div>
 
             </div>
@@ -1262,9 +1019,7 @@
             <button class="blog-filter-btn" data-blog-category="Logistics & Shipping">Logistics & Shipping</button>
             <button class="blog-filter-btn" data-blog-category="Customs & Compliance">Customs & Compliance</button>
             <button class="blog-filter-btn" data-blog-category="Trade Finance & Laws">Trade Finance & Laws</button>
-            <button class="blog-filter-btn" id="btnBlogPublishDesk" style="border-color: var(--accent-red); color: var(--accent-red); margin-left: auto; display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fa-solid fa-pen-nib"></i> Write Daily Blog
-            </button>
+
           </div>
 
           <!-- Blog Card Grid -->
@@ -1459,7 +1214,9 @@
                 <div class="form-group">
                   <label for="productCategory" class="form-label">Product Category</label>
                   <select id="productCategory" class="form-select">
-                    <option value="Agriculture & Spices">Agriculture & Spices</option>
+                    <option value="all">All Categories</option>
+                    <option value="Spices">Spices (Turmeric, Cumin, Chilli)</option>
+                    <option value="Psyllium">Dietary Fiber (Psyllium)</option>
                   </select>
                 </div>
 
@@ -1512,174 +1269,6 @@
 
   </main>
 
-  <!-- ==========================================================================
-       Locked Admin Modal Dashboard (Saves to Excel)
-       ========================================================================== -->
-  <div class="admin-overlay" id="adminOverlay">
-    <div class="admin-modal">
-      <div class="admin-header">
-        <div class="admin-title-area">
-          <i class="fa-solid fa-gears"></i>
-          <h3>MY EXPORT WORLD - Administrative Desk</h3>
-        </div>
-        <button class="admin-close-btn" id="adminCloseBtn" aria-label="Close Dashboard">&times;</button>
-      </div>
-      
-      <div class="admin-content">
-        <!-- Admin Dashboard Tabs -->
-        <div class="admin-tabs" style="display: flex; gap: 1rem; border-bottom: 2px solid var(--border-light); margin-bottom: 2rem;">
-          <button class="admin-tab-btn active" id="tabBtnInquiries"><i class="fa-solid fa-envelope-open-text"></i> Inquiry Tickets</button>
-          <button class="admin-tab-btn" id="tabBtnBlog"><i class="fa-solid fa-pen-nib"></i> Publish Daily Blog</button>
-        </div>
-
-        <!-- Tab 1: Inquiry Tickets Content -->
-        <div class="admin-tab-content active" id="adminContentInquiries">
-          <div class="admin-toolbar">
-            <div class="admin-toolbar-stats">
-              <div class="admin-stat-pill"><i class="fa-solid fa-envelope-open-text"></i> Total Tickets: <span id="adminStatTotal">0</span></div>
-              <div class="admin-stat-pill"><i class="fa-solid fa-database"></i> Database: <span>Local Secure (Excel Export)</span></div>
-            </div>
-            <div>
-              <button class="btn btn-primary" id="adminExportBtn" style="padding: 0.65rem 1.4rem; font-size: 0.85rem; border-radius: var(--radius-sm);">
-                <i class="fa-regular fa-file-excel"></i> Download Excel Report (.csv)
-              </button>
-              <button class="btn btn-secondary" id="adminClearBtn" style="padding: 0.65rem 1.4rem; font-size: 0.85rem; border-radius: var(--radius-sm); border-color: var(--accent-red); color: var(--accent-red); margin-left: 0.5rem;">
-                <i class="fa-regular fa-trash-can"></i> Clear All Data
-              </button>
-            </div>
-          </div>
-          
-          <!-- Table container -->
-          <div class="admin-table-container">
-            <table class="admin-table" id="adminTable">
-              <thead>
-                <tr>
-                  <th>Date / Time</th>
-                  <th>Company Name</th>
-                  <th>Contact Name</th>
-                  <th>Contact No</th>
-                  <th>Email Address</th>
-                  <th>Location / Port</th>
-                  <th>Product Selected</th>
-                  <th>Requirements</th>
-                </tr>
-              </thead>
-              <tbody id="adminTableBody">
-                <!-- Dynamically populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 2: Publish Daily Blog Content -->
-        <div class="admin-tab-content" id="adminContentBlog" style="display: none;">
-          <div style="max-width: 750px; margin: 0 auto; padding: 0.5rem 0;">
-            <h4 style="font-size: 1.3rem; margin-bottom: 0.4rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
-              <i class="fa-solid fa-pen-nib" style="color: var(--accent-red);"></i> Publish a Daily Export Insight
-            </h4>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.8rem;">Write a general trade, shipping, customs, or payment compliance insight to share with international buyers. It will publish instantly to the live Blog view!</p>
-            
-            <form class="inquiry-form" id="adminBlogForm" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
-              <!-- Title -->
-              <div class="form-group full-width">
-                <label for="blogTitle" class="form-label">Article Title <span>*</span></label>
-                <input type="text" id="blogTitle" class="form-input" placeholder="e.g. Navigating Maritime Freight: Essential Guide..." required>
-              </div>
-
-              <!-- Category -->
-              <div class="form-group">
-                <label for="blogCategory" class="form-label">Trade Category <span>*</span></label>
-                <select id="blogCategory" class="form-select" required>
-                  <option value="" disabled selected>-- Select Category --</option>
-                  <option value="Logistics & Shipping">Logistics & Shipping</option>
-                  <option value="Customs & Compliance">Customs & Compliance</option>
-                  <option value="Trade Finance & Laws">Trade Finance & Laws</option>
-                </select>
-              </div>
-
-              <!-- Read Time -->
-              <div class="form-group">
-                <label for="blogReadTime" class="form-label">Estimated Read Time <span>*</span></label>
-                <input type="text" id="blogReadTime" class="form-input" placeholder="e.g. 5 min read" required>
-              </div>
-
-              <!-- Cover Image Selector -->
-              <div class="form-group">
-                <label for="blogImage" class="form-label">Cover Sourcing Visual (Article Header) <span>*</span></label>
-                <select id="blogImage" class="form-select" required>
-                  <option value="images/blog_freight.png" selected>Ocean Freight Container Logistics (Default)</option>
-                  <option value="images/blog_finance.png">Global Trade Finance & Letters of Credit</option>
-                  <option value="images/blog_customs.png">Customs Clearances Papers & flatlay</option>
-                  <option value="images/blog_turmeric.png">Golden Organic Spices & Turmeric</option>
-                  <option value="images/blog_psyllium.png">Fibers & High-Purity Psyllium Husk</option>
-                  <option value="images/blog_honey.png">Acacia Single-Flora Golden Honey</option>
-                  <option value="custom">-- Use Custom URL --</option>
-                </select>
-                <input type="text" id="blogImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste cover image URL (e.g. images/my_image.png)">
-              </div>
-
-              <!-- Thumbnail Image Selector -->
-              <div class="form-group">
-                <label for="blogThumbnail" class="form-label">Grid Card Thumbnail <span>*</span></label>
-                <select id="blogThumbnail" class="form-select" required>
-                  <option value="images/blog_freight.png" selected>Ocean Freight Container Logistics (Default)</option>
-                  <option value="images/blog_finance.png">Global Trade Finance & Letters of Credit</option>
-                  <option value="images/blog_customs.png">Customs Clearances Papers & flatlay</option>
-                  <option value="images/blog_turmeric.png">Golden Organic Spices & Turmeric</option>
-                  <option value="images/blog_psyllium.png">Fibers & High-Purity Psyllium Husk</option>
-                  <option value="images/blog_honey.png">Acacia Single-Flora Golden Honey</option>
-                  <option value="custom">-- Use Custom URL --</option>
-                </select>
-                <input type="text" id="blogThumbnailCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste card thumbnail URL (e.g. images/my_thumb.png)">
-              </div>
-
-              <!-- Teaser Summary -->
-              <div class="form-group full-width">
-                <label for="blogSummary" class="form-label">Teaser Summary (Grid Card Teaser) <span>*</span></label>
-                <input type="text" id="blogSummary" class="form-input" placeholder="A brief 1-2 sentence teaser to hook readers inside the blog card grid..." required>
-              </div>
-
-              <!-- Full Article Body -->
-              <div class="form-group full-width">
-                <label for="blogBody" class="form-label">Article Body Content (HTML / Paragraphs supported) <span>*</span></label>
-                <textarea id="blogBody" class="form-textarea" style="min-height: 180px;" placeholder="Write your full daily trade insight article here. Use double line breaks for paragraph breaks. Standard HTML tags like <ul>, <li>, and <strong> are fully supported..." required></textarea>
-              </div>
-
-              <!-- Submit Button -->
-              <div class="form-submit-wrapper">
-                <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.8rem 2.2rem; font-size: 0.9rem;"><i class="fa-solid fa-paper-plane"></i> Publish Live Now</button>
-              </div>
-            </form>
-
-            <!-- Manage Blog Posts Section -->
-            <div style="margin-top: 3.5rem; padding-top: 2rem; border-top: 2px solid var(--border-light);">
-              <h4 style="font-size: 1.3rem; margin-bottom: 0.4rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
-                <i class="fa-solid fa-trash-can" style="color: var(--accent-red);"></i> Currently Active Insights
-              </h4>
-              <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Below is the list of all active trade insights on your website. You can instantly remove any outdated articles from this panel.</p>
-              
-              <div class="admin-table-container">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Category</th>
-                      <th>Read Time</th>
-                      <th>Date</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminBlogTableBody">
-                    <!-- Dynamic active blog list with Delete buttons -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ==========================================================================
        Global Footer & Contacts
@@ -1744,9 +1333,7 @@
         <div class="footer-copyright">
           &copy; 2026 <strong>MY EXPORT WORLD</strong>. All Rights Reserved. | Slogan: Your Gateway to Global Trade.
         </div>
-        <div class="footer-copyright">
-          <span class="footer-admin-trigger" id="adminTriggerBtn"><i class="fa-solid fa-key"></i> System Admin Panel</span>
-        </div>
+
       </div>
     </div>
   </footer>
@@ -1762,6 +1349,8 @@
       <i class="fa-brands fa-whatsapp"></i>
     </a>
   </div>
+
+
 
   <!-- Floating Toast Messages Container -->
   <div class="toast-container" id="toastContainer"></div>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MY EXPORT WORLD - Administrative Console</title>
+  
+  <!-- Base website styles & variables -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Standalone admin styles -->
+  <link rel="stylesheet" href="admin.css">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-body">
+
+  <!-- ==========================================================================
+       1. Lock Screen (Authorization Required)
+       ========================================================================== -->
+  <div class="auth-container" id="authContainer">
+    <div class="auth-card" id="authCard">
+      <div class="auth-logo">
+        <img src="images/logo.png" alt="MY EXPORT WORLD Logo">
+        <h2>MY EXPORT <span>WORLD</span></h2>
+      </div>
+      <p class="auth-desc">
+        This is a restricted, secure system workspace. Please enter your Administrative Access Key to enter the console.
+      </p>
+      
+      <form id="authForm">
+        <div class="auth-form-group">
+          <label for="accessKeyInput" class="form-label" style="text-align: center; display: block; font-weight:700;">Security Access Key <span>*</span></label>
+          <div class="auth-input-wrapper">
+            <input type="password" id="accessKeyInput" class="auth-input" maxlength="32" placeholder="••••" required autocomplete="current-password">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+        </div>
+        
+        <button type="submit" class="auth-btn">
+          Unlock Desk <i class="fa-solid fa-unlock-keyhole"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. Administrative Console Dashboard (Unlocked State)
+       ========================================================================== -->
+  <div class="dashboard-container" id="dashboardContainer">
+    
+    <!-- Top Dashboard Navigation Bar -->
+    <header class="dash-header">
+      <div class="dash-logo-area">
+        <img src="images/logo.png" alt="MY EXPORT WORLD Logo">
+        <h1>MY EXPORT <span>WORLD</span> <span style="font-size: 0.9rem; font-weight: 500; text-transform: uppercase; color: var(--accent-yellow); margin-left: 0.5rem;">Console</span></h1>
+      </div>
+      <div class="dash-header-actions">
+        <a href="index.html" class="btn-back-home">
+          <i class="fa-solid fa-arrow-left"></i> View Live Site
+        </a>
+        <button class="btn-logout" id="btnLogout" title="Log Out / Lock Console">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="dash-main">
+      
+      <!-- Tab Control Navigation -->
+      <nav class="dash-tab-bar">
+        <button class="dash-tab-btn active" id="tabBtnInquiries">
+          <i class="fa-solid fa-envelope-open-text"></i> Inquiry Tickets
+        </button>
+        <button class="dash-tab-btn" id="tabBtnBlog">
+          <i class="fa-solid fa-pen-nib"></i> Sourcing Insights Editorial
+        </button>
+        <button class="dash-tab-btn" id="tabBtnProducts">
+          <i class="fa-solid fa-wheat-awn"></i> Product Catalog
+        </button>
+      </nav>
+
+      <!-- TAB 1: Inquiries Management Desk -->
+      <section class="dash-panel active" id="panelInquiries">
+        <!-- Inquiry Stats widgets -->
+        <div class="stats-grid">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-inbox"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatInquiriesTotal">0</span>
+              <span class="stat-lbl">Total Tickets</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-fire-flame-curved"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatInquiriesToday">0</span>
+              <span class="stat-lbl">Received Today</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-database"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" style="font-size: 1.15rem; font-weight:700; margin-top: 0.3rem;">Local Secure</span>
+              <span class="stat-lbl">Database Registry</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toolbar operations -->
+        <div class="dash-toolbar">
+          <div class="dash-search-box">
+            <input type="text" id="inquirySearchInput" class="dash-search-input" placeholder="Search by Buyer, Company, Product, or text...">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <div class="toolbar-buttons">
+            <button class="btn-dash btn-dash-primary" id="adminExportBtn">
+              <i class="fa-regular fa-file-excel"></i> Export Spreadsheet (.csv)
+            </button>
+            <button class="btn-dash btn-dash-danger" id="adminClearBtn">
+              <i class="fa-regular fa-trash-can"></i> Clear All Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Inquiries Table Card -->
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 14%;">Date / Time</th>
+                  <th style="width: 14%;">Company Name</th>
+                  <th style="width: 12%;">Contact Name</th>
+                  <th style="width: 11%;">Contact No</th>
+                  <th style="width: 13%;">Email Address</th>
+                  <th style="width: 12%;">Physical Address</th>
+                  <th style="width: 12%;">Product Selected</th>
+                  <th style="width: 16%;">Buyer Specifics</th>
+                  <th style="width: 6%; text-align: center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody">
+                <!-- Javascript populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Sourcing Insights Editorial Panel -->
+      <section class="dash-panel" id="panelBlog">
+        <!-- Blog Stats widget -->
+        <div class="stats-grid" style="margin-bottom: 2.5rem;">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-newspaper"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatBlogsTotal">0</span>
+              <span class="stat-lbl">Articles Published</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-globe"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" style="font-size: 1.15rem; font-weight:700; margin-top: 0.3rem;">Live Synchronized</span>
+              <span class="stat-lbl">Publishing Mode</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Form Card -->
+        <div class="dash-form-wrapper">
+          <h4 class="dash-form-title">
+            <i class="fa-solid fa-pen-nib" style="color: var(--accent-red);"></i> Create Sourcing Insight
+          </h4>
+          <p class="dash-form-desc">Draft and publish standard international logistics, compliance, and trade finance advice for buyers. Published live instantly.</p>
+          
+          <form class="inquiry-form" id="adminBlogForm" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+            <!-- Title -->
+            <div class="form-group full-width">
+              <label for="blogTitle" class="form-label">Article Title <span>*</span></label>
+              <input type="text" id="blogTitle" class="form-input" placeholder="e.g. Navigating Maritime Freight: Essential Guide..." required>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label for="blogCategory" class="form-label">Trade Category <span>*</span></label>
+              <select id="blogCategory" class="form-select" required>
+                <option value="" disabled selected>-- Select Category --</option>
+                <option value="Logistics & Shipping">Logistics & Shipping</option>
+                <option value="Customs & Compliance">Customs & Compliance</option>
+                <option value="Trade Finance & Laws">Trade Finance & Laws</option>
+                <option value="custom">-- Custom Trade Category --</option>
+              </select>
+              <input type="text" id="blogCategoryCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter Custom Trade Category">
+            </div>
+
+            <!-- Read Time -->
+            <div class="form-group">
+              <label for="blogReadTime" class="form-label">Estimated Read Time <span>*</span></label>
+              <input type="text" id="blogReadTime" class="form-input" placeholder="e.g. 5 min read" required>
+            </div>
+
+            <!-- Cover Image Selector -->
+            <div class="form-group">
+              <label for="blogImage" class="form-label">Cover Sourcing Visual (Article Header) <span>*</span></label>
+              <select id="blogImage" class="form-select" required>
+                <option value="images/blog_freight.png" selected>Ocean Freight Container Logistics (Default)</option>
+                <option value="images/blog_finance.png">Global Trade Finance & Letters of Credit</option>
+                <option value="images/blog_customs.png">Customs Clearances Papers & flatlay</option>
+                <option value="images/blog_turmeric.png">Golden Organic Spices & Turmeric</option>
+                <option value="images/blog_psyllium.png">Fibers & High-Purity Psyllium Husk</option>
+                <option value="images/blog_honey.png">Acacia Single-Flora Golden Honey</option>
+                <option value="custom">-- Use Custom URL --</option>
+                <option value="upload">-- Upload Local Image --</option>
+              </select>
+              <input type="text" id="blogImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste cover image URL (e.g. images/my_image.png)">
+              <input type="file" id="blogImageFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Thumbnail Image Selector -->
+            <div class="form-group">
+              <label for="blogThumbnail" class="form-label">Grid Card Thumbnail <span>*</span></label>
+              <select id="blogThumbnail" class="form-select" required>
+                <option value="images/blog_freight.png" selected>Ocean Freight Container Logistics (Default)</option>
+                <option value="images/blog_finance.png">Global Trade Finance & Letters of Credit</option>
+                <option value="images/blog_customs.png">Customs Clearances Papers & flatlay</option>
+                <option value="images/blog_turmeric.png">Golden Organic Spices & Turmeric</option>
+                <option value="images/blog_psyllium.png">Fibers & High-Purity Psyllium Husk</option>
+                <option value="images/blog_honey.png">Acacia Single-Flora Golden Honey</option>
+                <option value="custom">-- Use Custom URL --</option>
+                <option value="upload">-- Upload Local Image --</option>
+              </select>
+              <input type="text" id="blogThumbnailCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste card thumbnail URL (e.g. images/my_thumb.png)">
+              <input type="file" id="blogThumbnailFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Teaser Summary -->
+            <div class="form-group full-width">
+              <label for="blogSummary" class="form-label">Teaser Summary (Grid Card Teaser) <span>*</span></label>
+              <input type="text" id="blogSummary" class="form-input" placeholder="A brief 1-2 sentence teaser to hook readers inside the blog card grid..." required>
+            </div>
+
+            <!-- Full Article Body -->
+            <div class="form-group full-width">
+              <label for="blogBody" class="form-label">Article Body Content (HTML / Paragraphs supported) <span>*</span></label>
+              <textarea id="blogBody" class="form-textarea" style="min-height: 180px;" placeholder="Write your full daily trade insight article here. Use double line breaks for paragraph breaks. Standard HTML tags like <ul>, <li>, and <strong> are fully supported..." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-submit-wrapper">
+              <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.8rem 2.2rem; font-size: 0.9rem;">
+                <i class="fa-solid fa-paper-plane"></i> Publish Live Now
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manage Blog Posts List -->
+        <div style="margin-top: 4rem;">
+          <h4 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
+            <i class="fa-solid fa-trash-can" style="color: var(--accent-red);"></i> Currently Active Insights
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Below is the list of all active trade insights on your website. You can instantly remove any outdated articles from this panel.</p>
+          
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="dash-table" style="min-width: 800px;">
+                <thead>
+                  <tr>
+                    <th style="width: 50%;">Title</th>
+                    <th style="width: 20%;">Category</th>
+                    <th style="width: 12%;">Read Time</th>
+                    <th style="width: 12%;">Date</th>
+                    <th style="width: 6%; text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminBlogTableBody">
+                  <!-- Javascript populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- TAB 3: Product Catalog Management Panel -->
+      <section class="dash-panel" id="panelProducts">
+        <!-- Product Stats widget -->
+        <div class="stats-grid" style="margin-bottom: 2.5rem;">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsTotal">0</span>
+              <span class="stat-lbl">Active Commodities</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-wheat-awn"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsTurmeric">0</span>
+              <span class="stat-lbl">Turmeric Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsPsyllium">0</span>
+              <span class="stat-lbl">Psyllium Husk Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-seedling"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsCumin">0</span>
+              <span class="stat-lbl">Cumin Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-pepper-hot"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsChilli">0</span>
+              <span class="stat-lbl">Red Chilli Products</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Form Card -->
+        <div class="dash-form-wrapper">
+          <h4 class="dash-form-title">
+            <i class="fa-solid fa-wheat-awn" style="color: var(--accent-red);"></i> Add Product to Catalog
+          </h4>
+          <p class="dash-form-desc">Create and publish active agricultural commodities to the live catalog categories. All catalog items sync instantly with the public homepage.</p>
+          
+          <form class="inquiry-form" id="adminProductForm" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+            <!-- Title -->
+            <div class="form-group">
+              <label for="prodTitle" class="form-label">Product Name / Title <span>*</span></label>
+              <input type="text" id="prodTitle" class="form-input" placeholder="e.g. Organic Turmeric Powder" required>
+            </div>
+
+            <!-- HS Code -->
+            <div class="form-group">
+              <label for="prodHsCode" class="form-label">HS Code <span>*</span></label>
+              <input type="text" id="prodHsCode" class="form-input" placeholder="e.g. 09103030" required>
+            </div>
+
+            <!-- Commodity Group -->
+            <div class="form-group">
+              <label for="prodCategory" class="form-label">Commodity Group / Category <span>*</span></label>
+              <select id="prodCategory" class="form-select" required>
+                <option value="" disabled selected>-- Select Category --</option>
+                <option value="turmeric">Turmeric (Haldi)</option>
+                <option value="psyllium">Psyllium Husk (Isabgol)</option>
+                <option value="cumin">Cumin Seeds & Powder</option>
+                <option value="chilli">Red Chilli & Powder</option>
+                <option value="custom">-- Custom Commodity Group --</option>
+              </select>
+              <input type="text" id="prodCategoryCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter Custom Commodity Group/Category">
+            </div>
+
+            <!-- Badge -->
+            <div class="form-group">
+              <label for="prodBadge" class="form-label">Card Badge / Grade Tag (e.g. 99% Pure)</label>
+              <input type="text" id="prodBadge" class="form-input" placeholder="e.g. Double Polished">
+            </div>
+
+            <!-- Image Selector -->
+            <div class="form-group full-width">
+              <label for="prodImage" class="form-label">Product Showcase Image <span>*</span></label>
+              <select id="prodImage" class="form-select" required>
+                <option value="images/turmeric_finger.jpg" selected>Dried Turmeric Finger (Preset)</option>
+                <option value="images/turmeric_powder.jpg">Turmeric Powder (Preset)</option>
+                <option value="images/turmeric_fresh.jpg">Fresh Turmeric (Preset)</option>
+                <option value="images/psyllium_husk.png">Psyllium Husk Whole (Preset)</option>
+                <option value="images/psyllium_powder.png">Psyllium Husk Powder (Preset)</option>
+                <option value="images/cumin_seeds.png">Cumin Seeds (Preset)</option>
+                <option value="images/cumin_powder.png">Cumin Powder (Preset)</option>
+                <option value="images/chilli_whole.png">Dried Whole Red Chilli (Preset)</option>
+                <option value="images/chilli_powder.png">Red Chilli Powder (Preset)</option>
+                <option value="custom">-- Use Custom URL --</option>
+                <option value="upload">-- Upload Local Image --</option>
+              </select>
+              <input type="text" id="prodImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste image URL (e.g. images/my_image.png)">
+              <input type="file" id="prodImageFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label for="prodDescription" class="form-label">Product Short Description <span>*</span></label>
+              <textarea id="prodDescription" class="form-textarea" style="min-height: 80px;" placeholder="Write a short summary card description..." required></textarea>
+            </div>
+
+            <!-- Specifications Heading -->
+            <div class="form-group full-width" style="margin-top: 0.5rem; margin-bottom: -0.5rem;">
+              <h5 style="font-size: 1rem; color: var(--primary-blue-dark); font-weight: 700;">Product Technical Specifications (Up to 5)</h5>
+              <p style="color: var(--text-muted); font-size: 0.8rem;">Enter technical properties to display on the product card (e.g., Origin, Packing, Purity, Curcumin value).</p>
+            </div>
+
+            <!-- Spec Pair 1 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 1: Name</label>
+              <input type="text" id="prodSpecName1" class="form-input" placeholder="e.g. Origin">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 1: Value</label>
+              <input type="text" id="prodSpecVal1" class="form-input" placeholder="e.g. Nizamabad, India">
+            </div>
+
+            <!-- Spec Pair 2 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 2: Name</label>
+              <input type="text" id="prodSpecName2" class="form-input" placeholder="e.g. Curcumin">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 2: Value</label>
+              <input type="text" id="prodSpecVal2" class="form-input" placeholder="e.g. Min 3.5%">
+            </div>
+
+            <!-- Spec Pair 3 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 3: Name</label>
+              <input type="text" id="prodSpecName3" class="form-input" placeholder="e.g. Packing">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 3: Value</label>
+              <input type="text" id="prodSpecVal3" class="form-input" placeholder="e.g. 25/50 kg PP Bags">
+            </div>
+
+            <!-- Spec Pair 4 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 4: Name</label>
+              <input type="text" id="prodSpecName4" class="form-input" placeholder="e.g. Purity">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 4: Value</label>
+              <input type="text" id="prodSpecVal4" class="form-input" placeholder="e.g. Min 99%">
+            </div>
+
+            <!-- Spec Pair 5 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 5: Name</label>
+              <input type="text" id="prodSpecName5" class="form-input" placeholder="e.g. Moisture">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 5: Value</label>
+              <input type="text" id="prodSpecVal5" class="form-input" placeholder="e.g. Max 10%">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-submit-wrapper full-width">
+              <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.8rem 2.2rem; font-size: 0.9rem;">
+                <i class="fa-solid fa-paper-plane"></i> Add to Catalog
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manage Catalog List -->
+        <div style="margin-top: 4rem;">
+          <h4 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
+            <i class="fa-solid fa-list-check" style="color: var(--accent-red);"></i> Active Catalog Commodities
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Below is the list of all active commodities on your public website catalog. You can instantly remove items from the live feed.</p>
+          
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="dash-table" style="min-width: 800px;">
+                <thead>
+                  <tr>
+                    <th style="width: 10%;">Image</th>
+                    <th style="width: 30%;">Product Title</th>
+                    <th style="width: 20%;">Commodity Group</th>
+                    <th style="width: 15%;">HS Code</th>
+                    <th style="width: 15%;">Grade Badge</th>
+                    <th style="width: 10%; text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminProductTableBody">
+                  <!-- Javascript populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Floating Toast Messages Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Javascript Dashboard Logics -->
+  <script src="admin.js"></script>
+</body>
+</html>
