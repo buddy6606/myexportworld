@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Double Polished",
       image: "images/turmeric_finger.jpg",
-      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin, rich in curcumin content.",
+      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin. Sourced from Nizamabad and Sangli as a premier dried turmeric finger exporter and global turmeric supplier india.",
       specs: [
         { name: "Curcumin", value: "Min 3.5%" },
         { name: "Origin", value: "Nizamabad / Sangli, India" },
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Ultra-Fine Ground",
       image: "images/turmeric_powder.jpg",
-      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma, essential oils, and curcumin concentration.",
+      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma and essential oils. Managed by a leading turmeric powder exporter india.",
       specs: [
         { name: "Curcumin", value: "Min 3.8%" },
         { name: "Origin", value: "Erode / Nizamabad, India" },
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Organic Harvest",
       image: "images/turmeric_fresh.jpg",
-      description: "Harvested fresh organic turmeric rhizomes, raw and unprocessed. Retains full therapeutic attributes, juice content, and fresh spice flavor.",
+      description: "Harvested fresh organic turmeric rhizomes, raw and unprocessed. Exported worldwide by a trusted fresh turmeric exporter india and premium turmeric exporter from india.",
       specs: [
         { name: "State", value: "Fresh Raw Rhizomes" },
         { name: "Origin", value: "Sangli / Erode, India" },
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "psyllium",
       badge: "99% Ultra-Pure",
       image: "images/psyllium_husk.png",
-      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber. Used widely in food processing and pharmaceuticals.",
+      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber. Sourced by a verified psyllium husk exporter india and trusted psyllium husk supplier india.",
       specs: [
         { name: "Purity Grade", value: "99% (Swell Index 45ml/g)" },
         { name: "Origin", value: "Gujarat / Rajasthan, India" },
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "psyllium",
       badge: "Milled Fiber",
       image: "images/psyllium_powder.png",
-      description: "Fine ground psyllium husk powder, ideal for easy blending into dietary supplements, bakery products, and pharmaceutical formulations.",
+      description: "Fine ground psyllium husk powder, ideal for dietary supplements. Exported globally by a recognized psyllium husk powder exporter and leading isabgol exporter india.",
       specs: [
         { name: "Purity Grade", value: "98% (40-60 mesh)" },
         { name: "Origin", value: "Gujarat, India" },
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "cumin",
       badge: "Sortex Cleaned",
       image: "images/cumin_seeds.png",
-      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds. Rich in essential oils and thymol content.",
+      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds. Sourced directly by a leading cumin seeds exporter india and premier cumin supplier india.",
       specs: [
         { name: "Purity", value: "Min 99%" },
         { name: "Origin", value: "Gujarat / Rajasthan, India" },
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "cumin",
       badge: "Aromatic Ground",
       image: "images/cumin_powder.png",
-      description: "Pure ground cumin spice, milled under cold processing to preserve natural volatile oils, rich earthy flavor, and warming aroma.",
+      description: "Pure ground cumin spice, milled under cold processing. Supplied worldwide by a certified cumin powder exporter india and premium jeera exporter india.",
       specs: [
         { name: "Volatile Oil", value: "Min 1.5%" },
         { name: "Origin", value: "Gujarat, India" },
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "chilli",
       badge: "Stemless Grade-A",
       image: "images/chilli_whole.png",
-      description: "Premium sun-dried whole red chilli pods, stemless, featuring vibrant deep red color and hot pungency rating. Selected carefully from Guntur origins.",
+      description: "Premium sun-dried stemless red chilli pods, featuring deep color and pungency rating. Exported globally by a leading dry red chilli exporter and red chilli exporter india.",
       specs: [
         { name: "Variety", value: "Guntur S17 / Teja" },
         { name: "Origin", value: "Andhra Pradesh, India" },
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "chilli",
       badge: "Vibrant Pungent",
       image: "images/chilli_powder.png",
-      description: "Finely ground premium red chilli powder, delivering consistent heat and rich red coloring. Hygienically processed without artificial colorings.",
+      description: "Finely ground premium red chilli powder, delivering consistent heat. Sourced and processed by a dedicated red chilli powder exporter india.",
       specs: [
         { name: "Pungency", value: "60,000 - 80,000 SHU" },
         { name: "Origin", value: "Guntur, India" },
@@ -388,7 +388,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stored) {
       products = JSON.parse(stored);
       
-      // Migrate old titles / suffixes if they exist in localStorage
       let modified = false;
       products.forEach(p => {
         if (p.title === "Cumin Seeds (Jeera)") {
@@ -401,6 +400,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (p.description && p.description.includes("(Jeera)")) {
           p.description = p.description.replace(" (Jeera)", "");
+          modified = true;
+        }
+        
+        // Auto-update descriptions with newly optimized keyword versions
+        const sample = sampleProducts.find(sp => sp.id === p.id);
+        if (sample && p.description !== sample.description) {
+          p.description = sample.description;
+          p.title = sample.title;
           modified = true;
         }
       });
