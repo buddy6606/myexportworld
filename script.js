@@ -569,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${specRowsHTML}
           </ul>
           <div class="product-actions">
-            <button class="btn btn-primary quick-inquire-btn" data-product="${escapeHTML(prod.title)} (${escapeHTML(prod.hsCode)})">Inquire Now</button>
+            <button class="btn btn-primary quick-inquire-btn" data-product="${escapeHTML(prod.title)} (${escapeHTML(prod.hsCode)})" aria-label="Inquire now from ${escapeHTML(prod.title)} supplier and exporter">Inquire Now</button>
           </div>
         </div>
       `;
