@@ -729,6 +729,100 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileNavMenu = document.getElementById('navMenu');
   const mobileNavToggle = document.getElementById('mobileNavToggle');
 
+  // Dynamic SEO Tag Updates
+  const updateSEOTags = (viewName, customData = null) => {
+    let title = "Spices & Psyllium Husk Exporter from India | MY EXPORT WORLD";
+    let description = "MY EXPORT WORLD is India's premier agricultural export house. Sourcing and exporting premium whole & ground spices, Guntur red chilli, cumin seeds, organic turmeric (powder/finger), and high-purity psyllium husk worldwide.";
+    let keywords = "MY EXPORT WORLD, spices exporter India, bulk turmeric powder, organic turmeric finger, Guntur red chilli supplier, cumin seeds exporter, isabgol exporter, psyllium husk exporter, Indian agricultural exports, bulk spices wholesale, Yash Patel, Mansi Patel";
+    let url = "https://www.myexportworld.com/";
+
+    if (viewName === 'product') {
+      title = "Premium Agricultural Commodities & Spices Catalog | MY EXPORT WORLD";
+      description = "Explore our premium export-quality agricultural catalog. Premium dried turmeric fingers, organic turmeric powder, high-purity psyllium husk, aromatic cumin seeds, and stemless red chilli.";
+      keywords = "organic turmeric, psyllium husk, isabgol, cumin seeds, Guntur red chilli, HS codes, spice grades, agricultural catalog, export quality";
+      url = "https://www.myexportworld.com/#product";
+    } else if (viewName === 'product-details') {
+      title = "Export-Grade Spices & Psyllium Sourcing Specifications | MY EXPORT WORLD";
+      description = "Detailed technical specifications, purity indices, and packaging standards for our turmeric, psyllium husk, cumin seeds, and dry red chilli exports.";
+      keywords = "spices specs, curcumin content, swell index, Sortex purity, packing sizes, import standards";
+      url = "https://www.myexportworld.com/#product-details";
+    } else if (viewName === 'about') {
+      title = "About Our Sourcing Excellence & Founding Partners | MY EXPORT WORLD";
+      description = "Meet our co-founders Mr. Yash Patel (AI & ML technologist) and Ms. Mansi Patel (operations standardizer). Discover our mission, corporate vision, and strategic farm-to-port supply synergies.";
+      keywords = "Yash Patel, Mansi Patel, agricultural leadership, direct sourcing India, tech-driven supply chain, corporate vision, quality standardization";
+      url = "https://www.myexportworld.com/#about";
+    } else if (viewName === 'certificates') {
+      title = "Certifications & Government Trade Compliance | MY EXPORT WORLD";
+      description = "Official credentials and merchant exporter compliance of MY EXPORT WORLD. Registered under APEDA, Spices Board of India, FSSAI, DGFT Import Export Code (IEC), ISO 22000, and HACCP.";
+      keywords = "APEDA certificate, Spices Board India, FSSAI license, Import Export Code, ISO 22000, HACCP, trade compliance, customs clearance";
+      url = "https://www.myexportworld.com/#certificates";
+    } else if (viewName === 'blog') {
+      title = "Daily Export Insights & Sourcing Intelligence Blog | MY EXPORT WORLD";
+      description = "Stay updated with real-time operational knowledge, customs procedures, ocean freight shipping guidelines, letters of credit (L/C), and international trade laws.";
+      keywords = "ocean freight, FCL LCL, Letter of Credit, trade finance, customs documentation, phytosanitary certificate, export guide";
+      url = "https://www.myexportworld.com/#blog";
+    } else if (viewName === 'blog-article') {
+      if (customData) {
+        title = `${customData.title} | MY EXPORT WORLD Blog`;
+        description = customData.teaserSummary || description;
+        url = `https://www.myexportworld.com/#blog-article`;
+      } else {
+        title = "Daily Export Insights & Sourcing Intelligence Blog | MY EXPORT WORLD";
+        description = "Read our latest trade guides, letters of credit compliance, and shipping logistics logs.";
+        url = "https://www.myexportworld.com/#blog-article";
+      }
+    } else if (viewName === 'contact') {
+      title = "Contact Sourcing Desk & Partner Support | MY EXPORT WORLD";
+      description = "Reach out to Mr. Yash Patel (Tech/Sourcing) or Ms. Mansi Patel (Operations/Logistics) for instant shipping logs, quotes, and contract support.";
+      keywords = "contact spices exporter, trade desk Gandhinagar, email myexportworld, contact number, partnership inquiry";
+      url = "https://www.myexportworld.com/#contact";
+    } else if (viewName === 'inquiry') {
+      title = "Request Quote & Live Sourcing Rate Card | MY EXPORT WORLD";
+      description = "Submit your specific agricultural requirements or target pricing for spices, seeds, and psyllium husks to receive a secure corporate quote within 4 hours.";
+      keywords = "request export quote, spice pricing, container quotes, bulk spices enquiry, custom declaration request";
+      url = "https://www.myexportworld.com/#inquiry";
+    }
+
+    document.title = title;
+    
+    const setMetaTag = (selector, attributeName, value) => {
+      let element = document.querySelector(selector);
+      if (element) {
+        element.setAttribute(attributeName, value);
+      } else {
+        const head = document.head;
+        if (selector.startsWith('meta[')) {
+          const newMeta = document.createElement('meta');
+          if (selector.includes('name=')) {
+            const nameVal = selector.match(/name="([^"]+)"/)[1];
+            newMeta.setAttribute('name', nameVal);
+          } else if (selector.includes('property=')) {
+            const propVal = selector.match(/property="([^"]+)"/)[1];
+            newMeta.setAttribute('property', propVal);
+          }
+          newMeta.setAttribute(attributeName, value);
+          head.appendChild(newMeta);
+        }
+      }
+    };
+
+    setMetaTag('meta[name="description"]', 'content', description);
+    setMetaTag('meta[name="keywords"]', 'content', keywords);
+    
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute('href', url);
+    }
+
+    setMetaTag('meta[property="og:title"]', 'content', title);
+    setMetaTag('meta[property="og:description"]', 'content', description);
+    setMetaTag('meta[property="og:url"]', 'content', url);
+
+    setMetaTag('meta[name="twitter:title"]', 'content', title);
+    setMetaTag('meta[name="twitter:description"]', 'content', description);
+    setMetaTag('meta[name="twitter:url"]', 'content', url);
+  };
+
   const switchView = (viewName) => {
     // Scroll to top instantly before transitions
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -785,18 +879,24 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hash === 'product-details') {
         switchView('product');
         navigateToLevel3();
+        updateSEOTags('product-details');
       } else if (hash === 'blog-article') {
         switchView('blog');
         // Show the article reader if we have a cached post
         if (currentBlogPost && blogGrid && blogSingleView) {
           blogGrid.style.display = 'none';
           blogSingleView.style.display = 'block';
+          updateSEOTags('blog-article', currentBlogPost);
+        } else {
+          updateSEOTags('blog-article');
         }
       } else {
         switchView(hash);
+        updateSEOTags(hash);
       }
     } else {
       switchView('home');
+      updateSEOTags('home');
     }
   };
 
