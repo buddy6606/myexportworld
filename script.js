@@ -738,9 +738,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Dynamic SEO Tag Updates
   const updateSEOTags = (viewName, customData = null) => {
-    let title = "Spices & Psyllium Husk Exporter from India | MY EXPORT WORLD";
-    let description = "MY EXPORT WORLD is India's premier agricultural export house. Sourcing and exporting premium whole & ground spices, Guntur red chilli, cumin seeds, organic turmeric (powder/finger), and high-purity psyllium husk worldwide.";
-    let keywords = "MY EXPORT WORLD, spices exporter India, bulk turmeric powder, organic turmeric finger, Guntur red chilli supplier, cumin seeds exporter, isabgol exporter, psyllium husk exporter, Indian agricultural exports, bulk spices wholesale, Yash Patel, Mansi Patel";
+    let title = "Spices Exporter from India | MY EXPORT WORLD";
+    let description = "MY EXPORT WORLD is a premier indian spices exporter and bulk spices supplier india. Sourcing and exporting agricultural products exporter india worldwide including organic turmeric, cumin seeds, Guntur red chilli, and psyllium husk.";
+    let keywords = "spices exporter from india, indian spices exporter, agricultural products exporter india, bulk spices supplier india, food ingredients exporter india, international spice supplier, gujarat export company, wholesale spices exporter, turmeric exporter from india, turmeric supplier india, psyllium husk exporter india, psyllium husk supplier india, isabgol exporter india, cumin seeds exporter india, cumin supplier india, cumin powder exporter india, jeera exporter india, red chilli exporter india, red chilli powder exporter india, dry red chilli exporter, Yash Patel, Mansi Patel";
     let url = "https://www.myexportworld.com/";
 
     if (viewName === 'product') {
