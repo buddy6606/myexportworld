@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const stored = localStorage.getItem('myexportworld_blog_posts');
       if (stored) {
         blogPosts = JSON.parse(stored);
-        
+
         let modified = false;
         sampleBlogPosts.forEach(sp => {
           const idx = blogPosts.findIndex(bp => bp.id === sp.id);
@@ -555,10 +555,10 @@ document.addEventListener('DOMContentLoaded', () => {
             blogPosts.push(sp);
             modified = true;
           } else {
-            if (blogPosts[idx].title !== sp.title || 
-                blogPosts[idx].teaserSummary !== sp.teaserSummary || 
-                blogPosts[idx].bodyContent !== sp.bodyContent ||
-                blogPosts[idx].coverImage !== sp.coverImage) {
+            if (blogPosts[idx].title !== sp.title ||
+              blogPosts[idx].teaserSummary !== sp.teaserSummary ||
+              blogPosts[idx].bodyContent !== sp.bodyContent ||
+              blogPosts[idx].coverImage !== sp.coverImage) {
               blogPosts[idx] = sp;
               modified = true;
             }
@@ -734,7 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const stored = localStorage.getItem('myexportworld_products');
       if (stored) {
         products = JSON.parse(stored);
-        
+
         let modified = false;
         products.forEach(p => {
           if (p.title === "Cumin Seeds (Jeera)") {
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
             p.description = p.description.replace(" (Jeera)", "");
             modified = true;
           }
-          
+
           // Auto-update descriptions with newly optimized keyword versions
           const sample = sampleProducts.find(sp => sp.id === p.id);
           if (sample && p.description !== sample.description) {
@@ -765,10 +765,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasHoney = products.some(p => p.category === 'honey');
         const hasCumin = products.some(p => p.category === 'cumin');
         const hasChilli = products.some(p => p.category === 'chilli');
-        
+
         if (hasHoney || !hasCumin || !hasChilli) {
           let cleanProducts = products.filter(p => p.category !== 'honey');
-          
+
           if (!hasCumin) {
             const cuminSeeds = sampleProducts.find(p => p.id === 'prod_cumin_seeds');
             const cuminPowder = sampleProducts.find(p => p.id === 'prod_cumin_powder');
@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chilliWhole) cleanProducts.push(chilliWhole);
             if (chilliPowder) cleanProducts.push(chilliPowder);
           }
-          
+
           products = cleanProducts;
           localStorage.setItem('myexportworld_products', JSON.stringify(products));
         }
@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
           customSection = document.createElement('div');
           customSection.className = 'commodity-section commodity-section-custom';
           customSection.id = categoryId;
-          
+
           const catTitle = prod.category.charAt(0).toUpperCase() + prod.category.slice(1);
           customSection.innerHTML = `
             <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
@@ -1142,7 +1142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.title = title;
-    
+
     const setMetaTag = (selector, attributeName, value) => {
       let element = document.querySelector(selector);
       if (element) {
@@ -1166,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setMetaTag('meta[name="description"]', 'content', description);
     setMetaTag('meta[name="keywords"]', 'content', keywords);
-    
+
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
       canonical.setAttribute('href', url);
@@ -1325,7 +1325,7 @@ document.addEventListener('DOMContentLoaded', () => {
           opt.textContent = productName;
           productDropdown.appendChild(opt);
         }
-        
+
         // Pre-fill dropdown
         productDropdown.value = productName;
         // Redirect to inquiry tab
@@ -1336,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 4. Inquiry Form Management ---
-  const GOOGLE_SHEETS_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"; // Replace with your Google Apps Script URL
+  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwUb3FvQG3DCqDGuEsHMqtYJdcXVPbsUf1FRXMwZJerCdLwQ4K-h289hjcGsNsdfFnw7A/exec"; // Replace with your Google Apps Script URL
   const inquiryForm = document.getElementById('inquiryForm');
   const inquiryCardWrapper = document.getElementById('inquiryCardWrapper');
   const inquirySuccessView = document.getElementById('inquirySuccessView');
@@ -1382,8 +1382,18 @@ document.addEventListener('DOMContentLoaded', () => {
         buyerQuestion
       };
 
-      // Send to Google Sheets (if configured)
+      // Send to Google Sheets and Telegram (if configured)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+        showToast("Submitting your inquiry...", "info");
+
+        // Find submit button to show loading feedback
+        const submitBtn = inquiryForm.querySelector('button[type="submit"]');
+        const originalBtnHtml = submitBtn ? submitBtn.innerHTML : 'Submit Inquiry';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `Sending... <i class="fa-solid fa-spinner fa-spin"></i>`;
+        }
+
         fetch(GOOGLE_SHEETS_URL, {
           method: "POST",
           mode: "no-cors",
@@ -1391,29 +1401,31 @@ document.addEventListener('DOMContentLoaded', () => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify(newInquiry)
-        }).catch(err => console.error("Google Sheets Submission Error:", err));
+        })
+          .then(() => {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnHtml;
+            }
+            inquiryCardWrapper.style.display = 'none';
+            inquirySuccessView.style.display = 'block';
+            showToast("Inquiry submitted successfully!", "success");
+          })
+          .catch(err => {
+            console.error("Submission Error:", err);
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnHtml;
+            }
+            showToast("Network error. Please try again.", "danger");
+          });
+      } else {
+        // Fallback if URL is not configured (Demo mode)
+        console.warn("GOOGLE_SHEETS_URL is not configured.");
+        inquiryCardWrapper.style.display = 'none';
+        inquirySuccessView.style.display = 'block';
+        showToast("Inquiry logged successfully (Demo Mode)", "success");
       }
-
-      // Redirect to WhatsApp
-      const whatsappText = 
-        `*New Sourcing Inquiry - MY EXPORT WORLD*` + "\n" +
-        `---------------------------------------` + "\n" +
-        `*Company:* ${companyName}` + "\n" +
-        `*Buyer Name:* ${buyerName}` + "\n" +
-        `*Phone/Contact:* ${contactNo}` + "\n" +
-        `*Email:* ${buyerEmail}` + "\n" +
-        `*Location:* ${buyerAddress}` + "\n" +
-        `*Product:* ${productSelected}` + "\n" +
-        `*Requirements:* ${buyerQuestion}` + "\n" +
-        `---------------------------------------` + "\n" +
-        `Submitted via myexportworld.com`;
-      const whatsappUrl = "https://wa.me/917600669179?text=" + encodeURIComponent(whatsappText);
-      window.open(whatsappUrl, "_self");
-
-      // Trigger Visual Success States (shown briefly before redirect)
-      inquiryCardWrapper.style.display = 'none';
-      inquirySuccessView.style.display = 'block';
-      showToast("Redirecting to WhatsApp...", "success");
 
     });
   }
@@ -1626,7 +1638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Default categories
     const categories = new Set(["Logistics & Shipping", "Customs & Compliance", "Trade Finance & Laws"]);
-    
+
     // Add custom ones from active blog posts
     blogPosts.forEach(post => {
       if (post.category && !categories.has(post.category)) {
