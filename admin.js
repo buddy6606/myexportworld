@@ -263,72 +263,87 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 2. Database Loader & Sync ---
   const loadDatabase = () => {
     // Load Inquiries
-    const storedInquiries = localStorage.getItem('myexportworld_inquiries');
-    if (storedInquiries) {
-      inquiries = JSON.parse(storedInquiries);
-    } else {
+    try {
+      const storedInquiries = localStorage.getItem('myexportworld_inquiries');
+      if (storedInquiries) {
+        inquiries = JSON.parse(storedInquiries);
+      } else {
+        inquiries = [];
+      }
+    } catch (e) {
+      console.error("Failed to parse inquiries from localStorage", e);
       inquiries = [];
     }
 
     // Load Blogs
-    const storedBlogs = localStorage.getItem('myexportworld_blog_posts');
-    if (storedBlogs) {
-      blogPosts = JSON.parse(storedBlogs);
-    } else {
+    try {
+      const storedBlogs = localStorage.getItem('myexportworld_blog_posts');
+      if (storedBlogs) {
+        blogPosts = JSON.parse(storedBlogs);
+      } else {
+        blogPosts = [];
+      }
+    } catch (e) {
+      console.error("Failed to parse blog posts from localStorage", e);
       blogPosts = [];
     }
 
     // Load Products
-    const storedProducts = localStorage.getItem('myexportworld_products');
-    if (storedProducts) {
-      products = JSON.parse(storedProducts);
+    try {
+      const storedProducts = localStorage.getItem('myexportworld_products');
+      if (storedProducts) {
+        products = JSON.parse(storedProducts);
 
-      // Migrate old titles / suffixes if they exist in localStorage
-      let modified = false;
-      products.forEach(p => {
-        if (p.title === "Cumin Seeds (Jeera)") {
-          p.title = "Cumin Seeds";
-          modified = true;
+        // Migrate old titles / suffixes if they exist in localStorage
+        let modified = false;
+        products.forEach(p => {
+          if (p.title === "Cumin Seeds (Jeera)") {
+            p.title = "Cumin Seeds";
+            modified = true;
+          }
+          if (p.title === "Dry Red Chilli (Whole)") {
+            p.title = "Dry Red Chilli";
+            modified = true;
+          }
+          if (p.description && p.description.includes("(Jeera)")) {
+            p.description = p.description.replace(" (Jeera)", "");
+            modified = true;
+          }
+        });
+        if (modified) {
+          localStorage.setItem('myexportworld_products', JSON.stringify(products));
         }
-        if (p.title === "Dry Red Chilli (Whole)") {
-          p.title = "Dry Red Chilli";
-          modified = true;
+
+        const hasHoney = products.some(p => p.category === 'honey');
+        const hasCumin = products.some(p => p.category === 'cumin');
+        const hasChilli = products.some(p => p.category === 'chilli');
+        
+        if (hasHoney || !hasCumin || !hasChilli) {
+          let cleanProducts = products.filter(p => p.category !== 'honey');
+          
+          if (!hasCumin) {
+            const cuminSeeds = sampleProducts.find(p => p.id === 'prod_cumin_seeds');
+            const cuminPowder = sampleProducts.find(p => p.id === 'prod_cumin_powder');
+            if (cuminSeeds) cleanProducts.push(cuminSeeds);
+            if (cuminPowder) cleanProducts.push(cuminPowder);
+          }
+          if (!hasChilli) {
+            const chilliWhole = sampleProducts.find(p => p.id === 'prod_red_chilli');
+            const chilliPowder = sampleProducts.find(p => p.id === 'prod_chilli_powder');
+            if (chilliWhole) cleanProducts.push(chilliWhole);
+            if (chilliPowder) cleanProducts.push(chilliPowder);
+          }
+          
+          products = cleanProducts;
+          localStorage.setItem('myexportworld_products', JSON.stringify(products));
         }
-        if (p.description && p.description.includes("(Jeera)")) {
-          p.description = p.description.replace(" (Jeera)", "");
-          modified = true;
-        }
-      });
-      if (modified) {
+      } else {
+        products = [...sampleProducts];
         localStorage.setItem('myexportworld_products', JSON.stringify(products));
       }
-
-      const hasHoney = products.some(p => p.category === 'honey');
-      const hasCumin = products.some(p => p.category === 'cumin');
-      const hasChilli = products.some(p => p.category === 'chilli');
-      
-      if (hasHoney || !hasCumin || !hasChilli) {
-        let cleanProducts = products.filter(p => p.category !== 'honey');
-        
-        if (!hasCumin) {
-          const cuminSeeds = sampleProducts.find(p => p.id === 'prod_cumin_seeds');
-          const cuminPowder = sampleProducts.find(p => p.id === 'prod_cumin_powder');
-          if (cuminSeeds) cleanProducts.push(cuminSeeds);
-          if (cuminPowder) cleanProducts.push(cuminPowder);
-        }
-        if (!hasChilli) {
-          const chilliWhole = sampleProducts.find(p => p.id === 'prod_red_chilli');
-          const chilliPowder = sampleProducts.find(p => p.id === 'prod_chilli_powder');
-          if (chilliWhole) cleanProducts.push(chilliWhole);
-          if (chilliPowder) cleanProducts.push(chilliPowder);
-        }
-        
-        products = cleanProducts;
-        localStorage.setItem('myexportworld_products', JSON.stringify(products));
-      }
-    } else {
+    } catch (e) {
+      console.error("Failed to parse products from localStorage", e);
       products = [...sampleProducts];
-      localStorage.setItem('myexportworld_products', JSON.stringify(products));
     }
 
     // Update Dashboard Views
@@ -339,17 +354,29 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const saveInquiries = () => {
-    localStorage.setItem('myexportworld_inquiries', JSON.stringify(inquiries));
+    try {
+      localStorage.setItem('myexportworld_inquiries', JSON.stringify(inquiries));
+    } catch (e) {
+      console.error("Failed to save inquiries to localStorage", e);
+    }
     updateStatistics();
   };
 
   const saveBlogPosts = () => {
-    localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+    try {
+      localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+    } catch (e) {
+      console.error("Failed to save blog posts to localStorage", e);
+    }
     updateStatistics();
   };
 
   const saveProducts = () => {
-    localStorage.setItem('myexportworld_products', JSON.stringify(products));
+    try {
+      localStorage.setItem('myexportworld_products', JSON.stringify(products));
+    } catch (e) {
+      console.error("Failed to save products to localStorage", e);
+    }
     updateStatistics();
   };
 
@@ -361,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (adminStatInquiriesToday) {
       const todayPrefix = getFormattedDate(); // "YYYY-MM-DD"
-      const todayCount = inquiries.filter(inq => inq.timestamp.startsWith(todayPrefix)).length;
+      const todayCount = inquiries.filter(inq => inq && inq.timestamp && typeof inq.timestamp === 'string' && inq.timestamp.startsWith(todayPrefix)).length;
       adminStatInquiriesToday.textContent = todayCount;
     }
 
@@ -461,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dataToRender.forEach((inq, index) => {
       // Find absolute index in main array
-      const absoluteIndex = inquiries.findIndex(item => item.timestamp === inq.timestamp && item.buyerEmail === inq.buyerEmail);
+      const absoluteIndex = inquiries.findIndex(item => item && inq && item.timestamp === inq.timestamp && item.buyerEmail === inq.buyerEmail);
       
       const row = document.createElement('tr');
       row.innerHTML = `
