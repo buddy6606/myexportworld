@@ -1395,24 +1395,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Redirect to WhatsApp
-      const whatsappText = `*New Sourcing Inquiry - MY EXPORT WORLD*\n` +
-        `---------------------------------------\n` +
-        `*Company:* ${companyName}\n` +
-        `*Buyer Name:* ${buyerName}\n` +
-        `*Phone/Contact:* ${contactNo}\n` +
-        `*Email:* ${buyerEmail}\n` +
-        `*Location:* ${buyerAddress}\n` +
-        `*Product:* ${productSelected}\n` +
-        `*Requirements:* ${buyerQuestion}\n` +
-        `---------------------------------------\n` +
-        `Submitted via Sourcing Desk Portal`;
-      const whatsappUrl = `https://wa.me/917600669179?text=${encodeURIComponent(whatsappText)}`;
-      window.location.href = whatsappUrl;
+      const whatsappText = 
+        `*New Sourcing Inquiry - MY EXPORT WORLD*` + "\n" +
+        `---------------------------------------` + "\n" +
+        `*Company:* ${companyName}` + "\n" +
+        `*Buyer Name:* ${buyerName}` + "\n" +
+        `*Phone/Contact:* ${contactNo}` + "\n" +
+        `*Email:* ${buyerEmail}` + "\n" +
+        `*Location:* ${buyerAddress}` + "\n" +
+        `*Product:* ${productSelected}` + "\n" +
+        `*Requirements:* ${buyerQuestion}` + "\n" +
+        `---------------------------------------` + "\n" +
+        `Submitted via myexportworld.com`;
+      const whatsappUrl = "https://wa.me/917600669179?text=" + encodeURIComponent(whatsappText);
+      window.open(whatsappUrl, "_self");
 
-      // Trigger Visual Success States
+      // Trigger Visual Success States (shown briefly before redirect)
       inquiryCardWrapper.style.display = 'none';
       inquirySuccessView.style.display = 'block';
-      showToast("Quote Inquiry Forwarded to WhatsApp!", "success");
+      showToast("Redirecting to WhatsApp...", "success");
 
     });
   }
