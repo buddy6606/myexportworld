@@ -1406,9 +1406,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `*Requirements:* ${buyerQuestion}\n` +
         `---------------------------------------\n` +
         `Submitted via Sourcing Desk Portal`;
-      
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=917600669179&text=${encodeURIComponent(whatsappText)}`;
-      window.open(whatsappUrl, '_blank');
+      const whatsappUrl = `https://wa.me/917600669179?text=${encodeURIComponent(whatsappText)}`;
+      window.location.href = whatsappUrl;
 
       // Trigger Visual Success States
       inquiryCardWrapper.style.display = 'none';
