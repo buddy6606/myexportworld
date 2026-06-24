@@ -1336,6 +1336,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 4. Inquiry Form Management ---
+  const GOOGLE_SHEETS_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"; // Replace with your Google Apps Script URL
   const inquiryForm = document.getElementById('inquiryForm');
   const inquiryCardWrapper = document.getElementById('inquiryCardWrapper');
   const inquirySuccessView = document.getElementById('inquirySuccessView');
@@ -1381,14 +1382,38 @@ document.addEventListener('DOMContentLoaded', () => {
         buyerQuestion
       };
 
-      // Push into state and save to local storage
-      inquiries.unshift(newInquiry); // Insert at first index
-      localStorage.setItem('myexportworld_inquiries', JSON.stringify(inquiries));
+      // Send to Google Sheets (if configured)
+      if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+        fetch(GOOGLE_SHEETS_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newInquiry)
+        }).catch(err => console.error("Google Sheets Submission Error:", err));
+      }
+
+      // Redirect to WhatsApp
+      const whatsappText = `*New Sourcing Inquiry - MY EXPORT WORLD*\n` +
+        `---------------------------------------\n` +
+        `*Company:* ${companyName}\n` +
+        `*Buyer Name:* ${buyerName}\n` +
+        `*Phone/Contact:* ${contactNo}\n` +
+        `*Email:* ${buyerEmail}\n` +
+        `*Location:* ${buyerAddress}\n` +
+        `*Product:* ${productSelected}\n` +
+        `*Requirements:* ${buyerQuestion}\n` +
+        `---------------------------------------\n` +
+        `Submitted via Sourcing Desk Portal`;
+      
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=917600669179&text=${encodeURIComponent(whatsappText)}`;
+      window.open(whatsappUrl, '_blank');
 
       // Trigger Visual Success States
       inquiryCardWrapper.style.display = 'none';
       inquirySuccessView.style.display = 'block';
-      showToast("Quote Inquiry Logged!", "success");
+      showToast("Quote Inquiry Forwarded to WhatsApp!", "success");
 
     });
   }
