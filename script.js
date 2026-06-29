@@ -139,6 +139,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const triggerGoogleTranslate = (lang) => {
+    const activeLang = lang || localStorage.getItem('myexportworld_lang') || 'en';
+    const targetLang = (activeLang === 'zh') ? 'zh-CN' : activeLang;
+    
+    document.cookie = "googtrans=/en/" + targetLang + "; path=/;";
+    document.cookie = "googtrans=/en/" + targetLang + "; domain=" + window.location.hostname + "; path=/;";
+
+    const applyTranslateCombo = () => {
+      const gtCombo = document.querySelector('.goog-te-combo');
+      if (gtCombo) {
+        if (gtCombo.value !== targetLang) {
+          gtCombo.value = targetLang;
+        }
+        gtCombo.dispatchEvent(new Event('change'));
+        return true;
+      }
+      return false;
+    };
+
+    if (!applyTranslateCombo()) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (applyTranslateCombo() || attempts > 15) {
+          clearInterval(interval);
+        }
+      }, 300);
+    }
+  };
+
+  window.googleTranslateElementInit = function() {
+    if (typeof google !== 'undefined' && google.translate && google.translate.TranslateElement) {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,gu,hi,zh-CN,es,de,ar,fr,ru,pt,ja,ko,id,tr,vi,th,it,nl,pl,sv,bn',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+
+      const savedLang = localStorage.getItem('myexportworld_lang') || 'en';
+      if (savedLang !== 'en') {
+        setTimeout(() => { triggerGoogleTranslate(savedLang); }, 300);
+      }
+    }
+  };
+
   const setLanguage = (lang) => {
     const selectedLang = translations[lang] ? lang : 'en';
     const dict = translations[selectedLang];
@@ -177,6 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (langSelect && langSelect.value !== selectedLang) {
       langSelect.value = selectedLang;
     }
+
+    triggerGoogleTranslate(selectedLang);
   };
 
   const initLanguage = () => {
@@ -1113,6 +1161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkEmptyGrid(gridPsyllium);
     checkEmptyGrid(gridCumin);
     checkEmptyGrid(gridChilli);
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // --- 8. Dynamic Products Nested Catalog Explorer ---
@@ -1367,6 +1416,8 @@ document.addEventListener('DOMContentLoaded', () => {
       mobileNavMenu.classList.remove('open');
       mobileNavToggle.classList.remove('active');
     }
+
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // Hash-based routing handler
@@ -1704,6 +1755,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       blogGrid.appendChild(card);
     });
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // Open Single View Reader
@@ -1766,6 +1818,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Scroll reader view smoothly to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // Back button event listener
