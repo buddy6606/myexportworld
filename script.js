@@ -139,6 +139,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const triggerGoogleTranslate = (lang) => {
+    const targetLang = (lang === 'zh') ? 'zh-CN' : lang;
+    document.cookie = "googtrans=/en/" + targetLang + "; path=/;";
+    document.cookie = "googtrans=/en/" + targetLang + "; domain=" + window.location.hostname + "; path=/;";
+
+    const gtCombo = document.querySelector('.goog-te-combo');
+    if (gtCombo) {
+      gtCombo.value = targetLang;
+      gtCombo.dispatchEvent(new Event('change'));
+    }
+  };
+
+  window.googleTranslateElementInit = function() {
+    if (typeof google !== 'undefined' && google.translate && google.translate.TranslateElement) {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,gu,hi,zh-CN,es,de,ar,fr,ru,pt,ja,ko,id,tr,vi,th,it,nl,pl,sv,bn',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+
+      const savedLang = localStorage.getItem('myexportworld_lang') || 'en';
+      if (savedLang !== 'en') {
+        setTimeout(() => { triggerGoogleTranslate(savedLang); }, 500);
+      }
+    }
+  };
+
   const setLanguage = (lang) => {
     const selectedLang = translations[lang] ? lang : 'en';
     const dict = translations[selectedLang];
@@ -154,7 +182,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (dict && dict[key]) {
-        el.textContent = dict[key];
+        if (key === 'hero_title') {
+          const titleText = dict[key];
+          const colonIdx = titleText.indexOf(':') !== -1 ? titleText.indexOf(':') : titleText.indexOf('：');
+          if (colonIdx !== -1) {
+            const part1 = titleText.substring(0, colonIdx + 1);
+            const part2 = titleText.substring(colonIdx + 1);
+            el.innerHTML = `${part1} <span>${part2.trim()}</span>`;
+          } else {
+            el.innerHTML = titleText;
+          }
+        } else {
+          el.textContent = dict[key];
+        }
       }
     });
 
@@ -163,6 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (langSelect && langSelect.value !== selectedLang) {
       langSelect.value = selectedLang;
     }
+
+    triggerGoogleTranslate(selectedLang);
   };
 
   const initLanguage = () => {

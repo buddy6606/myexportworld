@@ -3594,6 +3594,34 @@ button, input, select, textarea {
   padding: 0.55rem 2.2rem 0.55rem 1.8rem;
 }
 
+[dir="rtl"] .nav-menu {
+  direction: rtl;
+}
+
+/* Google Translate Widget Resets & Clean Styling */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+#goog-gt-tt,
+.goog-te-spinner-pos {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#google_translate_element {
+  display: none !important;
+}
+
+
 /* ==========================================================================
    Dynamic Micro-Animations & Interactivity Effects
    ========================================================================== */
