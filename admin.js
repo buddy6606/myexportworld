@@ -4,6 +4,26 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  // --- Firebase Cloud Database Setup ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDghJ_xAllf53HxEVdGVgAPlM2-hWJVI14",
+    authDomain: "website-ab545.firebaseapp.com",
+    projectId: "website-ab545",
+    storageBucket: "website-ab545.firebasestorage.app",
+    messagingSenderId: "682556744579",
+    appId: "1:682556744579:web:e46019c337a4f2940b4cb6",
+    measurementId: "G-QYTRY98GDT"
+  };
+
+  let db = null;
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+  }
+
   // --- State Variables ---
   let inquiries = [];
   let blogPosts = [];
@@ -261,92 +281,56 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- 2. Database Loader & Sync ---
+  let isFirestoreInitialized = false;
+
   const loadDatabase = () => {
-    // Load Inquiries
+    if (db && !isFirestoreInitialized) {
+      isFirestoreInitialized = true;
+      db.collection('inquiries').onSnapshot(snapshot => {
+        inquiries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        localStorage.setItem('myexportworld_inquiries', JSON.stringify(inquiries));
+        renderInquiriesTable();
+        updateStatistics();
+      });
+      db.collection('blog_posts').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          blogPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+          renderBlogsTable();
+          updateStatistics();
+        }
+      });
+      db.collection('products').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          localStorage.setItem('myexportworld_products', JSON.stringify(products));
+          renderProductsTable();
+          updateStatistics();
+        }
+      });
+    }
+
+    // Load Inquiries fallback
     try {
       const storedInquiries = localStorage.getItem('myexportworld_inquiries');
-      if (storedInquiries) {
-        inquiries = JSON.parse(storedInquiries);
-      } else {
-        inquiries = [];
-      }
-    } catch (e) {
-      console.error("Failed to parse inquiries from localStorage", e);
-      inquiries = [];
-    }
+      if (storedInquiries) inquiries = JSON.parse(storedInquiries);
+      else inquiries = [];
+    } catch (e) { inquiries = []; }
 
-    // Load Blogs
+    // Load Blogs fallback
     try {
       const storedBlogs = localStorage.getItem('myexportworld_blog_posts');
-      if (storedBlogs) {
-        blogPosts = JSON.parse(storedBlogs);
-      } else {
-        blogPosts = [];
-      }
-    } catch (e) {
-      console.error("Failed to parse blog posts from localStorage", e);
-      blogPosts = [];
-    }
+      if (storedBlogs) blogPosts = JSON.parse(storedBlogs);
+      else blogPosts = [];
+    } catch (e) { blogPosts = []; }
 
-    // Load Products
+    // Load Products fallback
     try {
       const storedProducts = localStorage.getItem('myexportworld_products');
-      if (storedProducts) {
-        products = JSON.parse(storedProducts);
+      if (storedProducts) products = JSON.parse(storedProducts);
+      else products = [...sampleProducts];
+    } catch (e) { products = [...sampleProducts]; }
 
-        // Migrate old titles / suffixes if they exist in localStorage
-        let modified = false;
-        products.forEach(p => {
-          if (p.title === "Cumin Seeds (Jeera)") {
-            p.title = "Cumin Seeds";
-            modified = true;
-          }
-          if (p.title === "Dry Red Chilli (Whole)") {
-            p.title = "Dry Red Chilli";
-            modified = true;
-          }
-          if (p.description && p.description.includes("(Jeera)")) {
-            p.description = p.description.replace(" (Jeera)", "");
-            modified = true;
-          }
-        });
-        if (modified) {
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-        }
-
-        const hasHoney = products.some(p => p.category === 'honey');
-        const hasCumin = products.some(p => p.category === 'cumin');
-        const hasChilli = products.some(p => p.category === 'chilli');
-        
-        if (hasHoney || !hasCumin || !hasChilli) {
-          let cleanProducts = products.filter(p => p.category !== 'honey');
-          
-          if (!hasCumin) {
-            const cuminSeeds = sampleProducts.find(p => p.id === 'prod_cumin_seeds');
-            const cuminPowder = sampleProducts.find(p => p.id === 'prod_cumin_powder');
-            if (cuminSeeds) cleanProducts.push(cuminSeeds);
-            if (cuminPowder) cleanProducts.push(cuminPowder);
-          }
-          if (!hasChilli) {
-            const chilliWhole = sampleProducts.find(p => p.id === 'prod_red_chilli');
-            const chilliPowder = sampleProducts.find(p => p.id === 'prod_chilli_powder');
-            if (chilliWhole) cleanProducts.push(chilliWhole);
-            if (chilliPowder) cleanProducts.push(chilliPowder);
-          }
-          
-          products = cleanProducts;
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-        }
-      } else {
-        products = [...sampleProducts];
-        localStorage.setItem('myexportworld_products', JSON.stringify(products));
-      }
-    } catch (e) {
-      console.error("Failed to parse products from localStorage", e);
-      products = [...sampleProducts];
-    }
-
-    // Update Dashboard Views
     renderInquiriesTable();
     renderBlogsTable();
     renderProductsTable();
@@ -356,18 +340,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveInquiries = () => {
     try {
       localStorage.setItem('myexportworld_inquiries', JSON.stringify(inquiries));
-    } catch (e) {
-      console.error("Failed to save inquiries to localStorage", e);
-    }
+    } catch (e) { console.error("Failed to save inquiries to localStorage", e); }
     updateStatistics();
   };
 
   const saveBlogPosts = () => {
     try {
       localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
-    } catch (e) {
-      console.error("Failed to save blog posts to localStorage", e);
-    }
+    } catch (e) { console.error("Failed to save blog posts to localStorage", e); }
     updateStatistics();
   };
 
@@ -702,9 +682,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetIdx = parseInt(btn.getAttribute('data-index'), 10);
         const confirmDelete = confirm("Are you sure you want to delete this insight? This action will remove it live from your website.");
         if (confirmDelete) {
+          const targetPost = blogPosts[targetIdx];
+          if (db && targetPost && targetPost.id) {
+            db.collection('blog_posts').doc(targetPost.id).delete();
+          }
           blogPosts.splice(targetIdx, 1);
           saveBlogPosts();
-          loadDatabase(); // Re-sync and re-render
+          loadDatabase();
           showToast("Article Removed Live!", "warning");
         }
       });
@@ -820,6 +804,10 @@ document.addEventListener('DOMContentLoaded', () => {
           bodyContent: formatBodyToHTML(rawBody)
         };
 
+        if (db) {
+          db.collection('blog_posts').doc(newPost.id).set(newPost);
+        }
+
         // Add to beginning of database
         blogPosts.unshift(newPost);
         saveBlogPosts();
@@ -930,9 +918,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetIdx = parseInt(btn.getAttribute('data-index'), 10);
         const confirmDelete = confirm(`Are you sure you want to delete "${products[targetIdx].title}"? This action will remove it live from your website catalog immediately.`);
         if (confirmDelete) {
+          const targetProd = products[targetIdx];
+          if (db && targetProd && targetProd.id) {
+            db.collection('products').doc(targetProd.id).delete();
+          }
           products.splice(targetIdx, 1);
           saveProducts();
-          loadDatabase(); // Re-sync and re-render
+          loadDatabase();
           showToast("Product deleted successfully", "warning");
         }
       });
@@ -989,6 +981,10 @@ document.addEventListener('DOMContentLoaded', () => {
           description,
           specs
         };
+
+        if (db) {
+          db.collection('products').doc(newProduct.id).set(newProduct);
+        }
 
         // Add to active products array
         products.push(newProduct);

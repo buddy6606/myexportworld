@@ -11,6 +11,25 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --- Firebase Cloud Database Setup ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDghJ_xAllf53HxEVdGVgAPlM2-hWJVI14",
+    authDomain: "website-ab545.firebaseapp.com",
+    projectId: "website-ab545",
+    storageBucket: "website-ab545.firebasestorage.app",
+    messagingSenderId: "682556744579",
+    appId: "1:682556744579:web:e46019c337a4f2940b4cb6",
+    measurementId: "G-QYTRY98GDT"
+  };
+
+  let db = null;
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+  }
+
   // --- 1. Global State & Sample Data ---
   let inquiries = [];
 
@@ -543,33 +562,26 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const loadBlogPosts = () => {
+    if (db) {
+      db.collection('blog_posts').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          blogPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+        } else {
+          sampleBlogPosts.forEach(sp => {
+            db.collection('blog_posts').doc(sp.id).set(sp);
+          });
+        }
+      }, err => {
+        console.error("Firestore blog posts sync error:", err);
+      });
+    }
     try {
       const stored = localStorage.getItem('myexportworld_blog_posts');
       if (stored) {
         blogPosts = JSON.parse(stored);
-
-        let modified = false;
-        sampleBlogPosts.forEach(sp => {
-          const idx = blogPosts.findIndex(bp => bp.id === sp.id);
-          if (idx === -1) {
-            blogPosts.push(sp);
-            modified = true;
-          } else {
-            if (blogPosts[idx].title !== sp.title ||
-              blogPosts[idx].teaserSummary !== sp.teaserSummary ||
-              blogPosts[idx].bodyContent !== sp.bodyContent ||
-              blogPosts[idx].coverImage !== sp.coverImage) {
-              blogPosts[idx] = sp;
-              modified = true;
-            }
-          }
-        });
-        if (modified) {
-          localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
-        }
       } else {
         blogPosts = [...sampleBlogPosts];
-        localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
       }
     } catch (e) {
       console.error("Failed to parse blog posts from localStorage", e);
@@ -730,64 +742,29 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const loadProducts = () => {
+    if (db) {
+      db.collection('products').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          localStorage.setItem('myexportworld_products', JSON.stringify(products));
+          renderPublicProducts();
+          populateProductDropdown();
+          populateProductCategorySelect();
+        } else {
+          sampleProducts.forEach(p => {
+            db.collection('products').doc(p.id).set(p);
+          });
+        }
+      }, err => {
+        console.error("Firestore products sync error:", err);
+      });
+    }
     try {
       const stored = localStorage.getItem('myexportworld_products');
       if (stored) {
         products = JSON.parse(stored);
-
-        let modified = false;
-        products.forEach(p => {
-          if (p.title === "Cumin Seeds (Jeera)") {
-            p.title = "Cumin Seeds";
-            modified = true;
-          }
-          if (p.title === "Dry Red Chilli (Whole)") {
-            p.title = "Dry Red Chilli";
-            modified = true;
-          }
-          if (p.description && p.description.includes("(Jeera)")) {
-            p.description = p.description.replace(" (Jeera)", "");
-            modified = true;
-          }
-
-          // Auto-update descriptions with newly optimized keyword versions
-          const sample = sampleProducts.find(sp => sp.id === p.id);
-          if (sample && p.description !== sample.description) {
-            p.description = sample.description;
-            p.title = sample.title;
-            modified = true;
-          }
-        });
-        if (modified) {
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-        }
-
-        const hasHoney = products.some(p => p.category === 'honey');
-        const hasCumin = products.some(p => p.category === 'cumin');
-        const hasChilli = products.some(p => p.category === 'chilli');
-
-        if (hasHoney || !hasCumin || !hasChilli) {
-          let cleanProducts = products.filter(p => p.category !== 'honey');
-
-          if (!hasCumin) {
-            const cuminSeeds = sampleProducts.find(p => p.id === 'prod_cumin_seeds');
-            const cuminPowder = sampleProducts.find(p => p.id === 'prod_cumin_powder');
-            if (cuminSeeds) cleanProducts.push(cuminSeeds);
-            if (cuminPowder) cleanProducts.push(cuminPowder);
-          }
-          if (!hasChilli) {
-            const chilliWhole = sampleProducts.find(p => p.id === 'prod_red_chilli');
-            const chilliPowder = sampleProducts.find(p => p.id === 'prod_chilli_powder');
-            if (chilliWhole) cleanProducts.push(chilliWhole);
-            if (chilliPowder) cleanProducts.push(chilliPowder);
-          }
-
-          products = cleanProducts;
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-        }
       } else {
         products = [...sampleProducts];
-        localStorage.setItem('myexportworld_products', JSON.stringify(products));
       }
     } catch (e) {
       console.error("Failed to parse products from localStorage", e);
@@ -1381,6 +1358,10 @@ document.addEventListener('DOMContentLoaded', () => {
         productSelected,
         buyerQuestion
       };
+
+      if (db) {
+        db.collection('inquiries').add(newInquiry).catch(err => console.error("Firestore inquiry error:", err));
+      }
 
       // Send to Google Sheets and Telegram (if configured)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
