@@ -3594,3 +3594,37 @@ button, input, select, textarea {
   padding: 0.55rem 2.2rem 0.55rem 1.8rem;
 }
 
+/* ==========================================================================
+   Dynamic Micro-Animations & Interactivity Effects
+   ========================================================================== */
+@keyframes heroFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.hero-badge {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+
+/* Card Hover Animations */
+.product-card, .blog-card, .certificate-card, .stat-counter-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.product-card:hover, .certificate-card:hover {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(11, 60, 155, 0.14);
+}
+
+/* Interactive Button Hover Glow */
+.btn-gold:hover, .nav-cta:hover {
+  animation: pulseGlow 1.5s ease infinite;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(214, 28, 44, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(214, 28, 44, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(214, 28, 44, 0); }
+}
+
