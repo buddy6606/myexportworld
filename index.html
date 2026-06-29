@@ -132,18 +132,46 @@
       <!-- Desktop Navigation Menu -->
       <nav>
         <ul class="nav-menu" id="navMenu">
-          <li><a class="nav-link active" data-view="home" aria-label="MY EXPORT WORLD Home - Indian Spices Exporter">Home</a></li>
-          <li><a class="nav-link" data-view="product" aria-label="Browse Catalog - Agricultural Products Exporter India">Products</a></li>
-          <li><a class="nav-link" data-view="certificates" aria-label="Certificates and Compliance - Spices Exporter from India">Certificates</a></li>
-          <li><a class="nav-link" data-view="about" aria-label="About Us Sourcing Desk - Indian Spices Wholesale Exporter">About Us</a></li>
-          <li><a class="nav-link" data-view="contact" aria-label="Contact Sourcing desk - Bulk Spices Supplier India">Contact Us</a></li>
-          <li><a class="nav-link" data-view="blog" aria-label="Daily Trade blog - International Spice Supplier">Blog</a></li>
-          <li><a class="nav-link" data-view="inquiry" aria-label="Request Quote Form - Food Ingredients Exporter India">Inquiry Form</a></li>
+          <li><a class="nav-link active" data-view="home" data-i18n="nav_home" aria-label="MY EXPORT WORLD Home - Indian Spices Exporter">Home</a></li>
+          <li><a class="nav-link" data-view="product" data-i18n="nav_products" aria-label="Browse Catalog - Agricultural Products Exporter India">Products</a></li>
+          <li><a class="nav-link" data-view="certificates" data-i18n="nav_certificates" aria-label="Certificates and Compliance - Spices Exporter from India">Certificates</a></li>
+          <li><a class="nav-link" data-view="about" data-i18n="nav_about" aria-label="About Us Sourcing Desk - Indian Spices Wholesale Exporter">About Us</a></li>
+          <li><a class="nav-link" data-view="contact" data-i18n="nav_contact" aria-label="Contact Sourcing desk - Bulk Spices Supplier India">Contact Us</a></li>
+          <li><a class="nav-link" data-view="blog" data-i18n="nav_blog" aria-label="Daily Trade blog - International Spice Supplier">Blog</a></li>
+          <li><a class="nav-link" data-view="inquiry" data-i18n="nav_inquiry" aria-label="Request Quote Form - Food Ingredients Exporter India">Inquiry Form</a></li>
         </ul>
       </nav>
       
-      <div class="flex-center" style="gap: 1.5rem;">
-        <button class="nav-cta" id="navCtaBtn" data-view="inquiry" aria-label="Request Quote from Indian Spices Wholesale Exporter">Inquire Now</button>
+      <div class="flex-center" style="gap: 1.2rem;">
+        <!-- Language Selector Dropdown -->
+        <div class="lang-selector-wrapper">
+          <i class="fa-solid fa-globe lang-icon"></i>
+          <select id="langSelect" class="lang-select" aria-label="Select Language">
+            <option value="en" selected>🇬🇧 English</option>
+            <option value="gu">🇮🇳 ગુજરાતી (Gujarati)</option>
+            <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+            <option value="zh">🇨🇳 中文 (Mandarin)</option>
+            <option value="es">🇪🇸 Español (Spanish)</option>
+            <option value="de">🇩🇪 Deutsch (German)</option>
+            <option value="ar">🇦🇪 العربية (Arabic)</option>
+            <option value="fr">🇫🇷 Français (French)</option>
+            <option value="ru">🇷🇺 Русский (Russian)</option>
+            <option value="pt">🇵🇹 Português (Portuguese)</option>
+            <option value="ja">🇯🇵 日本語 (Japanese)</option>
+            <option value="ko">🇰🇷 한국어 (Korean)</option>
+            <option value="id">🇮🇩 Bahasa (Indonesian)</option>
+            <option value="tr">🇹🇷 Türkçe (Turkish)</option>
+            <option value="vi">🇻🇳 Tiếng Việt (Vietnamese)</option>
+            <option value="th">🇹🇭 ไทย (Thai)</option>
+            <option value="it">🇮🇹 Italiano (Italian)</option>
+            <option value="nl">🇳🇱 Nederlands (Dutch)</option>
+            <option value="pl">🇵🇱 Polski (Polish)</option>
+            <option value="sv">🇸🇪 Svenska (Swedish)</option>
+            <option value="bn">🇧🇩 বাংলা (Bengali)</option>
+          </select>
+        </div>
+
+        <button class="nav-cta" id="navCtaBtn" data-view="inquiry" data-i18n="nav_cta" aria-label="Request Quote from Indian Spices Wholesale Exporter">Inquire Now</button>
         <!-- Mobile Nav Toggle -->
         <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation">
           <span></span>
@@ -177,18 +205,18 @@
             <div class="hero-content">
               <div class="hero-badge">
                 <span class="badge-dot"></span>
-                Govt. Recognized Export Partner
+                <span data-i18n="hero_badge">Govt. Recognized Export Partner</span>
               </div>
-              <h1 class="hero-title">Spices Exporter from India: <span>Premium Bulk Spices & Agricultural Products</span></h1>
-              <p class="hero-description">
+              <h1 class="hero-title" data-i18n="hero_title">Spices Exporter from India: <span>Premium Bulk Spices & Agricultural Products</span></h1>
+              <p class="hero-description" data-i18n="hero_desc">
                 <strong>MY EXPORT WORLD</strong> is a premier <strong>indian spices exporter</strong> and <strong>agricultural products exporter india</strong>. As a trusted <strong>bulk spices supplier india</strong>, we connect local farms with international trade hubs, delivering certified commodities with direct traceability and integrity.
               </p>
               <div class="hero-actions">
                 <button class="btn btn-primary btn-gold" data-view="product">
-                  Explore Commodities <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  <span data-i18n="hero_btn_explore">Explore Commodities</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </button>
                 <button class="btn btn-secondary btn-outline-white" data-view="contact">
-                  Talk to Founders <i class="fa-solid fa-arrow-trend-up"></i>
+                  <span data-i18n="hero_btn_contact">Talk to Founders</span> <i class="fa-solid fa-arrow-trend-up"></i>
                 </button>
               </div>
             </div>
@@ -218,7 +246,7 @@
               <div class="stat-number-wrapper">
                 <span class="stat-count-value" data-target="100">0</span><span class="stat-suffix">%</span>
               </div>
-              <div class="stat-label-text">Quality Assured</div>
+              <div class="stat-label-text" data-i18n="stat_quality">Quality Assured</div>
             </div>
 
             <!-- Stat 2: Client Dispatch Desk -->
@@ -229,7 +257,7 @@
               <div class="stat-number-wrapper">
                 <span class="stat-count-value" data-target="24">0</span><span class="stat-suffix">/7</span>
               </div>
-              <div class="stat-label-text">Client Dispatch Desk</div>
+              <div class="stat-label-text" data-i18n="stat_dispatch">Client Dispatch Desk</div>
             </div>
 
             <!-- Stat 3: Traceable Sourcing -->
@@ -240,7 +268,7 @@
               <div class="stat-number-wrapper">
                 <span class="stat-count-value" data-target="100">0</span><span class="stat-suffix">%</span>
               </div>
-              <div class="stat-label-text">Traceable Sourcing</div>
+              <div class="stat-label-text" data-i18n="stat_traceable">Traceable Sourcing</div>
             </div>
 
             <!-- Stat 4: Commodity Categories -->
@@ -251,7 +279,7 @@
               <div class="stat-number-wrapper">
                 <span class="stat-count-value" data-target="3">0</span><span class="stat-suffix">+</span>
               </div>
-              <div class="stat-label-text">Commodity Categories</div>
+              <div class="stat-label-text" data-i18n="stat_categories">Commodity Categories</div>
             </div>
 
           </div>

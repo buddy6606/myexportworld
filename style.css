@@ -3509,3 +3509,65 @@ button, input, select, textarea {
     flex-direction: column;
   }
 }
+
+/* ==========================================================================
+   Multi-Language (i18n) Selector & RTL Styles
+   ========================================================================== */
+.lang-selector-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lang-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--primary-blue);
+  font-size: 0.95rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lang-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  padding: 0.55rem 1.8rem 0.55rem 2.2rem;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary-blue-dark);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
+}
+
+.lang-select:hover, .lang-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(11, 60, 155, 0.12);
+}
+
+.lang-select option {
+  background: #ffffff;
+  color: var(--text-dark);
+  padding: 0.5rem;
+}
+
+/* RTL Support for Arabic */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .lang-icon {
+  left: auto;
+  right: 12px;
+}
+
+[dir="rtl"] .lang-select {
+  padding: 0.55rem 2.2rem 0.55rem 1.8rem;
+}
+

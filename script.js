@@ -30,6 +30,155 @@ document.addEventListener('DOMContentLoaded', () => {
     db = firebase.firestore();
   }
 
+  // --- 1B. Multi-Language (i18n) Translation Engine (21 Languages) ---
+  const translations = {
+    en: {
+      nav_home: "Home", nav_products: "Products", nav_certificates: "Certificates", nav_about: "About Us", nav_contact: "Contact Us", nav_blog: "Blog", nav_inquiry: "Inquiry Form", nav_cta: "Inquire Now",
+      hero_badge: "Govt. Recognized Export Partner", hero_title: "Spices Exporter from India: Premium Bulk Spices & Agricultural Products", hero_desc: "MY EXPORT WORLD is a premier indian spices exporter and agricultural products exporter india. As a trusted bulk spices supplier india, we connect local farms with international trade hubs.", hero_btn_explore: "Explore Commodities", hero_btn_contact: "Talk to Founders",
+      stat_quality: "Quality Assured", stat_dispatch: "Client Dispatch Desk", stat_traceable: "Traceable Sourcing", stat_categories: "Commodity Categories"
+    },
+    gu: {
+      nav_home: "હોમ", nav_products: "ઉત્પાદનો", nav_certificates: "પ્રમાણપત્રો", nav_about: "અમારા વિશે", nav_contact: "સંપર્ક કરો", nav_blog: "બ્લોગ", nav_inquiry: "પૂછપરછ ફોર્મ", nav_cta: "હવે પૂછપરછ કરો",
+      hero_badge: "સરકાર માન્ય નિકાસ ભાગીદાર", hero_title: "ભારતમાંથી મસાલા નિકાસકાર: પ્રીમિયમ બલ્ક મસાલા અને કૃષિ ઉત્પાદનો", hero_desc: "MY EXPORT WORLD એ ભારતીય મસાલા નિકાસકાર અને કૃષિ ઉત્પાદનો નિકાસકાર છે. અમે વિશ્વસનીય બલ્ક મસાલા સપ્લાયર તરીકે સ્થાનિક ખેતરોને આંતરરાષ્ટ્રીય વેપાર હબ સાથે જોડીએ છીએ.", hero_btn_explore: "ઉત્પાદનો જુઓ", hero_btn_contact: "સ્થાપકો સાથે વાત કરો",
+      stat_quality: "ગુણવત્તા ની ખાતરી", stat_dispatch: "ક્લાયન્ટ ડિસ્પેચ ડેસ્ક", stat_traceable: "ટ્રેસેબલ સોર્સિંગ", stat_categories: "ઉત્પાદન શ્રેણીઓ"
+    },
+    hi: {
+      nav_home: "होम", nav_products: "उत्पाद", nav_certificates: "प्रमाणपत्र", nav_about: "हमारे बारे में", nav_contact: "संपर्क करें", nav_blog: "ब्लॉग", nav_inquiry: "पूछताछ फॉर्म", nav_cta: "अभी पूछताछ करें",
+      hero_badge: "सरकारी मान्यता प्राप्त निर्यात भागीदार", hero_title: "भारत से मसाला निर्यातक: प्रीमियम थोक मसाले और कृषि उत्पाद", hero_desc: "MY EXPORT WORLD एक प्रमुख भारतीय मसाला निर्यातक और कृषि उत्पाद निर्यातक है। एक विश्वसनीय थोक मसाला आपूर्तिकर्ता के रूप में, हम स्थानीय खेतों को अंतरराष्ट्रीय व्यापार केंद्रों से जोड़ते हैं।", hero_btn_explore: "उत्पाद देखें", hero_btn_contact: "संस्थापकों से बात करें",
+      stat_quality: "गुणवत्ता सुनिश्चित", stat_dispatch: "ग्राहक डिस्पैच डेस्क", stat_traceable: "ट्रेसयोग्य सोर्सिंग", stat_categories: "उत्पाद श्रेणियां"
+    },
+    zh: {
+      nav_home: "首页", nav_products: "产品中心", nav_certificates: "资质认证", nav_about: "关于我们", nav_contact: "联系我们", nav_blog: "行业资讯", nav_inquiry: "询价表格", nav_cta: "立即询价",
+      hero_badge: "政府认证出口合作伙伴", hero_title: "印度香料出口商：优质散装香料和农产品", hero_desc: "MY EXPORT WORLD 是首屈一指的印度香料和农产品出口商。作为值得信赖的散装香料供应商，我们将当地农场与国际贸易枢纽连接起来。", hero_btn_explore: "探索商品", hero_btn_contact: "联系创始人",
+      stat_quality: "质量保证", stat_dispatch: "客户服务台", stat_traceable: "可追溯来源", stat_categories: "商品类别"
+    },
+    es: {
+      nav_home: "Inicio", nav_products: "Productos", nav_certificates: "Certificados", nav_about: "Nosotros", nav_contact: "Contacto", nav_blog: "Blog", nav_inquiry: "Formulario", nav_cta: "Consultar Ahora",
+      hero_badge: "Socio de Exportación Reconocido", hero_title: "Exportador de Especias de la India: Especias a Granel y Productos Agrícolas", hero_desc: "MY EXPORT WORLD es un exportador líder de especias indias y productos agrícolas. Conectamos granjas locales con centros de comercio internacional.", hero_btn_explore: "Explorar Productos", hero_btn_contact: "Hablar con Fundadores",
+      stat_quality: "Calidad Garantizada", stat_dispatch: "Despacho al Cliente", stat_traceable: "Origen Rastreable", stat_categories: "Categorías de Productos"
+    },
+    de: {
+      nav_home: "Startseite", nav_products: "Produkte", nav_certificates: "Zertifikate", nav_about: "Über Uns", nav_contact: "Kontakt", nav_blog: "Blog", nav_inquiry: "Anfrageformular", nav_cta: "Jetzt Anfragen",
+      hero_badge: "Staatlich Anerkannter Exportpartner", hero_title: "Gewürzexporteur aus Indien: Premium-Gewürze & Agrarprodukte", hero_desc: "MY EXPORT WORLD ist ein führender indischer Gewürz- und Agrarprodukte-Exporteur. Wir verbinden lokale Bauernhöfe mit internationalen Handelszentren.", hero_btn_explore: "Produkte Entdecken", hero_btn_contact: "Gründer Kontaktieren",
+      stat_quality: "Garantierte Qualität", stat_dispatch: "Kundenservice-Desk", stat_traceable: "Rückverfolgbare Herkunft", stat_categories: "Produktkategorien"
+    },
+    ar: {
+      nav_home: "الرئيسية", nav_products: "المنتجات", nav_certificates: "الشهادات", nav_about: "من نحن", nav_contact: "اتصل بنا", nav_blog: "المدونة", nav_inquiry: "نموذج الاستفسار", nav_cta: "استفسر الآن",
+      hero_badge: "شريك تصدير معتمد حكومياً", hero_title: "مصدر التوابل من الهند: توابل بالجملة ومنتجات زراعية فاخرة", hero_desc: "MY EXPORT WORLD هي شركة رائدة في تصدير التوابل والمنتجات الزراعية الهندية. نربط المزارع المحلية بمراكز التجارة الدولية.", hero_btn_explore: "استكشف المنتجات", hero_btn_contact: "تحدث مع المؤسسين",
+      stat_quality: "جودة مضمونة", stat_dispatch: "مكتب خدمة العملاء", stat_traceable: "مصدر قابل للتتبع", stat_categories: "فئات المنتجات"
+    },
+    fr: {
+      nav_home: "Accueil", nav_products: "Produits", nav_certificates: "Certificats", nav_about: "À Propos", nav_contact: "Contact", nav_blog: "Blog", nav_inquiry: "Demande de Devis", nav_cta: "Demander un Devis",
+      hero_badge: "Partenaire d'Exportation Agréé", hero_title: "Exportateur d'Épices d'Inde: Épices en Vrac & Produits Agricoles", hero_desc: "MY EXPORT WORLD est un exportateur majeur d'épices et de produits agricoles indiens. Nous relions les fermes locales aux marchés internationaux.", hero_btn_explore: "Explorer les Produits", hero_btn_contact: "Contacter les Fondateurs",
+      stat_quality: "Qualité Garantie", stat_dispatch: "Service Expédition Client", stat_traceable: "Traçabilité Garantie", stat_categories: "Catégories de Produits"
+    },
+    ru: {
+      nav_home: "Главная", nav_products: "Продукция", nav_certificates: "Сертификаты", nav_about: "О нас", nav_contact: "Контакты", nav_blog: "Блог", nav_inquiry: "Запрос цены", nav_cta: "Запросить цену",
+      hero_badge: "Официальный экспортный партнер", hero_title: "Экспортер специй из Индии: Специи оптом и сельхозпродукция", hero_desc: "MY EXPORT WORLD — ведущий экспортер индийских специй и сельскохозяйственной продукции. Мы соединяем фермы с мировыми торговыми хабами.", hero_btn_explore: "Каталог товаров", hero_btn_contact: "Связаться с основателями",
+      stat_quality: "Гарантия качества", stat_dispatch: "Служба отправки клиентов", stat_traceable: "Отслеживаемое происхождение", stat_categories: "Категории товаров"
+    },
+    pt: {
+      nav_home: "Início", nav_products: "Produtos", nav_certificates: "Certificados", nav_about: "Sobre Nós", nav_contact: "Contato", nav_blog: "Blog", nav_inquiry: "Formulário", nav_cta: "Consultar Agora",
+      hero_badge: "Parceiro de Exportação Reconhecido", hero_title: "Exportador de Especiarias da Índia: Especiarias a Granel e Produtos Agrícolas", hero_desc: "MY EXPORT WORLD é um importante exportador de especiarias indianas e produtos agrícolas, conectando fazendas locais a centros comerciais globais.", hero_btn_explore: "Explorar Produtos", hero_btn_contact: "Falar com Fundadores",
+      stat_quality: "Qualidade Garantida", stat_dispatch: "Atendimento ao Cliente", stat_traceable: "Origem Rastreável", stat_categories: "Categorias de Produtos"
+    },
+    ja: {
+      nav_home: "ホーム", nav_products: "製品一覧", nav_certificates: "認定資格", nav_about: "会社概要", nav_contact: "お問い合わせ", nav_blog: "ブログ", nav_inquiry: "見積もりフォーム", nav_cta: "今すぐ見積もり",
+      hero_badge: "政府認定輸出パートナー", hero_title: "インドのスパイス輸出業者：高品質バルクスパイス＆農産物", hero_desc: "MY EXPORT WORLDは、インドの高品質スパイスおよび農产物の主要輸出業者です。地域の農場と世界の貿易ハブを直接結びつけます。", hero_btn_explore: "商品を見る", hero_btn_contact: "創業者に相談",
+      stat_quality: "品質保証", stat_dispatch: "カスタマーデスク", stat_traceable: "トレーサビリティ保証", stat_categories: "商品カテゴリー"
+    },
+    ko: {
+      nav_home: "홈", nav_products: "제품 목록", nav_certificates: "인증서", nav_about: "회사 소개", nav_contact: "문의하기", nav_blog: "블로그", nav_inquiry: "견적 요청", nav_cta: "지금 견적 요청",
+      hero_badge: "정부 공인 수출 파트너", hero_title: "인도 향신료 수출업체: 프리미엄 대량 향신료 및 농산물", hero_desc: "MY EXPORT WORLD는 인도의 주요 향신료 및 농산물 수출업체입니다. 현지 농장과 글로벌 무역 허브를 직접 연결합니다.", hero_btn_explore: "상품 탐색", hero_btn_contact: "창립자 문의",
+      stat_quality: "품질 보증", stat_dispatch: "고객 출하 데스크", stat_traceable: "추적 가능한 추적", stat_categories: "상품 카테고리"
+    },
+    id: {
+      nav_home: "Beranda", nav_products: "Produk", nav_certificates: "Sertifikat", nav_about: "Tentang Kami", nav_contact: "Kontak", nav_blog: "Blog", nav_inquiry: "Formulir Pertanyaan", nav_cta: "Tanyakan Sekarang",
+      hero_badge: "Mitra Ekspor Resmi Pemerintah", hero_title: "Eksportir Rempah India: Rempah Curah Premium & Produk Pertanian", hero_desc: "MY EXPORT WORLD adalah eksportir utama rempah-rempah dan produk pertanian India. Kami menghubungkan petani lokal dengan pusat perdagangan dunia.", hero_btn_explore: "Jelajahi Produk", hero_btn_contact: "Hubungi Pendiri",
+      stat_quality: "Kualitas Terjamin", stat_dispatch: "Layanan Pelanggan", stat_traceable: "Sumber Terlacak", stat_categories: "Kategori Komoditas"
+    },
+    tr: {
+      nav_home: "Ana Sayfa", nav_products: "Ürünler", nav_certificates: "Sertifikalar", nav_about: "Hakkımızda", nav_contact: "İletişim", nav_blog: "Blog", nav_inquiry: "Teklif Formu", nav_cta: "Şimdi Teklif Alın",
+      hero_badge: "Devlet Onaylı İhracat Ortağı", hero_title: "Hindistan Baharat İhracatçısı: Toptan Baharat ve Tarım Ürünleri", hero_desc: "MY EXPORT WORLD, Hindistan'ın önde gelen baharat ve tarım ürünleri ihracatçısıdır. Yerel çiftlikleri uluslararası ticaret merkezleriyle buluşturuyoruz.", hero_btn_explore: "Ürünleri İnceleyin", hero_btn_contact: "Kurucularla Görüşün",
+      stat_quality: "Kalite Garantili", stat_dispatch: "Müşteri Sevkiyat Masası", stat_traceable: "Izlenebilir Kaynak", stat_categories: "Ürün Kategorileri"
+    },
+    vi: {
+      nav_home: "Trang chủ", nav_products: "Sản phẩm", nav_certificates: "Chứng nhận", nav_about: "Giới thiệu", nav_contact: "Liên hệ", nav_blog: "Blog", nav_inquiry: "Mẫu yêu cầu", nav_cta: "Yêu cầu báo giá",
+      hero_badge: "Đối tác xuất khẩu được chứng nhận", hero_title: "Nhà xuất khẩu gia vị Ấn Độ: Gia vị sỉ & Nông sản cao cấp", hero_desc: "MY EXPORT WORLD là nhà xuất khẩu gia vị và nông sản hàng đầu Ấn Độ, kết nối các trang trại địa phương với trung tâm thương mại quốc tế.", hero_btn_explore: "Khám phá sản phẩm", hero_btn_contact: "Nói chuyện với nhà sáng lập",
+      stat_quality: "Đảm bảo chất lượng", stat_dispatch: "Bàn giao hàng khách hàng", stat_traceable: "Nguồn gốc rõ ràng", stat_categories: "Danh mục sản phẩm"
+    },
+    th: {
+      nav_home: "หน้าแรก", nav_products: "สินค้า", nav_certificates: "ใบรับรอง", nav_about: "เกี่ยวกับเรา", nav_contact: "ติดต่อเรา", nav_blog: "บล็อก", nav_inquiry: "แบบฟอร์มสอบถาม", nav_cta: "สอบถามตอนนี้",
+      hero_badge: "พันธมิตรส่งออกที่ได้รับการรับรองจากรัฐบาล", hero_title: "ผู้ส่งออกเครื่องเทศจากอินเดีย: เครื่องเทศราคาส่งและสินค้าเกษตรพรีเมียม", hero_desc: "MY EXPORT WORLD เป็นผู้ส่งออกเครื่องเทศและสินค้าเกษตรชั้นนำของอินเดีย เชื่อมโยงฟาร์มท้องถิ่นเข้ากับศูนย์กลางการค้าระหว่างประเทศ", hero_btn_explore: "สำรวจสินค้า", hero_btn_contact: "พูดคุยกับผู้ก่อตั้ง",
+      stat_quality: "รับประกันคุณภาพ", stat_dispatch: "ฝ่ายจัดส่งสินค้า", stat_traceable: "ตรวจสอบแหล่งที่มาได้", stat_categories: "หมวดหมู่สินค้า"
+    },
+    it: {
+      nav_home: "Home", nav_products: "Prodotti", nav_certificates: "Certificati", nav_about: "Chi Siamo", nav_contact: "Contatti", nav_blog: "Blog", nav_inquiry: "Modulo Richiesta", nav_cta: "Richiedi Ora",
+      hero_badge: "Partner di Esportazione Riconosciuto", hero_title: "Esportatore di Spezie dall'India: Spezie Sfuse & Prodotti Agricoli Premium", hero_desc: "MY EXPORT WORLD è un principale esportatore di spezie e prodotti agricoli indiani. Colleghiamo le fattorie locali ai mercati internazionali.", hero_btn_explore: "Esplora Prodotti", hero_btn_contact: "Parla con i Fondatori",
+      stat_quality: "Qualità Garantita", stat_dispatch: "Servizio Spedizioni Clienti", stat_traceable: "Origine Tracciabile", stat_categories: "Categorie Prodotti"
+    },
+    nl: {
+      nav_home: "Home", nav_products: "Producten", nav_certificates: "Certificaten", nav_about: "Over Ons", nav_contact: "Contact", nav_blog: "Blog", nav_inquiry: "Offerteformulier", nav_cta: "Nu Offerte Vragen",
+      hero_badge: "Erkend Exportpartner", hero_title: "Specerijen Exporteur uit India: Premium Specerijen & Landbouwproducten", hero_desc: "MY EXPORT WORLD is een vooraanstaande Indiase exporteur van specerijen en landbouwproducten. Wij verbinden lokale boerderijen met internationale handelscentra.", hero_btn_explore: "Ontdek Producten", hero_btn_contact: "Spreek met Oprichters",
+      stat_quality: "Gegarandeerde Kwaliteit", stat_dispatch: "Klantenservice Desk", stat_traceable: "Traceerbare Herkomst", stat_categories: "Productcategorieën"
+    },
+    pl: {
+      nav_home: "Strona Główna", nav_products: "Produkty", nav_certificates: "Certyfikaty", nav_about: "O nas", nav_contact: "Kontakt", nav_blog: "Blog", nav_inquiry: "Formularz Zapytania", nav_cta: "Zapytaj Teraz",
+      hero_badge: "Oficjalny Partner Eksportowy", hero_title: "Eksporter Przypraw z Indii: Przyprawy Hurtowe i Produkty Rolne", hero_desc: "MY EXPORT WORLD to вiodący eksporter indyjskich przypraw i produktów rolnych. Łączymy lokalne gospodarstwa z międzynarodowymi centrami handlowymi.", hero_btn_explore: "Zobacz Produkty", hero_btn_contact: "Porozmawiaj z Założycielami",
+      stat_quality: "Gwarancja Jakości", stat_dispatch: "Dział Wysyłki Klienta", stat_traceable: "Identyfikowalne Pochodzenie", stat_categories: "Kategorie Towarów"
+    },
+    sv: {
+      nav_home: "Hem", nav_products: "Produkter", nav_certificates: "Certifikat", nav_about: "Om Oss", nav_contact: "Kontakt", nav_blog: "Blogg", nav_inquiry: "Förfrågan", nav_cta: "Begär Offert Nu",
+      hero_badge: "Godkänd Exportpartner", hero_title: "Kryddexportör från Indien: Premium Kryddor i Partihandel & Jordbruksprodukter", hero_desc: "MY EXPORT WORLD är en ledande indisk exportör av kryddor och jordbruksprodukter. Vi kopplar samman lokala jordbruk med internationella handelscentrum.", hero_btn_explore: "Utforska Produkter", hero_btn_contact: "Prata med Grundarna",
+      stat_quality: "Garanterad Kvalitet", stat_dispatch: "Kundleveransavdelning", stat_traceable: "Spårbar Härkomst", stat_categories: "Produktkategorier"
+    },
+    bn: {
+      nav_home: "হোম", nav_products: "পণ্যসমূহ", nav_certificates: "সনদপত্র", nav_about: "আমাদের সম্পর্কে", nav_contact: "যোগাযোগ", nav_blog: "ব্লগ", nav_inquiry: "অনুসন্ধান ফরম", nav_cta: "এখনই অনুসন্ধান করুন",
+      hero_badge: "সরকারি স্বীকৃত রফতানি অংশীদার", hero_title: "ভারত থেকে মসলা রফতানিকারক: প্রিমিয়াম বাল্ক মসলা ও কৃষি পণ্য", hero_desc: "MY EXPORT WORLD হলো ভারতের অন্যতম প্রধান মসলা ও কৃষি পণ্য রফতানিকারক প্রতিষ্ঠান। আমরা স্থানীয় খামারগুলোকে আন্তর্জাতিক বাণিজ্য হাবের সাথে যুক্ত করি।", hero_btn_explore: "পণ্যসমূহ দেখুন", hero_btn_contact: "প্রতিষ্ঠাতাদের সাথে কথা বলুন",
+      stat_quality: "গুণমান নিশ্চিত", stat_dispatch: "ক্লায়েন্ট ডিসপ্যাচ ডেস্কেল", stat_traceable: "ট্রেসযোগ্য সোর্সিং", stat_categories: "পণ্য বিভাগসমূহ"
+    }
+  };
+
+  const setLanguage = (lang) => {
+    const selectedLang = translations[lang] ? lang : 'en';
+    const dict = translations[selectedLang];
+    
+    if (selectedLang === 'ar') {
+      document.documentElement.setAttribute('dir', 'rtl');
+      document.documentElement.setAttribute('lang', 'ar');
+    } else {
+      document.documentElement.removeAttribute('dir');
+      document.documentElement.setAttribute('lang', selectedLang);
+    }
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict && dict[key]) {
+        el.textContent = dict[key];
+      }
+    });
+
+    localStorage.setItem('myexportworld_lang', selectedLang);
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect && langSelect.value !== selectedLang) {
+      langSelect.value = selectedLang;
+    }
+  };
+
+  const initLanguage = () => {
+    const savedLang = localStorage.getItem('myexportworld_lang') || 'en';
+    setLanguage(savedLang);
+
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+      langSelect.addEventListener('change', (e) => {
+        setLanguage(e.target.value);
+      });
+    }
+  };
+
+  initLanguage();
+
   // --- 1. Global State & Sample Data ---
   let inquiries = [];
 
