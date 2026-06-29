@@ -205,27 +205,29 @@ button, input, select, textarea {
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 2.2rem;
+  gap: 1.6rem;
   list-style: none;
 }
 
 .nav-link {
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--primary-blue-dark);
   position: relative;
-  padding: 0.5rem 0;
+  padding: 0.4rem 0.2rem;
   cursor: pointer;
+  transition: var(--transition-fast);
 }
 
 .nav-link::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
-  height: 3px;
+  height: 2.5px;
   background-color: var(--accent-red);
   border-radius: var(--radius-full);
   transition: var(--transition-smooth);
@@ -236,7 +238,7 @@ button, input, select, textarea {
 }
 
 .nav-link.active::after {
-  width: 100%;
+  width: 80%;
 }
 
 .nav-link:hover {
@@ -244,7 +246,7 @@ button, input, select, textarea {
 }
 
 .nav-link:hover::after {
-  width: 100%;
+  width: 80%;
 }
 
 /* Nav Actions (CTA Button) */
@@ -253,11 +255,13 @@ button, input, select, textarea {
   color: var(--text-light);
   font-family: var(--font-heading);
   font-weight: 700;
-  padding: 0.75rem 1.6rem;
+  font-size: 0.85rem;
+  padding: 0.6rem 1.4rem;
   border-radius: var(--radius-full);
   box-shadow: 0 4px 15px rgba(214, 28, 44, 0.2);
   transition: var(--transition-smooth);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .nav-cta:hover {
@@ -3532,18 +3536,20 @@ button, input, select, textarea {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 51, 102, 0.15);
   border-radius: var(--radius-full);
-  padding: 0.55rem 1.8rem 0.55rem 2.2rem;
+  padding: 0.5rem 1.2rem 0.5rem 2.1rem;
   font-family: var(--font-heading);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--primary-blue-dark);
   cursor: pointer;
   outline: none;
   transition: var(--transition-smooth);
   box-shadow: var(--shadow-sm);
+  max-width: 145px;
+  text-overflow: ellipsis;
 }
 
 .lang-select:hover, .lang-select:focus {
