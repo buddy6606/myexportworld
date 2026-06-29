@@ -140,14 +140,32 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const triggerGoogleTranslate = (lang) => {
-    const targetLang = (lang === 'zh') ? 'zh-CN' : lang;
+    const activeLang = lang || localStorage.getItem('myexportworld_lang') || 'en';
+    const targetLang = (activeLang === 'zh') ? 'zh-CN' : activeLang;
+    
     document.cookie = "googtrans=/en/" + targetLang + "; path=/;";
     document.cookie = "googtrans=/en/" + targetLang + "; domain=" + window.location.hostname + "; path=/;";
 
-    const gtCombo = document.querySelector('.goog-te-combo');
-    if (gtCombo) {
-      gtCombo.value = targetLang;
-      gtCombo.dispatchEvent(new Event('change'));
+    const applyTranslateCombo = () => {
+      const gtCombo = document.querySelector('.goog-te-combo');
+      if (gtCombo) {
+        if (gtCombo.value !== targetLang) {
+          gtCombo.value = targetLang;
+        }
+        gtCombo.dispatchEvent(new Event('change'));
+        return true;
+      }
+      return false;
+    };
+
+    if (!applyTranslateCombo()) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (applyTranslateCombo() || attempts > 15) {
+          clearInterval(interval);
+        }
+      }, 300);
     }
   };
 
@@ -162,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const savedLang = localStorage.getItem('myexportworld_lang') || 'en';
       if (savedLang !== 'en') {
-        setTimeout(() => { triggerGoogleTranslate(savedLang); }, 500);
+        setTimeout(() => { triggerGoogleTranslate(savedLang); }, 300);
       }
     }
   };
@@ -1141,6 +1159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkEmptyGrid(gridPsyllium);
     checkEmptyGrid(gridCumin);
     checkEmptyGrid(gridChilli);
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // --- 8. Dynamic Products Nested Catalog Explorer ---
@@ -1395,6 +1414,8 @@ document.addEventListener('DOMContentLoaded', () => {
       mobileNavMenu.classList.remove('open');
       mobileNavToggle.classList.remove('active');
     }
+
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // Hash-based routing handler
@@ -1732,6 +1753,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       blogGrid.appendChild(card);
     });
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // Open Single View Reader
@@ -1794,6 +1816,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Scroll reader view smoothly to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => { triggerGoogleTranslate(); }, 150);
   };
 
   // Back button event listener
