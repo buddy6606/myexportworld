@@ -1169,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
-      canonical.setAttribute('href', url);
+      canonical.setAttribute('href', "https://www.myexportworld.com/");
     }
 
     setMetaTag('meta[property="og:title"]', 'content', title);
