@@ -2025,6 +2025,9 @@ button, input, select, textarea {
 
 .inquiry-form-container {
   padding: 3.5rem 3rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .inquiry-form-container h3 {
@@ -2044,6 +2047,7 @@ button, input, select, textarea {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .form-group {
@@ -2051,6 +2055,7 @@ button, input, select, textarea {
   flex-direction: column;
   gap: 0.4rem;
   width: 100%;
+  min-width: 0;
 }
 
 .form-group.full-width {
@@ -2080,7 +2085,15 @@ button, input, select, textarea {
   color: var(--text-dark);
   transition: var(--transition-fast);
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+}
+
+.form-select {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .form-input::placeholder, .form-textarea::placeholder {
