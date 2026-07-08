@@ -29,7 +29,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     db = firebase.firestore();
   }
+  // --- Mobile Navigation Toggle ---
+  const mobileNavToggle = document.getElementById('mobileNavToggle');
+  const navMenu = document.getElementById('navMenu');
 
+  if (mobileNavToggle && navMenu) {
+    mobileNavToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navMenu.classList.toggle('open');
+      mobileNavToggle.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside of it
+    document.addEventListener('click', (e) => {
+      if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && e.target !== mobileNavToggle) {
+        navMenu.classList.remove('open');
+        mobileNavToggle.classList.remove('active');
+      }
+    });
+
+    // Close menu when clicking a nav link
+    const navLinks = navMenu.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+        mobileNavToggle.classList.remove('active');
+      });
+    });
+
+    // Append 'Inquire Now' CTA dynamically inside mobile nav menu if not already there
+    if (!navMenu.querySelector('.mobile-menu-cta')) {
+      const inquiryLi = document.createElement('li');
+      inquiryLi.className = 'mobile-menu-cta';
+      inquiryLi.innerHTML = `<a class="nav-link nav-cta-mobile" href="inquiry.html">Inquire Now</a>`;
+      navMenu.appendChild(inquiryLi);
+    }
+  }
 
 
   // --- 1. Global State & Sample Data ---
