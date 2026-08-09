@@ -1267,13 +1267,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Dynamic Navigation Transitions
   const navigateToLevel1 = () => {
-    if (!level1 || !level2 || !level3) return;
-    // Show L1, Hide L2 & L3
-    level1.classList.remove('hidden');
-    level2.classList.add('hidden');
-    level3.classList.add('hidden');
+    const l1 = document.getElementById('catalogLevel1');
+    const l2 = document.getElementById('catalogLevel2');
+    const l3 = document.getElementById('catalogLevel3');
+    if (l1) l1.classList.remove('hidden');
+    if (l2) l2.classList.add('hidden');
+    if (l3) l3.classList.add('hidden');
 
     // Reset breadcrumbs
+    const breadHome = document.getElementById('breadHome');
+    const breadCategory = document.getElementById('breadCategory');
+    const breadCommoditySep = document.getElementById('breadCommoditySep');
+    const breadCommodity = document.getElementById('breadCommodity');
+
     if (breadHome) breadHome.classList.add('active');
     if (breadCategory) {
       breadCategory.classList.remove('active');
@@ -1284,11 +1290,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const navigateToLevel2 = () => {
-    if (!level1 || !level2 || !level3) return;
-    // Show L2, Hide L1 & L3
-    level1.classList.add('hidden');
-    level2.classList.remove('hidden');
-    level3.classList.add('hidden');
+    const l1 = document.getElementById('catalogLevel1');
+    const l2 = document.getElementById('catalogLevel2');
+    const l3 = document.getElementById('catalogLevel3');
+    if (l1) l1.classList.add('hidden');
+    if (l2) l2.classList.remove('hidden');
+    if (l3) l3.classList.add('hidden');
+
+    const breadHome = document.getElementById('breadHome');
+    const breadCategory = document.getElementById('breadCategory');
+    const breadCommoditySep = document.getElementById('breadCommoditySep');
+    const breadCommodity = document.getElementById('breadCommodity');
 
     // Breadcrumbs: Catalog > Spices
     if (breadHome) breadHome.classList.remove('active');
@@ -1310,13 +1322,19 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const navigateToLevel3 = (filterCategory = 'all') => {
-    if (!level1 || !level2 || !level3) return;
-    // Show L3, Hide L1 & L2
-    level1.classList.add('hidden');
-    level2.classList.add('hidden');
-    level3.classList.remove('hidden');
+    const l1 = document.getElementById('catalogLevel1');
+    const l2 = document.getElementById('catalogLevel2');
+    const l3 = document.getElementById('catalogLevel3');
+    if (l1) l1.classList.add('hidden');
+    if (l2) l2.classList.add('hidden');
+    if (l3) l3.classList.remove('hidden');
 
     const catLower = (filterCategory || 'all').toLowerCase();
+
+    const breadHome = document.getElementById('breadHome');
+    const breadCategory = document.getElementById('breadCategory');
+    const breadCommoditySep = document.getElementById('breadCommoditySep');
+    const breadCommodity = document.getElementById('breadCommodity');
 
     // Breadcrumbs
     if (breadHome) breadHome.classList.remove('active');
@@ -1376,38 +1394,38 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.navigateToLevel3 = navigateToLevel3;
+  window.navigateToLevel2 = navigateToLevel2;
+  window.navigateToLevel1 = navigateToLevel1;
 
   // Event bindings
   // Level 1 Card/Action clicks -> Directly open list of products (Level 3)
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
+
+  const handleBrowseCommoditiesClick = (e) => {
+    if (e) e.stopPropagation();
+    navigateToLevel3('all');
+    window.location.hash = 'product-details';
+  };
+
   if (btnExploreAgri) {
-    btnExploreAgri.addEventListener('click', (e) => {
-      e.stopPropagation();
-      window.location.hash = 'product-details';
-    });
+    btnExploreAgri.addEventListener('click', handleBrowseCommoditiesClick);
   }
   if (categoryCardAgri) {
-    categoryCardAgri.addEventListener('click', (e) => {
-      window.location.hash = 'product-details';
-    });
+    categoryCardAgri.addEventListener('click', handleBrowseCommoditiesClick);
   }
 
   // Level 2 Spotlight Cards / Action clicks -> Navigate to Level 3 filtered by commodity
   const bindSpotlightClick = (btnId, cardId, categoryHash) => {
     const btn = document.getElementById(btnId);
     const card = document.getElementById(cardId);
-    if (btn) {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        window.location.hash = categoryHash;
-      });
-    }
-    if (card) {
-      card.addEventListener('click', () => {
-        window.location.hash = categoryHash;
-      });
-    }
+    const handler = (e) => {
+      if (e) e.stopPropagation();
+      navigateToLevel3(categoryHash);
+      window.location.hash = categoryHash;
+    };
+    if (btn) btn.addEventListener('click', handler);
+    if (card) card.addEventListener('click', handler);
   };
 
   bindSpotlightClick('btnSelectTurmeric', 'spotlightCardTurmeric', 'turmeric');
@@ -1418,7 +1436,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Level 2 Back click -> Returns to Level 1
   const btnBackToLevel1 = document.getElementById('btnBackToLevel1');
   if (btnBackToLevel1) {
-    btnBackToLevel1.addEventListener('click', () => {
+    btnBackToLevel1.addEventListener('click', (e) => {
+      if (e) e.stopPropagation();
+      navigateToLevel1();
       window.location.hash = 'product';
     });
   }
@@ -1426,31 +1446,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // Level 3 Back click -> Returns to Level 1 (Categories)
   const btnBackToLevel2 = document.getElementById('btnBackToLevel2');
   if (btnBackToLevel2) {
-    btnBackToLevel2.addEventListener('click', () => {
+    btnBackToLevel2.addEventListener('click', (e) => {
+      if (e) e.stopPropagation();
+      navigateToLevel1();
       window.location.hash = 'product';
     });
   }
 
   // Level 3 Category Filter Tabs click
   document.querySelectorAll('.filter-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      if (e) e.stopPropagation();
       const cat = btn.getAttribute('data-category');
-      if (cat === 'all') {
-        window.location.hash = 'product-details';
-      } else {
-        window.location.hash = cat;
-      }
+      navigateToLevel3(cat);
+      window.location.hash = cat === 'all' ? 'product-details' : cat;
     });
   });
 
   // Breadcrumb action binds
+  const breadHome = document.getElementById('breadHome');
+  const breadCategory = document.getElementById('breadCategory');
   if (breadHome) {
     breadHome.addEventListener('click', () => {
+      navigateToLevel1();
       window.location.hash = 'product';
     });
   }
   if (breadCategory) {
     breadCategory.addEventListener('click', () => {
+      navigateToLevel2();
       window.location.hash = 'spices';
     });
   }
