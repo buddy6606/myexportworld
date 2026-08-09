@@ -1742,8 +1742,12 @@ Time: ${timestamp}`;
         }
       };
 
-      // Fire dispatches immediately
-      sendTelegramNotice();
+      // Fire dispatches immediately with try-catch safety
+      try {
+        sendTelegramNotice();
+      } catch (tgErr) {
+        console.warn("Telegram notice error:", tgErr);
+      }
 
       // Step 5: Send to Google Sheets (and relay Telegram server-side as extra backup)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
@@ -1754,13 +1758,15 @@ Time: ${timestamp}`;
           telegramMsgHTML: telegramMsgHTML,
           telegramMsgPlain: telegramMsgPlain
         };
-        fetch(GOOGLE_SHEETS_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sheetPayload),
-          keepalive: true
-        }).catch(() => {}); // Silent fail — data already saved locally and dispatched
+        try {
+          fetch(GOOGLE_SHEETS_URL, {
+            method: "POST",
+            body: JSON.stringify(sheetPayload),
+            keepalive: true
+          }).catch(() => {});
+        } catch (gsErr) {
+          console.warn("Google Sheets sync error:", gsErr);
+        }
       }
 
       // Step 3: Show success view in UI
