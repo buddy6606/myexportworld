@@ -1148,6 +1148,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Render Public Catalog Items
   const renderPublicProducts = () => {
     const gridsWrapper = document.querySelector('#catalogLevel3 .grids-wrapper');
+    const gridTurmeric = document.getElementById('gridTurmeric');
+    const gridPsyllium = document.getElementById('gridPsyllium');
+    const gridCumin = document.getElementById('gridCumin');
+    const gridChilli = document.getElementById('gridChilli');
+
     if (!gridsWrapper || !gridTurmeric || !gridPsyllium || !gridCumin || !gridChilli) return;
 
     gridTurmeric.innerHTML = '';
