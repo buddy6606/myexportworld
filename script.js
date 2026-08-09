@@ -1024,49 +1024,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
-  const loadProducts = () => {
-    // 1. Synchronous instant initialization
-    try {
-      const stored = localStorage.getItem('myexportworld_products');
-      if (stored) {
-        products = JSON.parse(stored);
-      } else {
-        products = [...sampleProducts];
-      }
-    } catch (e) {
-      products = [...sampleProducts];
-    }
-
-    renderPublicProducts();
-    populateProductDropdown();
-    populateProductCategorySelect();
-
-    // 2. Asynchronous Firestore background sync
-    if (db) {
-      db.collection('products').onSnapshot(snapshot => {
-        if (!snapshot.empty) {
-          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        } else {
-          products = [...sampleProducts];
-          sampleProducts.forEach(p => {
-            db.collection('products').doc(p.id).set(p).catch(() => {});
-          });
-        }
-        try {
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-        } catch (e) {}
-        renderPublicProducts();
-        populateProductDropdown();
-        populateProductCategorySelect();
-      }, err => {
-        console.error("Firestore products sync error:", err);
-      });
-    }
-  };
-
-  loadProducts();
-
-
   // Populate Specific Product Dropdown in Inquiry Form with dynamic category filtering
   const populateProductDropdown = (categoryFilter = 'all') => {
     const productDropdown = document.getElementById('productSelected');
@@ -1097,8 +1054,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fallbackOpt.textContent = "Other / Bulk Spices Inquiry";
     productDropdown.appendChild(fallbackOpt);
   };
-
-  populateProductDropdown();
 
   // Dynamically populate Product Category select inside Sourcing center
   const populateProductCategorySelect = () => {
@@ -1134,8 +1089,6 @@ document.addEventListener('DOMContentLoaded', () => {
       productCategorySelect.appendChild(opt);
     });
   };
-
-  populateProductCategorySelect();
 
   // Filter products when category changes
   const productCategorySelect = document.getElementById('productCategory');
@@ -1249,6 +1202,48 @@ document.addEventListener('DOMContentLoaded', () => {
     checkEmptyGrid(gridChilli);
     
   };
+
+  const loadProducts = () => {
+    // 1. Synchronous instant initialization
+    try {
+      const stored = localStorage.getItem('myexportworld_products');
+      if (stored) {
+        products = JSON.parse(stored);
+      } else {
+        products = [...sampleProducts];
+      }
+    } catch (e) {
+      products = [...sampleProducts];
+    }
+
+    renderPublicProducts();
+    populateProductDropdown();
+    populateProductCategorySelect();
+
+    // 2. Asynchronous Firestore background sync
+    if (db) {
+      db.collection('products').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } else {
+          products = [...sampleProducts];
+          sampleProducts.forEach(p => {
+            db.collection('products').doc(p.id).set(p).catch(() => {});
+          });
+        }
+        try {
+          localStorage.setItem('myexportworld_products', JSON.stringify(products));
+        } catch (e) {}
+        renderPublicProducts();
+        populateProductDropdown();
+        populateProductCategorySelect();
+      }, err => {
+        console.error("Firestore products sync error:", err);
+      });
+    }
+  };
+
+  loadProducts();
 
   // --- 8. Dynamic Products Nested Catalog Explorer ---
   const level1 = document.getElementById('catalogLevel1');
