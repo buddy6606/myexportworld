@@ -108,7 +108,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="style.css?v=2.2.0">
+  <link rel="stylesheet" href="style.css">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -184,16 +184,45 @@
                 <strong>MY EXPORT WORLD</strong> is a premier <strong>indian spices exporter</strong> and <strong>agricultural products exporter india</strong>. As a trusted <strong>bulk spices supplier india</strong>, we connect local farms with international trade hubs, delivering certified commodities with direct traceability and integrity.
               </p>
               <div class="hero-actions">
-                <a href="products.html" class="btn btn-primary btn-gold">
+                <button class="btn btn-primary btn-gold" data-view="product">
                   <span data-i18n="hero_btn_explore">Explore Commodities</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                <a href="contact.html" class="btn btn-secondary btn-outline-white">
+                </button>
+                <button class="btn btn-secondary btn-outline-white" data-view="contact">
                   <span data-i18n="hero_btn_contact">Talk to Founders</span> <i class="fa-solid fa-arrow-trend-up"></i>
-                </a>
+                </button>
               </div>
             </div>
             
             <div class="hero-showcase">
+              <div class="hero-showcase-overlay" style="padding: 2.2rem; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, rgba(5, 25, 59, 0.88) 0%, rgba(11, 60, 155, 0.8) 100%); color: #ffffff; border-radius: var(--radius-lg); position: relative; backdrop-filter: blur(8px);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; background: rgba(214, 28, 44, 0.25); border: 1px solid var(--accent-red); color: #ff6b6b; padding: 0.35rem 0.9rem; border-radius: var(--radius-full); display: flex; align-items: center; gap: 0.4rem;">
+                    <span style="width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; display: inline-block;"></span> Live Trade Desk
+                  </span>
+                  <img src="images/logo.png" alt="MY EXPORT WORLD Logo" style="width: 44px; height: 44px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));">
+                </div>
+
+                <div>
+                  <h3 style="font-size: 1.6rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem; font-family: var(--font-heading);">MY EXPORT WORLD</h3>
+                  <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.88); line-height: 1.45; margin-bottom: 1.2rem;">
+                    Premier Indian Spices & Agricultural Commodity Exporter. Sourcing directly from farming clusters in Nizamabad, Sangli, Guntur & Gujarat.
+                  </p>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.78rem; background: rgba(255,255,255,0.12); padding: 0.3rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2);">Organic Turmeric</span>
+                    <span style="font-size: 0.78rem; background: rgba(255,255,255,0.12); padding: 0.3rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2);">Psyllium Husk 99%</span>
+                    <span style="font-size: 0.78rem; background: rgba(255,255,255,0.12); padding: 0.3rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2);">Sortex Cumin</span>
+                    <span style="font-size: 0.78rem; background: rgba(255,255,255,0.12); padding: 0.3rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2);">Stemless Red Chilli</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: rgba(255,255,255,0.9);">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--accent-yellow);"></i> APEDA, FSSAI & Spices Board Certified
+                  </div>
+                  <a href="products.html" class="btn btn-primary btn-gold" style="padding: 0.45rem 1.1rem; font-size: 0.82rem; text-decoration: none;">Explore Catalog <i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -252,6 +281,85 @@
                 <span class="stat-count-value" data-target="3">0</span><span class="stat-suffix">+</span>
               </div>
               <div class="stat-label-text" data-i18n="stat_categories">Commodity Categories</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Sourcing Commodities Section -->
+      <div class="featured-commodities-section section-padding" style="background: var(--bg-main); border-bottom: 1px solid var(--border-light);">
+        <div class="container">
+          <div class="section-header text-center">
+            <span class="section-subtitle">Primary Export Catalog</span>
+            <h2 class="section-title">Featured Agricultural Commodities</h2>
+            <p class="section-desc">Sourced directly from verified farming clusters across India with 100% laboratory quality compliance and origin traceability.</p>
+          </div>
+
+          <div class="sub-products-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem;">
+            
+            <!-- Card 1: Turmeric -->
+            <div class="product-card">
+              <div class="product-img-wrapper">
+                <img src="images/turmeric_finger.jpg" alt="Dried Turmeric Finger" class="product-img" onerror="this.src='images/logo.png';">
+                <span class="product-badge">Double Polished</span>
+              </div>
+              <div class="product-info">
+                <span class="hs-code-tag">HS CODE: 09103020</span>
+                <h3 class="product-title">Dried Turmeric Finger</h3>
+                <p class="product-desc">Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin. Min 3.5% Curcumin.</p>
+                <div class="product-actions" style="margin-top: 1rem;">
+                  <a href="products.html#turmeric" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none;">View Turmeric Catalog <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Psyllium Husk -->
+            <div class="product-card">
+              <div class="product-img-wrapper">
+                <img src="images/psyllium_husk.png" alt="Psyllium Husk Whole" class="product-img" onerror="this.src='images/logo.png';">
+                <span class="product-badge">99% Ultra-Pure</span>
+              </div>
+              <div class="product-info">
+                <span class="hs-code-tag">HS CODE: 12119032</span>
+                <h3 class="product-title">Psyllium Husk Whole</h3>
+                <p class="product-desc">Premium whole seed husks of Plantago ovata. Outstanding soluble dietary fiber for global food and pharmaceutical industries.</p>
+                <div class="product-actions" style="margin-top: 1rem;">
+                  <a href="products.html#psyllium" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none;">View Psyllium Catalog <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Cumin Seeds -->
+            <div class="product-card">
+              <div class="product-img-wrapper">
+                <img src="images/cumin_seeds.png" alt="Cumin Seeds" class="product-img" onerror="this.src='images/logo.png';">
+                <span class="product-badge">Sortex Cleaned</span>
+              </div>
+              <div class="product-info">
+                <span class="hs-code-tag">HS CODE: 09093120</span>
+                <h3 class="product-title">Cumin Seeds (Jeera)</h3>
+                <p class="product-desc">Machine-cleaned and Sortex-purified dry cumin seeds. High essential oil concentration and rich aroma profile.</p>
+                <div class="product-actions" style="margin-top: 1rem;">
+                  <a href="products.html#cumin" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none;">View Cumin Catalog <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Red Chilli -->
+            <div class="product-card">
+              <div class="product-img-wrapper">
+                <img src="images/chilli_whole.png" alt="Dry Red Chilli" class="product-img" onerror="this.src='images/logo.png';">
+                <span class="product-badge">Stemless Grade-A</span>
+              </div>
+              <div class="product-info">
+                <span class="hs-code-tag">HS CODE: 09042211</span>
+                <h3 class="product-title">Dry Red Chilli</h3>
+                <p class="product-desc">Stemless sun-dried Guntur red chilli pods. High pungency (75k-100k SHU) and deep red ASTA color value.</p>
+                <div class="product-actions" style="margin-top: 1rem;">
+                  <a href="products.html#chilli" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none;">View Red Chilli Catalog <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -624,8 +732,8 @@
   
 
   <!-- JavaScript Logics -->
-  <script src="auto-blog-engine.js?v=3.0.0"></script>
-  <script src="script.js?v=3.0.0"></script>
+  <script src="auto-blog-engine.js"></script>
+  <script src="script.js"></script>
   
 </body>
 </html>

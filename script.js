@@ -808,43 +808,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const loadBlogPosts = () => {
     // 1. Synchronous instant initialization (0ms render)
-    let localPosts = [];
     try {
       const stored = localStorage.getItem('myexportworld_blog_posts');
       if (stored) {
-        localPosts = JSON.parse(stored);
+        blogPosts = ensureTodayPost(JSON.parse(stored));
+      } else {
+        blogPosts = ensureTodayPost([...sampleBlogPosts]);
       }
-    } catch (e) {}
+    } catch (e) {
+      blogPosts = ensureTodayPost([...sampleBlogPosts]);
+    }
 
-    // Combine sample posts and local posts so all posts are present immediately
-    const combined = [...localPosts];
-    sampleBlogPosts.forEach(sp => {
-      if (!combined.some(p => p && p.id === sp.id)) {
-        combined.push(sp);
-      }
-    });
-
-    blogPosts = ensureTodayPost(combined);
-    try {
-      localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
-    } catch (e) {}
-
-    // Render grid immediately on load (all 8+ articles rendered instantly)
+    // Render grid immediately on load
     renderBlogFilters();
     renderBlogGrid('all');
 
-    // 2. Asynchronous Firestore background sync
+    // 2. Asynchronous Firestore background sync with safe merging
     if (db) {
       db.collection('blog_posts').onSnapshot(snapshot => {
-        if (!snapshot.empty) {
-          const remotePosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          remotePosts.forEach(rp => {
-            if (!combined.some(p => p && p.id === rp.id)) {
-              combined.push(rp);
-            }
+        const postsMap = new Map();
+        // 1. Seed map with default sampleBlogPosts
+        sampleBlogPosts.forEach(sp => postsMap.set(sp.id, sp));
+
+        // 2. Overlay documents received from Firestore
+        if (snapshot && !snapshot.empty) {
+          snapshot.docs.forEach(doc => {
+            postsMap.set(doc.id, { id: doc.id, ...doc.data() });
           });
-          blogPosts = ensureTodayPost(combined);
         }
+
+        // 3. Combine into final list with today's post guaranteed
+        const mergedPosts = Array.from(postsMap.values());
+        blogPosts = ensureTodayPost(mergedPosts);
+
+        // Seed missing sample posts into Firestore in background
+        if (!snapshot || snapshot.empty || snapshot.docs.length < sampleBlogPosts.length) {
+          sampleBlogPosts.forEach(sp => {
+            db.collection('blog_posts').doc(sp.id).set(sp).catch(() => {});
+          });
+        }
+
         try {
           localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
         } catch (e) {}
@@ -863,19 +866,8 @@ document.addEventListener('DOMContentLoaded', () => {
     AutoBlogEngine.checkAndPublishDailyPost(db).then(todayPost => {
       try {
         const stored = localStorage.getItem('myexportworld_blog_posts');
-        if (stored) localPosts = JSON.parse(stored);
-        else localPosts = [];
-
-        const combined = [...localPosts];
-        sampleBlogPosts.forEach(sp => {
-          if (!combined.some(p => p && p.id === sp.id)) {
-            combined.push(sp);
-          }
-        });
-        if (todayPost && !combined.some(p => p && p.id === todayPost.id)) {
-          combined.unshift(todayPost);
-        }
-        blogPosts = ensureTodayPost(combined);
+        if (stored) blogPosts = ensureTodayPost(JSON.parse(stored));
+        else if (todayPost) blogPosts = ensureTodayPost([todayPost, ...sampleBlogPosts]);
       } catch (e) {}
       renderBlogFilters();
       renderBlogGrid('all');
@@ -1031,15 +1023,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ]
     }
   ];
-
-  // Product Grid DOM references
-  const level1 = document.getElementById('catalogLevel1');
-  const level2 = document.getElementById('catalogLevel2');
-  const level3 = document.getElementById('catalogLevel3');
-  const gridTurmeric = document.getElementById('gridTurmeric');
-  const gridPsyllium = document.getElementById('gridPsyllium');
-  const gridCumin = document.getElementById('gridCumin');
-  const gridChilli = document.getElementById('gridChilli');
 
   const loadProducts = () => {
     // 1. Synchronous instant initialization
@@ -1280,25 +1263,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dynamic Navigation Transitions
   const navigateToLevel1 = () => {
     if (!level1 || !level2 || !level3) return;
+    // Show L1, Hide L2 & L3
     level1.classList.remove('hidden');
     level2.classList.add('hidden');
     level3.classList.add('hidden');
 
+    // Reset breadcrumbs
+    if (breadHome) breadHome.classList.add('active');
     if (breadCategory) {
       breadCategory.classList.remove('active');
       breadCategory.classList.add('hidden');
     }
     if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
     if (breadCommodity) breadCommodity.classList.add('hidden');
-    if (breadHome) breadHome.classList.add('active');
   };
 
   const navigateToLevel2 = () => {
     if (!level1 || !level2 || !level3) return;
+    // Show L2, Hide L1 & L3
     level1.classList.add('hidden');
     level2.classList.remove('hidden');
     level3.classList.add('hidden');
 
+    // Breadcrumbs: Catalog > Spices
     if (breadHome) breadHome.classList.remove('active');
     if (breadCategory) {
       breadCategory.textContent = "Spices";
@@ -1309,158 +1296,166 @@ document.addEventListener('DOMContentLoaded', () => {
     if (breadCommodity) breadCommodity.classList.add('hidden');
   };
 
-  const navigateToLevel3 = (targetCommodity = 'all') => {
+  const categoryTitleMap = {
+    'all': 'All Commodities',
+    'turmeric': 'Turmeric (Haldi)',
+    'psyllium': 'Psyllium Husk (Isabgol)',
+    'cumin': 'Cumin Seeds & Powder',
+    'chilli': 'Red Chilli & Powder'
+  };
+
+  const navigateToLevel3 = (filterCategory = 'all') => {
     if (!level1 || !level2 || !level3) return;
+    // Show L3, Hide L1 & L2
     level1.classList.add('hidden');
     level2.classList.add('hidden');
     level3.classList.remove('hidden');
 
+    const catLower = (filterCategory || 'all').toLowerCase();
+
+    // Breadcrumbs
     if (breadHome) breadHome.classList.remove('active');
     if (breadCategory) {
       breadCategory.textContent = "Spices";
       breadCategory.classList.remove('hidden');
-      breadCategory.classList.remove('active');
+      if (catLower === 'all') {
+        breadCategory.classList.add('active');
+        if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
+        if (breadCommodity) breadCommodity.classList.add('hidden');
+      } else {
+        breadCategory.classList.remove('active');
+        if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+        if (breadCommodity) {
+          breadCommodity.textContent = categoryTitleMap[catLower] || (catLower.charAt(0).toUpperCase() + catLower.slice(1));
+          breadCommodity.classList.remove('hidden');
+          breadCommodity.classList.add('active');
+        }
+      }
     }
 
-    const sectionTurmeric = document.getElementById('sectionTurmeric');
-    const sectionPsyllium = document.getElementById('sectionPsyllium');
-    const sectionCumin = document.getElementById('sectionCumin');
-    const sectionChilli = document.getElementById('sectionChilli');
-
-    // Highlight matching filter tab button
-    document.querySelectorAll('.commodity-filter-btn').forEach(btn => {
-      const btnFilter = btn.getAttribute('data-commodity-filter');
-      if (btnFilter === targetCommodity || (targetCommodity === 'all' && btnFilter === 'all')) {
+    // Update filter tab active state
+    document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+      if (btn.getAttribute('data-category') === catLower) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
       }
     });
 
-    if (targetCommodity === 'turmeric') {
-      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
-      if (breadCommodity) {
-        breadCommodity.textContent = "Turmeric";
-        breadCommodity.classList.remove('hidden');
-        breadCommodity.classList.add('active');
-      }
+    // Toggle Visibility of Sections
+    const sectionTurmeric = document.getElementById('sectionTurmeric');
+    const sectionPsyllium = document.getElementById('sectionPsyllium');
+    const sectionCumin = document.getElementById('sectionCumin');
+    const sectionChilli = document.getElementById('sectionChilli');
+    const customSections = document.querySelectorAll('.commodity-section-custom');
+
+    if (catLower === 'all') {
       if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
-      if (sectionPsyllium) sectionPsyllium.classList.add('hidden');
-      if (sectionCumin) sectionCumin.classList.add('hidden');
-      if (sectionChilli) sectionChilli.classList.add('hidden');
-    } else if (targetCommodity === 'psyllium') {
-      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
-      if (breadCommodity) {
-        breadCommodity.textContent = "Psyllium Husk";
-        breadCommodity.classList.remove('hidden');
-        breadCommodity.classList.add('active');
-      }
-      if (sectionTurmeric) sectionTurmeric.classList.add('hidden');
       if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
-      if (sectionCumin) sectionCumin.classList.add('hidden');
-      if (sectionChilli) sectionChilli.classList.add('hidden');
-    } else if (targetCommodity === 'cumin') {
-      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
-      if (breadCommodity) {
-        breadCommodity.textContent = "Cumin Seeds";
-        breadCommodity.classList.remove('hidden');
-        breadCommodity.classList.add('active');
-      }
-      if (sectionTurmeric) sectionTurmeric.classList.add('hidden');
-      if (sectionPsyllium) sectionPsyllium.classList.add('hidden');
       if (sectionCumin) sectionCumin.classList.remove('hidden');
-      if (sectionChilli) sectionChilli.classList.add('hidden');
-    } else if (targetCommodity === 'chilli') {
-      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
-      if (breadCommodity) {
-        breadCommodity.textContent = "Red Chilli";
-        breadCommodity.classList.remove('hidden');
-        breadCommodity.classList.add('active');
-      }
-      if (sectionTurmeric) sectionTurmeric.classList.add('hidden');
-      if (sectionPsyllium) sectionPsyllium.classList.add('hidden');
-      if (sectionCumin) sectionCumin.classList.add('hidden');
       if (sectionChilli) sectionChilli.classList.remove('hidden');
+      customSections.forEach(sec => sec.classList.remove('hidden'));
     } else {
-      if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
-      if (breadCommodity) breadCommodity.classList.add('hidden');
-      if (breadCategory) breadCategory.classList.add('active');
-      if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
-      if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
-      if (sectionCumin) sectionCumin.classList.remove('hidden');
-      if (sectionChilli) sectionChilli.classList.remove('hidden');
+      if (sectionTurmeric) sectionTurmeric.classList.toggle('hidden', catLower !== 'turmeric');
+      if (sectionPsyllium) sectionPsyllium.classList.toggle('hidden', catLower !== 'psyllium');
+      if (sectionCumin) sectionCumin.classList.toggle('hidden', catLower !== 'cumin');
+      if (sectionChilli) sectionChilli.classList.toggle('hidden', catLower !== 'chilli');
+      customSections.forEach(sec => {
+        const customCat = sec.id.replace('section_custom_', '');
+        sec.classList.toggle('hidden', customCat !== catLower);
+      });
     }
 
+    // Render active products dynamically
     renderPublicProducts();
   };
 
   // Event bindings
-  // L1: "Browse Commodities" / Click on Spices card -> go directly to All Products catalog
+  // Level 1 Card/Action clicks -> Navigate to Level 2 (Spices)
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
   if (btnExploreAgri) {
     btnExploreAgri.addEventListener('click', (e) => {
       e.stopPropagation();
-      window.location.hash = 'all-products';
+      window.location.hash = 'spices';
     });
   }
   if (categoryCardAgri) {
     categoryCardAgri.addEventListener('click', (e) => {
-      if (e.target.id !== 'btnExploreAgri' && !e.target.closest('#btnExploreAgri')) {
-        window.location.hash = 'all-products';
-      }
+      window.location.hash = 'spices';
     });
   }
 
-  // Level 3 Category Filter Buttons
-  document.querySelectorAll('.commodity-filter-btn').forEach(btn => {
+  // Level 2 Spotlight Cards / Action clicks -> Navigate to Level 3 filtered by commodity
+  const bindSpotlightClick = (btnId, cardId, categoryHash) => {
+    const btn = document.getElementById(btnId);
+    const card = document.getElementById(cardId);
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.hash = categoryHash;
+      });
+    }
+    if (card) {
+      card.addEventListener('click', () => {
+        window.location.hash = categoryHash;
+      });
+    }
+  };
+
+  bindSpotlightClick('btnSelectTurmeric', 'spotlightCardTurmeric', 'turmeric');
+  bindSpotlightClick('btnSelectPsyllium', 'spotlightCardPsyllium', 'psyllium');
+  bindSpotlightClick('btnSelectCumin', 'spotlightCardCumin', 'cumin');
+  bindSpotlightClick('btnSelectChilli', 'spotlightCardChilli', 'chilli');
+
+  // Level 2 Back click -> Returns to Level 1
+  const btnBackToLevel1 = document.getElementById('btnBackToLevel1');
+  if (btnBackToLevel1) {
+    btnBackToLevel1.addEventListener('click', () => {
+      window.location.hash = 'product';
+    });
+  }
+
+  // Level 3 Back click -> Returns to Level 2 (Spices)
+  const btnBackToLevel2 = document.getElementById('btnBackToLevel2');
+  if (btnBackToLevel2) {
+    btnBackToLevel2.addEventListener('click', () => {
+      window.location.hash = 'spices';
+    });
+  }
+
+  // Level 3 Category Filter Tabs click
+  document.querySelectorAll('.filter-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const filter = btn.getAttribute('data-commodity-filter');
-      if (filter === 'all') {
-        window.location.hash = 'all-products';
+      const cat = btn.getAttribute('data-category');
+      if (cat === 'all') {
+        window.location.hash = 'product-details';
       } else {
-        window.location.hash = filter;
+        window.location.hash = cat;
       }
     });
   });
 
-  // L2: Select specific commodity -> go to Level 3 filtered to that commodity
-  const btnSelectTurmeric = document.getElementById('btnSelectTurmeric');
-  const btnSelectPsyllium = document.getElementById('btnSelectPsyllium');
-  const btnSelectCumin = document.getElementById('btnSelectCumin');
-  const btnSelectChilli = document.getElementById('btnSelectChilli');
+  // Breadcrumb action binds
+  if (breadHome) {
+    breadHome.addEventListener('click', () => {
+      window.location.hash = 'product';
+    });
+  }
+  if (breadCategory) {
+    breadCategory.addEventListener('click', () => {
+      window.location.hash = 'spices';
+    });
+  }
 
-  if (btnSelectTurmeric) btnSelectTurmeric.addEventListener('click', () => { window.location.hash = 'turmeric'; });
-  if (btnSelectPsyllium) btnSelectPsyllium.addEventListener('click', () => { window.location.hash = 'psyllium'; });
-  if (btnSelectCumin) btnSelectCumin.addEventListener('click', () => { window.location.hash = 'cumin'; });
-  if (btnSelectChilli) btnSelectChilli.addEventListener('click', () => { window.location.hash = 'chilli'; });
-
-  const spotlightCardTurmeric = document.getElementById('spotlightCardTurmeric');
-  const spotlightCardPsyllium = document.getElementById('spotlightCardPsyllium');
-  const spotlightCardCumin = document.getElementById('spotlightCardCumin');
-  const spotlightCardChilli = document.getElementById('spotlightCardChilli');
-
-  if (spotlightCardTurmeric) spotlightCardTurmeric.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'turmeric'; });
-  if (spotlightCardPsyllium) spotlightCardPsyllium.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'psyllium'; });
-  if (spotlightCardCumin) spotlightCardCumin.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'cumin'; });
-  if (spotlightCardChilli) spotlightCardChilli.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'chilli'; });
-
-  // Back Buttons & Breadcrumb navigation Binds
-  const btnBackToLevel1 = document.getElementById('btnBackToLevel1');
-  if (btnBackToLevel1) btnBackToLevel1.addEventListener('click', () => { window.location.hash = 'categories'; });
-
-  const btnBackToLevel2 = document.getElementById('btnBackToLevel2');
-  if (btnBackToLevel2) btnBackToLevel2.addEventListener('click', () => { window.location.hash = 'spices'; });
-
-  if (breadHome) breadHome.addEventListener('click', () => { window.location.hash = 'categories'; });
-  if (breadCategory) breadCategory.addEventListener('click', () => { window.location.hash = 'spices'; });
-
+  // --- 2. MPA Local Routing & Prefill Handlers ---
+  
   // Handle Products Catalog Hash Navigation
   const handleProductsRouting = () => {
     const level1 = document.getElementById('catalogLevel1');
     if (!level1) return;
     
-    const hash = window.location.hash;
+    const hash = (window.location.hash || '').toLowerCase();
     if (hash === '#spices') {
       navigateToLevel2();
     } else if (hash === '#turmeric') {
@@ -1469,9 +1464,9 @@ document.addEventListener('DOMContentLoaded', () => {
       navigateToLevel3('psyllium');
     } else if (hash === '#cumin') {
       navigateToLevel3('cumin');
-    } else if (hash === '#chilli') {
+    } else if (hash === '#chilli' || hash === '#red-chilli') {
       navigateToLevel3('chilli');
-    } else if (hash === '#product-details' || hash === '#all-products') {
+    } else if (hash === '#product-details' || hash === '#all') {
       navigateToLevel3('all');
     } else {
       navigateToLevel1();
@@ -1493,34 +1488,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   
-  // Blog Reader Back Button Event Listener
-  const btnBlogBack = document.getElementById('btnBlogBack');
-  if (btnBlogBack) {
-    btnBlogBack.addEventListener('click', () => {
-      const blogGrid = document.getElementById('blogCardGrid');
-      const blogSingleView = document.getElementById('blogSingleView');
-      if (blogGrid) blogGrid.style.display = 'grid';
-      if (blogSingleView) blogSingleView.style.display = 'none';
-      window.location.hash = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  // Global Navigation Helper for data-view elements
-  document.addEventListener('click', (e) => {
-    const viewBtn = e.target.closest('[data-view]');
-    if (viewBtn) {
-      const view = viewBtn.getAttribute('data-view');
-      if (view === 'product' || view === 'products') window.location.href = 'products.html';
-      else if (view === 'contact') window.location.href = 'contact.html';
-      else if (view === 'inquiry') window.location.href = 'inquiry.html';
-      else if (view === 'blog') window.location.href = 'blog.html';
-      else if (view === 'certificates') window.location.href = 'certificates.html';
-      else if (view === 'about') window.location.href = 'about.html';
-      else if (view === 'home') window.location.href = 'index.html';
-    }
-  });
-
   window.addEventListener('hashchange', () => {
     handleProductsRouting();
     handleBlogRouting();
@@ -1587,23 +1554,26 @@ document.addEventListener('DOMContentLoaded', () => {
     inquiryForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Read form fields with smart fallbacks
-      const companyName = document.getElementById('companyName')?.value.trim() || 'Valued Client';
-      const buyerName = document.getElementById('buyerName')?.value.trim() || 'Valued Buyer';
-      const contactNo = document.getElementById('contactNo')?.value.trim() || 'Not Provided';
-      const buyerEmail = document.getElementById('buyerEmail')?.value.trim() || 'Not Provided';
-      const buyerAddress = document.getElementById('buyerAddress')?.value.trim() || 'Not Provided';
-      const rawProduct = document.getElementById('productSelected')?.value;
-      const productSelected = (rawProduct && rawProduct !== "") ? rawProduct : 'General Agricultural Commodities Inquiry';
-      const buyerQuestion = document.getElementById('buyerQuestion')?.value.trim() || 'Requested live sourcing quotation and specs card.';
+      // Read form fields
+      const companyName = document.getElementById('companyName').value.trim();
+      const buyerName = document.getElementById('buyerName').value.trim();
+      const contactNo = document.getElementById('contactNo').value.trim();
+      const buyerEmail = document.getElementById('buyerEmail').value.trim();
+      const buyerAddress = document.getElementById('buyerAddress').value.trim();
+      const productSelected = document.getElementById('productSelected').value;
+      const buyerQuestion = document.getElementById('buyerQuestion').value.trim();
 
-      // Flexible validation: require at least one contact channel (phone or email)
-      if (contactNo === 'Not Provided' && buyerEmail === 'Not Provided') {
-        showToast("Please provide your Phone Number or Email Address.", "warning");
-        const phoneInput = document.getElementById('contactNo');
-        const emailInput = document.getElementById('buyerEmail');
-        if (phoneInput) phoneInput.style.borderColor = 'var(--accent-red)';
-        if (emailInput) emailInput.style.borderColor = 'var(--accent-red)';
+      // Validation
+      if (!companyName || !buyerName || !contactNo || !buyerEmail || !buyerAddress || !productSelected || !buyerQuestion) {
+        showToast("Please fill in all mandatory fields.", "warning");
+        // Highlight empty required fields
+        ['companyName','buyerName','contactNo','buyerEmail','buyerAddress','productSelected','buyerQuestion'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && !el.value.trim()) {
+            el.style.borderColor = 'var(--accent-red)';
+            el.addEventListener('input', () => { el.style.borderColor = ''; }, { once: true });
+          }
+        });
         return;
       }
 
@@ -1647,24 +1617,37 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `Submit Inquiry <i class="fa-solid fa-paper-plane"></i>`;
       }
 
-      // Step 4: Send Telegram notification instantly to owner's Telegram chat
+      // Helper function to escape HTML special characters for Telegram HTML mode
+      const escapeTelegramHTML = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      };
+
+      // Step 4: Send Telegram notification with robust fallback
       const TELEGRAM_TOKEN = "8892460990:AAHeJ16iPlXBaSAkpiji2H-Thn8CeKgadlE";
       const TELEGRAM_CHAT_ID = "8825936223";
 
-      const safeTgHtml = (str) => {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      };
+      const safeCompany = escapeTelegramHTML(companyName);
+      const safeBuyer = escapeTelegramHTML(buyerName);
+      const safeContact = escapeTelegramHTML(contactNo);
+      const safeEmail = escapeTelegramHTML(buyerEmail);
+      const safeAddress = escapeTelegramHTML(buyerAddress);
+      const safeProduct = escapeTelegramHTML(productSelected);
+      const safeQuestion = escapeTelegramHTML(buyerQuestion);
 
       const telegramMsgHTML = `🔔 <b>New Inquiry — MY EXPORT WORLD</b>
 
-🏢 <b>Company:</b> ${safeTgHtml(companyName)}
-👤 <b>Name:</b> ${safeTgHtml(buyerName)}
-📞 <b>Phone:</b> ${safeTgHtml(contactNo)}
-📧 <b>Email:</b> ${safeTgHtml(buyerEmail)}
-📍 <b>Address:</b> ${safeTgHtml(buyerAddress)}
-📦 <b>Product:</b> ${safeTgHtml(productSelected)}
-💬 <b>Message:</b> ${safeTgHtml(buyerQuestion)}
+🏢 <b>Company:</b> ${safeCompany}
+👤 <b>Name:</b> ${safeBuyer}
+📞 <b>Phone:</b> ${safeContact}
+📧 <b>Email:</b> ${safeEmail}
+📍 <b>Address:</b> ${safeAddress}
+📦 <b>Product:</b> ${safeProduct}
+💬 <b>Message:</b> ${safeQuestion}
 
 ⏰ <b>Time:</b> ${timestamp}`;
 
@@ -1680,9 +1663,9 @@ Message: ${buyerQuestion}
 
 Time: ${timestamp}`;
 
-      async function sendTelegramAlert() {
+      const sendTelegramNotice = async () => {
         try {
-          const res1 = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+          const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1691,29 +1674,34 @@ Time: ${timestamp}`;
               parse_mode: "HTML"
             })
           });
-          const data1 = await res1.json();
-          if (data1 && data1.ok) {
-            console.log("Telegram inquiry alert delivered successfully (HTML mode):", data1);
-            return;
-          }
-          console.warn("Telegram HTML mode error, sending plain text fallback...", data1);
-          
-          const res2 = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chat_id: TELEGRAM_CHAT_ID,
-              text: telegramMsgPlain
-            })
-          });
-          const data2 = await res2.json();
-          console.log("Telegram inquiry alert delivered (Plain mode):", data2);
-        } catch (err) {
-          console.error("Telegram alert fetch error:", err);
-        }
-      }
 
-      sendTelegramAlert();
+          if (!res.ok) {
+            console.warn("Telegram HTML delivery failed, sending plain text fallback...", res.statusText);
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: telegramMsgPlain
+              })
+            });
+          }
+        } catch (err) {
+          console.warn("Telegram notification network fallback:", err);
+          try {
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: telegramMsgPlain
+              })
+            });
+          } catch (ex) {}
+        }
+      };
+
+      sendTelegramNotice();
 
       // Step 5: Send to Google Sheets silently in background (non-critical, will not block)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
@@ -1805,19 +1793,25 @@ Time: ${timestamp}`;
   }
 
   // Use Intersection Observer to trigger animation when section scrolls into view
-  if (statsSection && 'IntersectionObserver' in window) {
-    const statsObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !statsAnimated) {
-          triggerStatsAnimation();
-          statsObserver.unobserve(entry.target);
-        }
+  if (statsSection) {
+    if ('IntersectionObserver' in window) {
+      const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !statsAnimated) {
+            triggerStatsAnimation();
+            statsObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1 // Trigger when 10% of the section is visible
       });
-    }, {
-      threshold: 0.3 // Trigger when 30% of the section is visible
-    });
 
-    statsObserver.observe(statsSection);
+      statsObserver.observe(statsSection);
+    }
+    // Fallback trigger after 600ms in case observer threshold is missed
+    setTimeout(() => {
+      if (!statsAnimated) triggerStatsAnimation();
+    }, 600);
   }
 
   // Prevent leaving the site directly without confirmation ONLY if form is dirty
