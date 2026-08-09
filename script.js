@@ -1318,6 +1318,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionCumin = document.getElementById('sectionCumin');
     const sectionChilli = document.getElementById('sectionChilli');
 
+    // Highlight matching filter tab button
+    document.querySelectorAll('.commodity-filter-btn').forEach(btn => {
+      const btnFilter = btn.getAttribute('data-commodity-filter');
+      if (btnFilter === targetCommodity || (targetCommodity === 'all' && btnFilter === 'all')) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
     if (targetCommodity === 'turmeric') {
       if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
       if (breadCommodity) {
@@ -1376,22 +1386,34 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Event bindings
-  // L1: "Browse Commodities" / Click on Spices card -> go to Level 2
+  // L1: "Browse Commodities" / Click on Spices card -> go directly to All Products catalog
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
   if (btnExploreAgri) {
     btnExploreAgri.addEventListener('click', (e) => {
       e.stopPropagation();
-      window.location.hash = 'spices';
+      window.location.hash = 'all-products';
     });
   }
   if (categoryCardAgri) {
     categoryCardAgri.addEventListener('click', (e) => {
       if (e.target.id !== 'btnExploreAgri' && !e.target.closest('#btnExploreAgri')) {
-        window.location.hash = 'spices';
+        window.location.hash = 'all-products';
       }
     });
   }
+
+  // Level 3 Category Filter Buttons
+  document.querySelectorAll('.commodity-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.getAttribute('data-commodity-filter');
+      if (filter === 'all') {
+        window.location.hash = 'all-products';
+      } else {
+        window.location.hash = filter;
+      }
+    });
+  });
 
   // L2: Select specific commodity -> go to Level 3 filtered to that commodity
   const btnSelectTurmeric = document.getElementById('btnSelectTurmeric');
@@ -1528,26 +1550,23 @@ document.addEventListener('DOMContentLoaded', () => {
     inquiryForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Read form fields
-      const companyName = document.getElementById('companyName').value.trim();
-      const buyerName = document.getElementById('buyerName').value.trim();
-      const contactNo = document.getElementById('contactNo').value.trim();
-      const buyerEmail = document.getElementById('buyerEmail').value.trim();
-      const buyerAddress = document.getElementById('buyerAddress').value.trim();
-      const productSelected = document.getElementById('productSelected').value;
-      const buyerQuestion = document.getElementById('buyerQuestion').value.trim();
+      // Read form fields with smart fallbacks
+      const companyName = document.getElementById('companyName')?.value.trim() || 'Valued Client';
+      const buyerName = document.getElementById('buyerName')?.value.trim() || 'Valued Buyer';
+      const contactNo = document.getElementById('contactNo')?.value.trim() || 'Not Provided';
+      const buyerEmail = document.getElementById('buyerEmail')?.value.trim() || 'Not Provided';
+      const buyerAddress = document.getElementById('buyerAddress')?.value.trim() || 'Not Provided';
+      const rawProduct = document.getElementById('productSelected')?.value;
+      const productSelected = (rawProduct && rawProduct !== "") ? rawProduct : 'General Agricultural Commodities Inquiry';
+      const buyerQuestion = document.getElementById('buyerQuestion')?.value.trim() || 'Requested live sourcing quotation and specs card.';
 
-      // Validation
-      if (!companyName || !buyerName || !contactNo || !buyerEmail || !buyerAddress || !productSelected || !buyerQuestion) {
-        showToast("Please fill in all mandatory fields.", "warning");
-        // Highlight empty required fields
-        ['companyName','buyerName','contactNo','buyerEmail','buyerAddress','productSelected','buyerQuestion'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el && !el.value.trim()) {
-            el.style.borderColor = 'var(--accent-red)';
-            el.addEventListener('input', () => { el.style.borderColor = ''; }, { once: true });
-          }
-        });
+      // Flexible validation: require at least one contact channel (phone or email)
+      if (contactNo === 'Not Provided' && buyerEmail === 'Not Provided') {
+        showToast("Please provide your Phone Number or Email Address.", "warning");
+        const phoneInput = document.getElementById('contactNo');
+        const emailInput = document.getElementById('buyerEmail');
+        if (phoneInput) phoneInput.style.borderColor = 'var(--accent-red)';
+        if (emailInput) emailInput.style.borderColor = 'var(--accent-red)';
         return;
       }
 

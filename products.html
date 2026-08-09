@@ -108,7 +108,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2.1.0">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -326,10 +326,19 @@
                LEVEL 3: SUB-PRODUCTS GRIDS
                ========================================== -->
           <div class="catalog-level catalog-level-3 hidden" id="catalogLevel3">
-            <div class="catalog-navigation-bar">
+            <div class="catalog-navigation-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
               <button class="btn-back" id="btnBackToLevel2">
                 <i class="fa-solid fa-arrow-left-long"></i> Back to Categories
               </button>
+            </div>
+
+            <!-- Category Filter Toolbar -->
+            <div class="commodity-filter-tabs flex-center" style="gap: 0.8rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
+              <button class="btn btn-secondary commodity-filter-btn active" data-commodity-filter="all" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 700;">All Commodities</button>
+              <button class="btn btn-secondary commodity-filter-btn" data-commodity-filter="turmeric" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-wheat-awn" style="color: var(--accent-yellow);"></i> Turmeric (Haldi)</button>
+              <button class="btn btn-secondary commodity-filter-btn" data-commodity-filter="psyllium" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-shield-halved" style="color: var(--success);"></i> Psyllium Husk</button>
+              <button class="btn btn-secondary commodity-filter-btn" data-commodity-filter="cumin" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-seedling" style="color: var(--accent-yellow);"></i> Cumin Seeds</button>
+              <button class="btn btn-secondary commodity-filter-btn" data-commodity-filter="chilli" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-pepper-hot" style="color: var(--accent-red);"></i> Red Chilli</button>
             </div>
 
             <!-- Grids Wrapper -->
@@ -479,8 +488,8 @@
   
 
   <!-- JavaScript Logics -->
-  <script src="auto-blog-engine.js"></script>
-  <script src="script.js"></script>
+  <script src="auto-blog-engine.js?v=2.1.0"></script>
+  <script src="script.js?v=2.1.0"></script>
   
 </body>
 </html>
