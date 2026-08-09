@@ -48,6 +48,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Global data-view navigation delegate
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-view]');
+      if (el) {
+        const view = el.getAttribute('data-view');
+        if (view === 'product' || view === 'products') window.location.href = 'products.html';
+        else if (view === 'contact') window.location.href = 'contact.html';
+        else if (view === 'certificates') window.location.href = 'certificates.html';
+        else if (view === 'inquiry') window.location.href = 'inquiry.html';
+        else if (view === 'about') window.location.href = 'about.html';
+        else if (view === 'blog') window.location.href = 'blog.html';
+      }
+    });
+
     // Close menu when clicking a nav link
     const navLinks = navMenu.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
