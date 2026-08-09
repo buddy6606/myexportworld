@@ -1397,9 +1397,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryCardAgri = document.getElementById('categoryCardAgri');
 
   const handleBrowseCommoditiesClick = (e) => {
-    if (e) e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     navigateToLevel3('all');
     window.location.hash = 'product-details';
+    document.getElementById('catalogLevel3')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   if (btnExploreAgri) {
