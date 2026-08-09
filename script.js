@@ -1259,12 +1259,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const gridCumin = document.getElementById('gridCumin');
   const gridChilli = document.getElementById('gridChilli');
 
-  // Breadcrumbs elements
-  const breadHome = document.getElementById('breadHome');
-  const breadCategory = document.getElementById('breadCategory');
-  const breadCommoditySep = document.getElementById('breadCommoditySep');
-  const breadCommodity = document.getElementById('breadCommodity');
-
   // Dynamic Navigation Transitions
   const navigateToLevel1 = () => {
     const l1 = document.getElementById('catalogLevel1');
@@ -1694,41 +1688,27 @@ Message: ${buyerQuestion}
 
 Time: ${timestamp}`;
 
-      const sendTelegramNotice = async () => {
-        try {
-          const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chat_id: TELEGRAM_CHAT_ID,
-              text: telegramMsgHTML,
-              parse_mode: "HTML"
-            })
-          });
+      const sendTelegramNotice = () => {
+        // Telegram's API does not allow a browser JSON request from every origin.
+        // A URL-encoded no-cors POST avoids the CORS preflight while still sending
+        // the notification to Telegram.
+        const telegramPayload = new URLSearchParams({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: telegramMsgHTML,
+          parse_mode: 'HTML'
+        });
 
-          if (!res.ok) {
-            console.warn("Telegram HTML delivery failed, sending plain text fallback...", res.statusText);
-            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: telegramMsgPlain
-              })
-            });
-          }
+        try {
+          return fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: telegramPayload
+          }).catch(err => {
+            console.warn('Telegram notification could not be sent:', err);
+          });
         } catch (err) {
-          console.warn("Telegram notification network fallback:", err);
-          try {
-            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: telegramMsgPlain
-              })
-            });
-          } catch (ex) {}
+          console.warn('Telegram notification could not be sent:', err);
+          return Promise.resolve();
         }
       };
 
