@@ -808,18 +808,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const loadBlogPosts = () => {
     // 1. Synchronous instant initialization (0ms render)
+    let localPosts = [];
     try {
       const stored = localStorage.getItem('myexportworld_blog_posts');
       if (stored) {
-        blogPosts = ensureTodayPost(JSON.parse(stored));
-      } else {
-        blogPosts = ensureTodayPost([...sampleBlogPosts]);
+        localPosts = JSON.parse(stored);
       }
-    } catch (e) {
-      blogPosts = ensureTodayPost([...sampleBlogPosts]);
-    }
+    } catch (e) {}
 
-    // Render grid immediately on load
+    // Combine sample posts and local posts so all posts are present immediately
+    const combined = [...localPosts];
+    sampleBlogPosts.forEach(sp => {
+      if (!combined.some(p => p && p.id === sp.id)) {
+        combined.push(sp);
+      }
+    });
+
+    blogPosts = ensureTodayPost(combined);
+    try {
+      localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+    } catch (e) {}
+
+    // Render grid immediately on load (all 8+ articles rendered instantly)
     renderBlogFilters();
     renderBlogGrid('all');
 
@@ -827,12 +837,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (db) {
       db.collection('blog_posts').onSnapshot(snapshot => {
         if (!snapshot.empty) {
-          blogPosts = ensureTodayPost(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        } else {
-          blogPosts = ensureTodayPost([...sampleBlogPosts]);
-          sampleBlogPosts.forEach(sp => {
-            db.collection('blog_posts').doc(sp.id).set(sp).catch(() => {});
+          const remotePosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          remotePosts.forEach(rp => {
+            if (!combined.some(p => p && p.id === rp.id)) {
+              combined.push(rp);
+            }
           });
+          blogPosts = ensureTodayPost(combined);
         }
         try {
           localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
@@ -852,8 +863,19 @@ document.addEventListener('DOMContentLoaded', () => {
     AutoBlogEngine.checkAndPublishDailyPost(db).then(todayPost => {
       try {
         const stored = localStorage.getItem('myexportworld_blog_posts');
-        if (stored) blogPosts = ensureTodayPost(JSON.parse(stored));
-        else if (todayPost) blogPosts = ensureTodayPost([todayPost, ...sampleBlogPosts]);
+        if (stored) localPosts = JSON.parse(stored);
+        else localPosts = [];
+
+        const combined = [...localPosts];
+        sampleBlogPosts.forEach(sp => {
+          if (!combined.some(p => p && p.id === sp.id)) {
+            combined.push(sp);
+          }
+        });
+        if (todayPost && !combined.some(p => p && p.id === todayPost.id)) {
+          combined.unshift(todayPost);
+        }
+        blogPosts = ensureTodayPost(combined);
       } catch (e) {}
       renderBlogFilters();
       renderBlogGrid('all');
@@ -1249,12 +1271,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dynamic Navigation Transitions
   const navigateToLevel1 = () => {
     if (!level1 || !level2 || !level3) return;
-    // Show L1, Hide L2 & L3
     level1.classList.remove('hidden');
     level2.classList.add('hidden');
     level3.classList.add('hidden');
 
-    // Reset breadcrumbs
     if (breadCategory) {
       breadCategory.classList.remove('active');
       breadCategory.classList.add('hidden');
@@ -1264,12 +1284,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (breadHome) breadHome.classList.add('active');
   };
 
-  const navigateToLevel3 = () => {
+  const navigateToLevel2 = () => {
     if (!level1 || !level2 || !level3) return;
-    // Show L3 directly, Hide L1 & L2
     level1.classList.add('hidden');
-    level2.classList.add('hidden');
-    level3.classList.remove('hidden');
+    level2.classList.remove('hidden');
+    level3.classList.add('hidden');
 
     if (breadHome) breadHome.classList.remove('active');
     if (breadCategory) {
@@ -1279,73 +1298,150 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
     if (breadCommodity) breadCommodity.classList.add('hidden');
+  };
 
-    // Show all commodity sections
+  const navigateToLevel3 = (targetCommodity = 'all') => {
+    if (!level1 || !level2 || !level3) return;
+    level1.classList.add('hidden');
+    level2.classList.add('hidden');
+    level3.classList.remove('hidden');
+
+    if (breadHome) breadHome.classList.remove('active');
+    if (breadCategory) {
+      breadCategory.textContent = "Spices";
+      breadCategory.classList.remove('hidden');
+      breadCategory.classList.remove('active');
+    }
+
     const sectionTurmeric = document.getElementById('sectionTurmeric');
     const sectionPsyllium = document.getElementById('sectionPsyllium');
     const sectionCumin = document.getElementById('sectionCumin');
     const sectionChilli = document.getElementById('sectionChilli');
 
-    if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
-    if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
-    if (sectionCumin) sectionCumin.classList.remove('hidden');
-    if (sectionChilli) sectionChilli.classList.remove('hidden');
-    document.querySelectorAll('.commodity-section-custom').forEach(sec => sec.classList.remove('hidden'));
+    if (targetCommodity === 'turmeric') {
+      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+      if (breadCommodity) {
+        breadCommodity.textContent = "Turmeric";
+        breadCommodity.classList.remove('hidden');
+        breadCommodity.classList.add('active');
+      }
+      if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
+      if (sectionPsyllium) sectionPsyllium.classList.add('hidden');
+      if (sectionCumin) sectionCumin.classList.add('hidden');
+      if (sectionChilli) sectionChilli.classList.add('hidden');
+    } else if (targetCommodity === 'psyllium') {
+      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+      if (breadCommodity) {
+        breadCommodity.textContent = "Psyllium Husk";
+        breadCommodity.classList.remove('hidden');
+        breadCommodity.classList.add('active');
+      }
+      if (sectionTurmeric) sectionTurmeric.classList.add('hidden');
+      if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
+      if (sectionCumin) sectionCumin.classList.add('hidden');
+      if (sectionChilli) sectionChilli.classList.add('hidden');
+    } else if (targetCommodity === 'cumin') {
+      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+      if (breadCommodity) {
+        breadCommodity.textContent = "Cumin Seeds";
+        breadCommodity.classList.remove('hidden');
+        breadCommodity.classList.add('active');
+      }
+      if (sectionTurmeric) sectionTurmeric.classList.add('hidden');
+      if (sectionPsyllium) sectionPsyllium.classList.add('hidden');
+      if (sectionCumin) sectionCumin.classList.remove('hidden');
+      if (sectionChilli) sectionChilli.classList.add('hidden');
+    } else if (targetCommodity === 'chilli') {
+      if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+      if (breadCommodity) {
+        breadCommodity.textContent = "Red Chilli";
+        breadCommodity.classList.remove('hidden');
+        breadCommodity.classList.add('active');
+      }
+      if (sectionTurmeric) sectionTurmeric.classList.add('hidden');
+      if (sectionPsyllium) sectionPsyllium.classList.add('hidden');
+      if (sectionCumin) sectionCumin.classList.add('hidden');
+      if (sectionChilli) sectionChilli.classList.remove('hidden');
+    } else {
+      if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
+      if (breadCommodity) breadCommodity.classList.add('hidden');
+      if (breadCategory) breadCategory.classList.add('active');
+      if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
+      if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
+      if (sectionCumin) sectionCumin.classList.remove('hidden');
+      if (sectionChilli) sectionChilli.classList.remove('hidden');
+    }
 
-    // Render active products dynamically
     renderPublicProducts();
   };
 
   // Event bindings
-  // L1 Card/Action clicks
+  // L1: "Browse Commodities" / Click on Spices card -> go to Level 2
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
   if (btnExploreAgri) {
-    btnExploreAgri.addEventListener('click', () => {
-      window.location.hash = 'product-details';
+    btnExploreAgri.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.location.hash = 'spices';
     });
   }
   if (categoryCardAgri) {
     categoryCardAgri.addEventListener('click', (e) => {
-      // Prevent double trigger if action button was clicked directly
       if (e.target.id !== 'btnExploreAgri' && !e.target.closest('#btnExploreAgri')) {
-        window.location.hash = 'product-details';
+        window.location.hash = 'spices';
       }
     });
   }
 
-  // L3 Back clicks
+  // L2: Select specific commodity -> go to Level 3 filtered to that commodity
+  const btnSelectTurmeric = document.getElementById('btnSelectTurmeric');
+  const btnSelectPsyllium = document.getElementById('btnSelectPsyllium');
+  const btnSelectCumin = document.getElementById('btnSelectCumin');
+  const btnSelectChilli = document.getElementById('btnSelectChilli');
+
+  if (btnSelectTurmeric) btnSelectTurmeric.addEventListener('click', () => { window.location.hash = 'turmeric'; });
+  if (btnSelectPsyllium) btnSelectPsyllium.addEventListener('click', () => { window.location.hash = 'psyllium'; });
+  if (btnSelectCumin) btnSelectCumin.addEventListener('click', () => { window.location.hash = 'cumin'; });
+  if (btnSelectChilli) btnSelectChilli.addEventListener('click', () => { window.location.hash = 'chilli'; });
+
+  const spotlightCardTurmeric = document.getElementById('spotlightCardTurmeric');
+  const spotlightCardPsyllium = document.getElementById('spotlightCardPsyllium');
+  const spotlightCardCumin = document.getElementById('spotlightCardCumin');
+  const spotlightCardChilli = document.getElementById('spotlightCardChilli');
+
+  if (spotlightCardTurmeric) spotlightCardTurmeric.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'turmeric'; });
+  if (spotlightCardPsyllium) spotlightCardPsyllium.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'psyllium'; });
+  if (spotlightCardCumin) spotlightCardCumin.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'cumin'; });
+  if (spotlightCardChilli) spotlightCardChilli.addEventListener('click', (e) => { if (!e.target.closest('button')) window.location.hash = 'chilli'; });
+
+  // Back Buttons & Breadcrumb navigation Binds
+  const btnBackToLevel1 = document.getElementById('btnBackToLevel1');
+  if (btnBackToLevel1) btnBackToLevel1.addEventListener('click', () => { window.location.hash = 'categories'; });
+
   const btnBackToLevel2 = document.getElementById('btnBackToLevel2');
-  if (btnBackToLevel2) {
-    btnBackToLevel2.addEventListener('click', () => {
-      window.location.hash = 'product';
-    });
-  }
+  if (btnBackToLevel2) btnBackToLevel2.addEventListener('click', () => { window.location.hash = 'spices'; });
 
-  // Breadcrumb action binds
-  if (breadHome) {
-    breadHome.addEventListener('click', () => {
-      window.location.hash = 'product';
-    });
-  }
-  if (breadCategory) {
-    breadCategory.addEventListener('click', () => {
-      window.location.hash = 'product';
-    });
-  }
+  if (breadHome) breadHome.addEventListener('click', () => { window.location.hash = 'categories'; });
+  if (breadCategory) breadCategory.addEventListener('click', () => { window.location.hash = 'spices'; });
 
-  // Set default view state on load
-  navigateToLevel1();
-
-  // --- 2. MPA Local Routing & Prefill Handlers ---
-  
   // Handle Products Catalog Hash Navigation
   const handleProductsRouting = () => {
     const level1 = document.getElementById('catalogLevel1');
     if (!level1) return;
     
-    if (window.location.hash === '#product-details') {
-      navigateToLevel3();
+    const hash = window.location.hash;
+    if (hash === '#spices') {
+      navigateToLevel2();
+    } else if (hash === '#turmeric') {
+      navigateToLevel3('turmeric');
+    } else if (hash === '#psyllium') {
+      navigateToLevel3('psyllium');
+    } else if (hash === '#cumin') {
+      navigateToLevel3('cumin');
+    } else if (hash === '#chilli') {
+      navigateToLevel3('chilli');
+    } else if (hash === '#product-details' || hash === '#all-products') {
+      navigateToLevel3('all');
     } else {
       navigateToLevel1();
     }
@@ -1495,30 +1591,57 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `Submit Inquiry <i class="fa-solid fa-paper-plane"></i>`;
       }
 
-      // Step 4: Send Telegram notification instantly
+      // Step 4: Send Telegram notification instantly with safe escaping & fallback
       const TELEGRAM_TOKEN = "8892460990:AAHeJ16iPlXBaSAkpiji2H-Thn8CeKgadlE";
       const TELEGRAM_CHAT_ID = "8825936223";
-      const telegramMsg = `🔔 <b>New Inquiry — MY EXPORT WORLD</b>
 
-🏢 <b>Company:</b> ${companyName}
-👤 <b>Name:</b> ${buyerName}
-📞 <b>Phone:</b> ${contactNo}
-📧 <b>Email:</b> ${buyerEmail}
-📍 <b>Address:</b> ${buyerAddress}
-📦 <b>Product:</b> ${productSelected}
-💬 <b>Message:</b> ${buyerQuestion}
+      const safeTgHtml = (str) => {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      };
+
+      const telegramMsgHTML = `🔔 <b>New Inquiry — MY EXPORT WORLD</b>
+
+🏢 <b>Company:</b> ${safeTgHtml(companyName)}
+👤 <b>Name:</b> ${safeTgHtml(buyerName)}
+📞 <b>Phone:</b> ${safeTgHtml(contactNo)}
+📧 <b>Email:</b> ${safeTgHtml(buyerEmail)}
+📍 <b>Address:</b> ${safeTgHtml(buyerAddress)}
+📦 <b>Product:</b> ${safeTgHtml(productSelected)}
+💬 <b>Message:</b> ${safeTgHtml(buyerQuestion)}
 
 ⏰ <b>Time:</b> ${timestamp}`;
+
+      const telegramMsgPlain = `🔔 New Inquiry — MY EXPORT WORLD
+
+Company: ${companyName}
+Name: ${buyerName}
+Phone: ${contactNo}
+Email: ${buyerEmail}
+Address: ${buyerAddress}
+Product: ${productSelected}
+Message: ${buyerQuestion}
+
+Time: ${timestamp}`;
 
       fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
-          text: telegramMsg,
+          text: telegramMsgHTML,
           parse_mode: "HTML"
         })
-      }).catch(() => {}); // Silent fail — inquiry already saved
+      }).catch(() => {
+        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: telegramMsgPlain
+          })
+        }).catch(() => {});
+      });
 
       // Step 5: Send to Google Sheets silently in background (non-critical, will not block)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
