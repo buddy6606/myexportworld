@@ -1371,18 +1371,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Event bindings
-  // Level 1 Card/Action clicks -> Navigate to Level 2 (Spices)
+  // Level 1 Card/Action clicks -> Directly open list of products (Level 3)
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
   if (btnExploreAgri) {
     btnExploreAgri.addEventListener('click', (e) => {
       e.stopPropagation();
-      window.location.hash = 'spices';
+      window.location.hash = 'product-details';
     });
   }
   if (categoryCardAgri) {
     categoryCardAgri.addEventListener('click', (e) => {
-      window.location.hash = 'spices';
+      window.location.hash = 'product-details';
     });
   }
 
@@ -1416,11 +1416,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Level 3 Back click -> Returns to Level 2 (Spices)
+  // Level 3 Back click -> Returns to Level 1 (Categories)
   const btnBackToLevel2 = document.getElementById('btnBackToLevel2');
   if (btnBackToLevel2) {
     btnBackToLevel2.addEventListener('click', () => {
-      window.location.hash = 'spices';
+      window.location.hash = 'product';
     });
   }
 
