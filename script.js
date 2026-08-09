@@ -1370,6 +1370,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPublicProducts();
   };
 
+  window.navigateToLevel3 = navigateToLevel3;
+
   // Event bindings
   // Level 1 Card/Action clicks -> Directly open list of products (Level 3)
   const btnExploreAgri = document.getElementById('btnExploreAgri');
