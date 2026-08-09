@@ -1610,7 +1610,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = `Submit Inquiry <i class="fa-solid fa-paper-plane"></i>`;
       }
 
-      // Step 4: Send Telegram notification instantly with safe escaping & fallback
+      // Step 4: Send Telegram notification instantly to owner's Telegram chat
       const TELEGRAM_TOKEN = "8892460990:AAHeJ16iPlXBaSAkpiji2H-Thn8CeKgadlE";
       const TELEGRAM_CHAT_ID = "8825936223";
 
@@ -1643,24 +1643,40 @@ Message: ${buyerQuestion}
 
 Time: ${timestamp}`;
 
-      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: telegramMsgHTML,
-          parse_mode: "HTML"
-        })
-      }).catch(() => {
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: telegramMsgPlain
-          })
-        }).catch(() => {});
-      });
+      async function sendTelegramAlert() {
+        try {
+          const res1 = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: telegramMsgHTML,
+              parse_mode: "HTML"
+            })
+          });
+          const data1 = await res1.json();
+          if (data1 && data1.ok) {
+            console.log("Telegram inquiry alert delivered successfully (HTML mode):", data1);
+            return;
+          }
+          console.warn("Telegram HTML mode error, sending plain text fallback...", data1);
+          
+          const res2 = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: telegramMsgPlain
+            })
+          });
+          const data2 = await res2.json();
+          console.log("Telegram inquiry alert delivered (Plain mode):", data2);
+        } catch (err) {
+          console.error("Telegram alert fetch error:", err);
+        }
+      }
+
+      sendTelegramAlert();
 
       // Step 5: Send to Google Sheets silently in background (non-critical, will not block)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
