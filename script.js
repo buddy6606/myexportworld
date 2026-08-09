@@ -1656,7 +1656,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .replace(/"/g, '&quot;');
       };
 
-      // Step 4: Send Telegram notification with robust fallback
+      // Step 4: Send Telegram notification with resilient multi-tier delivery
       const TELEGRAM_TOKEN = "8892460990:AAHeJ16iPlXBaSAkpiji2H-Thn8CeKgadlE";
       const TELEGRAM_CHAT_ID = "8825936223";
 
@@ -1692,40 +1692,80 @@ Message: ${buyerQuestion}
 
 Time: ${timestamp}`;
 
-      const sendTelegramNotice = () => {
-        // Telegram's API does not allow a browser JSON request from every origin.
-        // A URL-encoded no-cors POST avoids the CORS preflight while still sending
-        // the notification to Telegram.
-        const telegramPayload = new URLSearchParams({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: telegramMsgHTML,
-          parse_mode: 'HTML'
-        });
-
+      const sendTelegramNotice = async () => {
+        const apiUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+        
+        // Tier 1: Standard CORS JSON POST (HTML formatted)
         try {
-          return fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+          const res = await fetch(apiUrl, {
             method: 'POST',
-            mode: 'no-cors',
-            body: telegramPayload
-          }).catch(err => {
-            console.warn('Telegram notification could not be sent:', err);
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: telegramMsgHTML,
+              parse_mode: 'HTML'
+            })
           });
+          if (res.ok) {
+            console.log('Telegram HTML notification dispatched successfully.');
+            return;
+          }
+          console.warn('Telegram HTML POST returned status:', res.status);
         } catch (err) {
-          console.warn('Telegram notification could not be sent:', err);
-          return Promise.resolve();
+          console.warn('Telegram HTML POST network error, retrying plain text:', err);
+        }
+
+        // Tier 2: Standard CORS JSON POST (Plain Text fallback - avoids HTML parsing errors)
+        try {
+          const res2 = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text: telegramMsgPlain
+            })
+          });
+          if (res2.ok) {
+            console.log('Telegram Plain Text notification dispatched successfully.');
+            return;
+          }
+          console.warn('Telegram Plain POST returned status:', res2.status);
+        } catch (err) {
+          console.warn('Telegram Plain POST network error, trying GET beacon fallback:', err);
+        }
+
+        // Tier 3: GET Beacon Fallback (bypasses CORS preflight & POST body restrictions)
+        try {
+          const getUrl = `${apiUrl}?chat_id=${encodeURIComponent(TELEGRAM_CHAT_ID)}&text=${encodeURIComponent(telegramMsgPlain)}`;
+          if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+            navigator.sendBeacon(getUrl);
+          } else {
+            const img = new Image();
+            img.src = getUrl;
+          }
+          console.log('Telegram GET beacon fallback fired.');
+        } catch (e) {
+          console.warn('Telegram GET beacon fallback error:', e);
         }
       };
 
       sendTelegramNotice();
 
-      // Step 5: Send to Google Sheets silently in background (non-critical, will not block)
+      // Step 5: Send to Google Sheets (and relay Telegram server-side as extra backup)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+        const sheetPayload = {
+          ...newInquiry,
+          telegramToken: TELEGRAM_TOKEN,
+          telegramChatId: TELEGRAM_CHAT_ID,
+          telegramMsgHTML: telegramMsgHTML,
+          telegramMsgPlain: telegramMsgPlain
+        };
         fetch(GOOGLE_SHEETS_URL, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newInquiry)
-        }).catch(() => {}); // Silent fail — data already saved above
+          body: JSON.stringify(sheetPayload)
+        }).catch(() => {}); // Silent fail — data already saved locally and dispatched
       }
 
     });
