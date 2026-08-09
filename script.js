@@ -1032,6 +1032,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
+  // Product Grid DOM references
+  const level1 = document.getElementById('catalogLevel1');
+  const level2 = document.getElementById('catalogLevel2');
+  const level3 = document.getElementById('catalogLevel3');
+  const gridTurmeric = document.getElementById('gridTurmeric');
+  const gridPsyllium = document.getElementById('gridPsyllium');
+  const gridCumin = document.getElementById('gridCumin');
+  const gridChilli = document.getElementById('gridChilli');
+
   const loadProducts = () => {
     // 1. Synchronous instant initialization
     try {
@@ -1484,6 +1493,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   
+  // Blog Reader Back Button Event Listener
+  const btnBlogBack = document.getElementById('btnBlogBack');
+  if (btnBlogBack) {
+    btnBlogBack.addEventListener('click', () => {
+      const blogGrid = document.getElementById('blogCardGrid');
+      const blogSingleView = document.getElementById('blogSingleView');
+      if (blogGrid) blogGrid.style.display = 'grid';
+      if (blogSingleView) blogSingleView.style.display = 'none';
+      window.location.hash = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Global Navigation Helper for data-view elements
+  document.addEventListener('click', (e) => {
+    const viewBtn = e.target.closest('[data-view]');
+    if (viewBtn) {
+      const view = viewBtn.getAttribute('data-view');
+      if (view === 'product' || view === 'products') window.location.href = 'products.html';
+      else if (view === 'contact') window.location.href = 'contact.html';
+      else if (view === 'inquiry') window.location.href = 'inquiry.html';
+      else if (view === 'blog') window.location.href = 'blog.html';
+      else if (view === 'certificates') window.location.href = 'certificates.html';
+      else if (view === 'about') window.location.href = 'about.html';
+      else if (view === 'home') window.location.href = 'index.html';
+    }
+  });
+
   window.addEventListener('hashchange', () => {
     handleProductsRouting();
     handleBlogRouting();
