@@ -1568,7 +1568,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 4. Inquiry Form Management ---
-  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwUb3FvQG3DCqDGuEsHMqtYJdcXVPbsUf1FRXMwZJerCdLwQ4K-h289hjcGsNsdfFnw7A/exec";
+  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyxoOmVpFvdpVuAaOQOQ_CzW4C2XyXSrFTEN7Ws-zW_DOM-FbxNx2zicFj1HcqleXDt/exec";
   const inquiryForm = document.getElementById('inquiryForm');
   const inquiryCardWrapper = document.getElementById('inquiryCardWrapper');
   const inquirySuccessView = document.getElementById('inquirySuccessView');
