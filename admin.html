@@ -179,6 +179,45 @@
           </div>
         </div>
 
+        <!-- Automated Daily Blog System (100% Free - Official Data Engine) -->
+        <div class="dash-form-wrapper" style="margin-bottom: 2.5rem; background: linear-gradient(135deg, rgba(5, 25, 59, 0.03) 0%, rgba(214, 28, 44, 0.03) 100%); border: 1px solid rgba(5, 25, 59, 0.15);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h4 class="dash-form-title" style="margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.6rem;">
+                <i class="fa-solid fa-robot" style="color: var(--primary-blue);"></i> Official Data Daily Auto-Blog System
+                <span class="badge-product" style="background: rgba(46, 204, 113, 0.15); color: #27ae60; border-color: rgba(46, 204, 113, 0.3); font-size: 0.75rem;">100% FREE AUTOMATION</span>
+              </h4>
+              <p class="dash-form-desc" style="margin-bottom: 1rem; max-width: 750px;">
+                Generates and uploads daily data-backed articles sourced directly from official standards: <strong>Spices Board of India</strong>, <strong>DGFT</strong>, <strong>APEDA</strong>, and <strong>CBIC Customs</strong>.
+              </p>
+            </div>
+            
+            <!-- Quick Actions Stack -->
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: #ffffff; padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border-light);">
+                <input type="checkbox" id="autoBlogToggleCheck" checked style="width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer;">
+                <span>Daily Auto-Publishing ON</span>
+              </label>
+
+              <button class="btn btn-primary" id="btnTriggerAutoBlog" style="background: var(--primary-blue); border-color: var(--primary-blue); color: #ffffff; font-weight: 600; padding: 0.65rem 1.4rem; font-size: 0.85rem;">
+                <i class="fa-solid fa-bolt" style="color: var(--accent-yellow);"></i> Generate & Publish Official Report Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Official Data Badges -->
+          <div style="display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; padding-top: 0.8rem; border-top: 1px dashed rgba(0,0,0,0.1); font-size: 0.8rem; color: var(--text-muted);">
+            <span style="font-weight: 700; color: var(--primary-blue-dark);"><i class="fa-solid fa-link"></i> Verified Data Endpoints:</span>
+            <a href="http://www.indianspices.com/quality/quality-standards.html" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Spices Board Specs</a>
+            <span>•</span>
+            <a href="https://www.dgft.gov.in/CP/?opt=itc-hs-code" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> DGFT HS Codes</a>
+            <span>•</span>
+            <a href="https://agriexchange.apeda.gov.in/" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> APEDA Standards</a>
+            <span>•</span>
+            <a href="https://www.cbic.gov.in/htdocs-cbec/customs/cst-manual/manual-toc" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> CBIC Customs Rules</a>
+          </div>
+        </div>
+
         <!-- Blog Form Card -->
         <div class="dash-form-wrapper">
           <h4 class="dash-form-title">
@@ -507,6 +546,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Javascript Dashboard Logics -->
+  <script src="auto-blog-engine.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

@@ -196,7 +196,70 @@
 
           <!-- Blog Card Grid -->
           <div class="blog-grid" id="blogCardGrid">
-            <!-- Dynamically populated by JS -->
+            
+            <!-- Article 1: Today's Official Auto Report -->
+            <div class="blog-card">
+              <div class="blog-card-img-wrapper">
+                <img src="images/psyllium_husk.png" alt="Psyllium Husk Quality Bulletin" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-category-badge badge-customs">Customs & Compliance</span>
+                  <span><i class="fa-regular fa-clock"></i> 5 min read</span>
+                </div>
+                <h3 class="blog-card-title">Psyllium Husk Quality Bulletin (August 9, 2026): 99% Purity Standards, Swell Index & FDA Compliance</h3>
+                <p class="blog-card-summary">Official technical specs bulletin on plantago ovata husks, swell index parameters (min 40ml/g), heavy metal laboratory limits, and quarantine clearance under Spices Board & APEDA guidelines.</p>
+                <div class="blog-card-footer">
+                  <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                    <i class="fa-regular fa-calendar-days" style="margin-right: 0.3rem;"></i> August 9, 2026
+                  </span>
+                  <span class="blog-read-more">Read Insight <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Article 2: Turmeric Finger -->
+            <div class="blog-card">
+              <div class="blog-card-img-wrapper">
+                <img src="images/blog_turmeric.png" alt="Turmeric Finger Sourcing" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-category-badge badge-customs">Customs & Compliance</span>
+                  <span><i class="fa-regular fa-clock"></i> 6 min read</span>
+                </div>
+                <h3 class="blog-card-title">Navigating US-FDA Phytosanitary Standards for Turmeric Finger Exporters</h3>
+                <p class="blog-card-summary">Comprehensive breakdown of maximum residue limits (MRL), curcumin percentage testing, and double-polishing quality controls required for seamless port clearance in North America.</p>
+                <div class="blog-card-footer">
+                  <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                    <i class="fa-regular fa-calendar-days" style="margin-right: 0.3rem;"></i> June 23, 2026
+                  </span>
+                  <span class="blog-read-more">Read Insight <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Article 3: Freight Logistics -->
+            <div class="blog-card">
+              <div class="blog-card-img-wrapper">
+                <img src="images/blog_freight.png" alt="Ocean Freight Shipping" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-category-badge badge-logistics">Logistics & Shipping</span>
+                  <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+                </div>
+                <h3 class="blog-card-title">Optimizing Containerized Freight Costs from Mundra Port to European Hubs</h3>
+                <p class="blog-card-summary">Strategic insights on securing FCL reefer containers, mitigating transit moisture risks in agricultural cargo, and navigating L/C payment clauses with global freight forwarders.</p>
+                <div class="blog-card-footer">
+                  <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+                    <i class="fa-regular fa-calendar-days" style="margin-right: 0.3rem;"></i> May 29, 2026
+                  </span>
+                  <span class="blog-read-more">Read Insight <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- Single Article Reader Container (Initially Hidden, Dynamic Content) -->
@@ -215,9 +278,6 @@
         </div>
       </div>
     </section>
-
-  </main>
-
 
   </main>
 
@@ -315,6 +375,7 @@
   
 
   <!-- JavaScript Logics -->
+  <script src="auto-blog-engine.js"></script>
   <script src="script.js"></script>
   
 </body>

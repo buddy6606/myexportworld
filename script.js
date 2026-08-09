@@ -67,8 +67,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
+  // --- 0. Global Utility Helpers ---
+  const escapeHTML = (str) => {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
+  // Toast Notification System (hoisted as function so it's available everywhere)
+  function showToast(message, type = "info") {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    let iconClass = "fa-info-circle";
+    if (type === "success") iconClass = "fa-circle-check";
+    if (type === "warning") iconClass = "fa-triangle-exclamation";
+    if (type === "danger") iconClass = "fa-circle-xmark";
+    toast.innerHTML = `<i class="fa-solid ${iconClass}" style="font-size:1.2rem; color:${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--accent-yellow)' : type === 'danger' ? 'var(--accent-red)' : 'var(--primary-blue)'}"></i><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.animation = "toastSlideOut 0.4s ease forwards";
+      toast.addEventListener('animationend', () => toast.remove());
+    }, 2500);
+  }
+
   // --- 1. Global State & Sample Data ---
   let inquiries = [];
+  let blogPosts = [];
 
   // Sample seed data to showcase the admin dashboard immediately
   const sampleInquiries = [
@@ -114,8 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadInquiries();
 
   // --- Daily Blog Database & Sample Data ---
-  let blogPosts = [];
-
   const sampleBlogPosts = [
     {
       id: "seed_freight",
@@ -598,35 +626,239 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
+  // --- 9. Dynamic Daily Blog & Publisher Engine ---
+  let currentBlogPost = null;
+
+  function getBlogElements() {
+    return {
+      blogGrid: document.getElementById('blogCardGrid'),
+      blogSingleView: document.getElementById('blogSingleView'),
+      blogArticleContent: document.getElementById('blogArticleContent'),
+      btnBlogBack: document.getElementById('btnBlogBack')
+    };
+  }
+
+  function renderBlogGrid(filterCategory = 'all') {
+    const { blogGrid } = getBlogElements();
+    if (!blogGrid) return;
+    blogGrid.innerHTML = '';
+
+    const filtered = (blogPosts || []).filter(post => {
+      if (!post || !post.category) return false;
+      if (filterCategory === 'all') return true;
+      return post.category.toLowerCase() === filterCategory.toLowerCase();
+    });
+
+    if (filtered.length === 0) {
+      blogGrid.innerHTML = `
+        <div style="grid-column: span 3; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-light);">
+          <i class="fa-solid fa-feather-pointed" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
+          <h4 style="font-size: 1.4rem; color: var(--primary-blue-dark); margin-bottom: 0.5rem;">No Articles Posted Yet</h4>
+          <p style="color: var(--text-muted);">Check back soon or publish an insight from the Administrative Desk.</p>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(post => {
+      const card = document.createElement('div');
+      card.className = 'blog-card';
+
+      let badgeClass = 'badge-logistics';
+      if (post.category && post.category.includes('Customs')) badgeClass = 'badge-customs';
+      if (post.category && (post.category.includes('Finance') || post.category.includes('Laws'))) badgeClass = 'badge-finance';
+
+      card.innerHTML = `
+        <div class="blog-card-img-wrapper">
+          <img src="${escapeHTML(post.thumbnailImage || post.coverImage)}" alt="${escapeHTML(post.title)}" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
+        </div>
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            <span class="blog-category-badge ${badgeClass}">${escapeHTML(post.category)}</span>
+            <span><i class="fa-regular fa-clock"></i> ${escapeHTML(post.readTime)}</span>
+          </div>
+          <h3 class="blog-card-title">${escapeHTML(post.title)}</h3>
+          <p class="blog-card-summary">${escapeHTML(post.teaserSummary)}</p>
+          <div class="blog-card-footer">
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+              <i class="fa-regular fa-calendar-days" style="margin-right: 0.3rem;"></i> ${escapeHTML(post.dateFormatted || 'Recent')}
+            </span>
+            <span class="blog-read-more">Read Insight <i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        currentBlogPost = post;
+        openArticleReader(post);
+        window.location.hash = 'blog-article';
+      });
+      blogGrid.appendChild(card);
+    });
+  }
+
+  function openArticleReader(post) {
+    const { blogGrid, blogSingleView, blogArticleContent } = getBlogElements();
+    if (!blogGrid || !blogSingleView || !blogArticleContent || !post) return;
+
+    blogGrid.style.display = 'none';
+    blogSingleView.style.display = 'block';
+
+    let badgeClass = 'badge-logistics';
+    if (post.category && post.category.includes('Customs')) badgeClass = 'badge-customs';
+    if (post.category && (post.category.includes('Finance') || post.category.includes('Laws'))) badgeClass = 'badge-finance';
+
+    blogArticleContent.innerHTML = `
+      <div class="blog-article-header">
+        <div class="blog-article-meta">
+          <span class="blog-category-badge ${badgeClass}">${escapeHTML(post.category)}</span>
+          <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="fa-regular fa-calendar-days"></i> Published: ${escapeHTML(post.dateFormatted || 'Recent')}</span>
+          <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="fa-regular fa-clock"></i> Estimated Read: ${escapeHTML(post.readTime)}</span>
+        </div>
+        <h1 class="blog-article-title">${escapeHTML(post.title)}</h1>
+      </div>
+
+      <div class="blog-article-cover-wrapper">
+        <img src="${escapeHTML(post.coverImage)}" alt="${escapeHTML(post.title)}" class="blog-article-cover" onerror="this.src='images/blog_freight.png';">
+      </div>
+
+      <div class="blog-article-content">
+        ${post.bodyContent}
+      </div>
+
+      <div class="blog-cta-card">
+        <div class="blog-cta-info">
+          <h4>Procure Premium Spices & Husks</h4>
+          <p>Ready to source internationally with 100% logistics, compliance, and payment security? Connect directly with our sourcing advisors to get a custom commercial quote.</p>
+        </div>
+        <div class="blog-cta-action">
+          <button class="btn btn-primary" id="btnBlogCtaInquire" style="background: var(--accent-yellow); border-color: var(--accent-yellow); color: var(--primary-blue-dark); font-weight: 700;">
+            <i class="fa-solid fa-paper-plane"></i> Start Sourcing Proposal
+          </button>
+        </div>
+      </div>
+    `;
+
+    const btnBlogCtaInquire = document.getElementById('btnBlogCtaInquire');
+    if (btnBlogCtaInquire) {
+      btnBlogCtaInquire.addEventListener('click', () => {
+        const productDropdown = document.getElementById('productSelected');
+        if (productDropdown) {
+          productDropdown.value = "General Sourcing / Logistics Request";
+        }
+        window.location.hash = 'inquiry';
+        showToast("Welcome to Sourcing Center", "success");
+      });
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderBlogFilters() {
+    const filterToolbar = document.querySelector('.blog-filter-toolbar');
+    if (!filterToolbar) return;
+
+    const categories = new Set(["Logistics & Shipping", "Customs & Compliance", "Trade Finance & Laws"]);
+    (blogPosts || []).forEach(post => {
+      if (post && post.category && !categories.has(post.category)) {
+        categories.add(post.category);
+      }
+    });
+
+    filterToolbar.innerHTML = '<button class="blog-filter-btn active" data-blog-category="all">All Insights</button>';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'blog-filter-btn';
+      btn.setAttribute('data-blog-category', cat);
+      btn.textContent = cat;
+      filterToolbar.appendChild(btn);
+    });
+
+    const newFilterButtons = filterToolbar.querySelectorAll('.blog-filter-btn');
+    newFilterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        newFilterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.getAttribute('data-blog-category');
+        renderBlogGrid(cat);
+      });
+    });
+  }
+
+  const sortBlogPosts = (postsArray) => {
+    if (!Array.isArray(postsArray)) return [];
+    return postsArray.sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.isoDate || 0).getTime();
+      const timeB = new Date(b.timestamp || b.isoDate || 0).getTime();
+      return timeB - timeA;
+    });
+  };
+
+  const ensureTodayPost = (postsList) => {
+    if (!Array.isArray(postsList)) postsList = [];
+    if (typeof AutoBlogEngine !== 'undefined') {
+      const todayPost = AutoBlogEngine.generateOfficialPost(new Date());
+      const hasToday = postsList.some(p => p && (p.isoDate === todayPost.isoDate || (p.timestamp && p.timestamp.startsWith(todayPost.isoDate))));
+      if (!hasToday) {
+        postsList.unshift(todayPost);
+      }
+    }
+    return sortBlogPosts(postsList);
+  };
+
   const loadBlogPosts = () => {
+    // 1. Synchronous instant initialization (0ms render)
+    try {
+      const stored = localStorage.getItem('myexportworld_blog_posts');
+      if (stored) {
+        blogPosts = ensureTodayPost(JSON.parse(stored));
+      } else {
+        blogPosts = ensureTodayPost([...sampleBlogPosts]);
+      }
+    } catch (e) {
+      blogPosts = ensureTodayPost([...sampleBlogPosts]);
+    }
+
+    // Render grid immediately on load
+    renderBlogFilters();
+    renderBlogGrid('all');
+
+    // 2. Asynchronous Firestore background sync
     if (db) {
       db.collection('blog_posts').onSnapshot(snapshot => {
         if (!snapshot.empty) {
-          blogPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+          blogPosts = ensureTodayPost(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         } else {
+          blogPosts = ensureTodayPost([...sampleBlogPosts]);
           sampleBlogPosts.forEach(sp => {
-            db.collection('blog_posts').doc(sp.id).set(sp);
+            db.collection('blog_posts').doc(sp.id).set(sp).catch(() => {});
           });
         }
+        try {
+          localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
+        } catch (e) {}
+        renderBlogFilters();
+        renderBlogGrid('all');
       }, err => {
         console.error("Firestore blog posts sync error:", err);
       });
     }
-    try {
-      const stored = localStorage.getItem('myexportworld_blog_posts');
-      if (stored) {
-        blogPosts = JSON.parse(stored);
-      } else {
-        blogPosts = [...sampleBlogPosts];
-      }
-    } catch (e) {
-      console.error("Failed to parse blog posts from localStorage", e);
-      blogPosts = [...sampleBlogPosts];
-    }
   };
 
   loadBlogPosts();
+
+  // Execute Daily Auto Blog Check (100% Free Auto Publisher)
+  if (typeof AutoBlogEngine !== 'undefined') {
+    AutoBlogEngine.checkAndPublishDailyPost(db).then(todayPost => {
+      try {
+        const stored = localStorage.getItem('myexportworld_blog_posts');
+        if (stored) blogPosts = ensureTodayPost(JSON.parse(stored));
+        else if (todayPost) blogPosts = ensureTodayPost([todayPost, ...sampleBlogPosts]);
+      } catch (e) {}
+      renderBlogFilters();
+      renderBlogGrid('all');
+    }).catch(err => console.error("Auto blog engine error:", err));
+  }
 
   // --- 8. Dynamic Products Database & Loader ---
   let products = [];
@@ -779,23 +1011,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const loadProducts = () => {
-    if (db) {
-      db.collection('products').onSnapshot(snapshot => {
-        if (!snapshot.empty) {
-          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-          renderPublicProducts();
-          populateProductDropdown();
-          populateProductCategorySelect();
-        } else {
-          sampleProducts.forEach(p => {
-            db.collection('products').doc(p.id).set(p);
-          });
-        }
-      }, err => {
-        console.error("Firestore products sync error:", err);
-      });
-    }
+    // 1. Synchronous instant initialization
     try {
       const stored = localStorage.getItem('myexportworld_products');
       if (stored) {
@@ -804,8 +1020,33 @@ document.addEventListener('DOMContentLoaded', () => {
         products = [...sampleProducts];
       }
     } catch (e) {
-      console.error("Failed to parse products from localStorage", e);
       products = [...sampleProducts];
+    }
+
+    renderPublicProducts();
+    populateProductDropdown();
+    populateProductCategorySelect();
+
+    // 2. Asynchronous Firestore background sync
+    if (db) {
+      db.collection('products').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } else {
+          products = [...sampleProducts];
+          sampleProducts.forEach(p => {
+            db.collection('products').doc(p.id).set(p).catch(() => {});
+          });
+        }
+        try {
+          localStorage.setItem('myexportworld_products', JSON.stringify(products));
+        } catch (e) {}
+        renderPublicProducts();
+        populateProductDropdown();
+        populateProductCategorySelect();
+      }, err => {
+        console.error("Firestore products sync error:", err);
+      });
     }
   };
 
@@ -1113,6 +1354,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle Blog Article Hash Navigation
   const handleBlogRouting = () => {
     const blogGrid = document.getElementById('blogCardGrid');
+    const blogSingleView = document.getElementById('blogSingleView');
     if (!blogGrid) return;
     
     if (window.location.hash === '#blog-article' && currentBlogPost) {
@@ -1180,7 +1422,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 4. Inquiry Form Management ---
-  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwUb3FvQG3DCqDGuEsHMqtYJdcXVPbsUf1FRXMwZJerCdLwQ4K-h289hjcGsNsdfFnw7A/exec"; // Replace with your Google Apps Script URL
+  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwUb3FvQG3DCqDGuEsHMqtYJdcXVPbsUf1FRXMwZJerCdLwQ4K-h289hjcGsNsdfFnw7A/exec";
   const inquiryForm = document.getElementById('inquiryForm');
   const inquiryCardWrapper = document.getElementById('inquiryCardWrapper');
   const inquirySuccessView = document.getElementById('inquirySuccessView');
@@ -1199,13 +1441,28 @@ document.addEventListener('DOMContentLoaded', () => {
       const productSelected = document.getElementById('productSelected').value;
       const buyerQuestion = document.getElementById('buyerQuestion').value.trim();
 
-      // Simple Validation Check
+      // Validation
       if (!companyName || !buyerName || !contactNo || !buyerEmail || !buyerAddress || !productSelected || !buyerQuestion) {
         showToast("Please fill in all mandatory fields.", "warning");
+        // Highlight empty required fields
+        ['companyName','buyerName','contactNo','buyerEmail','buyerAddress','productSelected','buyerQuestion'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && !el.value.trim()) {
+            el.style.borderColor = 'var(--accent-red)';
+            el.addEventListener('input', () => { el.style.borderColor = ''; }, { once: true });
+          }
+        });
         return;
       }
 
-      // Format Date-Time string
+      // Disable submit button to prevent double-submit
+      const submitBtn = inquiryForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `Saving... <i class="fa-solid fa-spinner fa-spin"></i>`;
+      }
+
+      // Format timestamp
       const now = new Date();
       const timestamp = now.getFullYear() + '-' +
         String(now.getMonth() + 1).padStart(2, '0') + '-' +
@@ -1214,65 +1471,63 @@ document.addEventListener('DOMContentLoaded', () => {
         String(now.getMinutes()).padStart(2, '0') + ':' +
         String(now.getSeconds()).padStart(2, '0');
 
-      // Construct New Submission object
-      const newInquiry = {
-        timestamp,
-        companyName,
-        buyerName,
-        contactNo,
-        buyerEmail,
-        buyerAddress,
-        productSelected,
-        buyerQuestion
-      };
+      const newInquiry = { timestamp, companyName, buyerName, contactNo, buyerEmail, buyerAddress, productSelected, buyerQuestion };
 
+      // Step 1: Save to localStorage immediately (never lose data)
+      try {
+        const existing = JSON.parse(localStorage.getItem('myexportworld_inquiries') || '[]');
+        existing.unshift(newInquiry);
+        localStorage.setItem('myexportworld_inquiries', JSON.stringify(existing));
+        inquiries = existing;
+      } catch (ex) {}
+
+      // Step 2: Save to Firestore (non-blocking background)
       if (db) {
-        db.collection('inquiries').add(newInquiry).catch(err => console.error("Firestore inquiry error:", err));
+        db.collection('inquiries').add(newInquiry).catch(err => console.warn("Firestore inquiry sync:", err));
       }
 
-      // Send to Google Sheets and Telegram (if configured)
+      // Step 3: Show success IMMEDIATELY — never block on any network call
+      if (inquiryCardWrapper) inquiryCardWrapper.style.display = 'none';
+      if (inquirySuccessView) inquirySuccessView.style.display = 'block';
+      showToast("Inquiry submitted successfully!", "success");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Submit Inquiry <i class="fa-solid fa-paper-plane"></i>`;
+      }
+
+      // Step 4: Send Telegram notification instantly
+      const TELEGRAM_TOKEN = "8892460990:AAHeJ16iPlXBaSAkpiji2H-Thn8CeKgadlE";
+      const TELEGRAM_CHAT_ID = "8825936223";
+      const telegramMsg = `🔔 <b>New Inquiry — MY EXPORT WORLD</b>
+
+🏢 <b>Company:</b> ${companyName}
+👤 <b>Name:</b> ${buyerName}
+📞 <b>Phone:</b> ${contactNo}
+📧 <b>Email:</b> ${buyerEmail}
+📍 <b>Address:</b> ${buyerAddress}
+📦 <b>Product:</b> ${productSelected}
+💬 <b>Message:</b> ${buyerQuestion}
+
+⏰ <b>Time:</b> ${timestamp}`;
+
+      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: telegramMsg,
+          parse_mode: "HTML"
+        })
+      }).catch(() => {}); // Silent fail — inquiry already saved
+
+      // Step 5: Send to Google Sheets silently in background (non-critical, will not block)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-        showToast("Submitting your inquiry...", "info");
-
-        // Find submit button to show loading feedback
-        const submitBtn = inquiryForm.querySelector('button[type="submit"]');
-        const originalBtnHtml = submitBtn ? submitBtn.innerHTML : 'Submit Inquiry';
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = `Sending... <i class="fa-solid fa-spinner fa-spin"></i>`;
-        }
-
         fetch(GOOGLE_SHEETS_URL, {
           method: "POST",
           mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newInquiry)
-        })
-          .then(() => {
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalBtnHtml;
-            }
-            inquiryCardWrapper.style.display = 'none';
-            inquirySuccessView.style.display = 'block';
-            showToast("Inquiry submitted successfully!", "success");
-          })
-          .catch(err => {
-            console.error("Submission Error:", err);
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalBtnHtml;
-            }
-            showToast("Network error. Please try again.", "danger");
-          });
-      } else {
-        // Fallback if URL is not configured (Demo mode)
-        console.warn("GOOGLE_SHEETS_URL is not configured.");
-        inquiryCardWrapper.style.display = 'none';
-        inquirySuccessView.style.display = 'block';
-        showToast("Inquiry logged successfully (Demo Mode)", "success");
+        }).catch(() => {}); // Silent fail — data already saved above
       }
 
     });
@@ -1287,50 +1542,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Helper utility to safely escape raw strings against XSS inside client-side renders
-  const escapeHTML = (str) => {
-    if (!str) return '';
-    return str.replace(/[&<>'"]/g,
-      tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      }[tag] || tag)
-    );
-  };
-
-  // --- 7. Toast Alerts Notification System ---
-  const showToast = (message, type = "info") => {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-
-    // Choose icon based on alert type
-    let iconClass = "fa-info-circle";
-    if (type === "success") iconClass = "fa-circle-check";
-    if (type === "warning") iconClass = "fa-triangle-exclamation";
-
-    toast.innerHTML = `
-      <i class="fa-solid ${iconClass}" style="font-size:1.2rem; color:${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--accent-red)' : 'var(--primary-blue)'}"></i>
-      <span>${message}</span>
-    `;
-
-    container.appendChild(toast);
-
-    // Fade and slide out after 2 seconds
-    setTimeout(() => {
-      toast.style.animation = "toastSlideOut 0.4s ease forwards";
-      toast.addEventListener('animationend', () => {
-        toast.remove();
-      });
-    }, 2000);
-  };
-
-  // Add toast exit keyframes dynamically to style.css or let JS handle it, but wait: we can define it directly
+  // Add toast exit keyframes dynamically
   const styleSheet = document.createElement("style");
   styleSheet.innerText = `
     @keyframes toastSlideOut {
@@ -1339,187 +1551,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `;
   document.head.appendChild(styleSheet);
-
-  // --- 9. Dynamic Daily Blog & Publisher Engine ---
-  const blogGrid = document.getElementById('blogCardGrid');
-  const blogSingleView = document.getElementById('blogSingleView');
-  const blogArticleContent = document.getElementById('blogArticleContent');
-  const btnBlogBack = document.getElementById('btnBlogBack');
-  const adminBlogForm = document.getElementById('adminBlogForm');
-  let currentBlogPost = null;
-  const blogFilterButtons = document.querySelectorAll('.blog-filter-btn');
-
-
-
-  // Render Grid
-  const renderBlogGrid = (filterCategory = 'all') => {
-    if (!blogGrid) return;
-    blogGrid.innerHTML = '';
-
-    const filtered = blogPosts.filter(post => {
-      if (filterCategory === 'all') return true;
-      return post.category.toLowerCase() === filterCategory.toLowerCase();
-    });
-
-    if (filtered.length === 0) {
-      blogGrid.innerHTML = `
-        <div style="grid-column: span 3; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-light);">
-          <i class="fa-solid fa-feather-pointed" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
-          <h4 style="font-size: 1.4rem; color: var(--primary-blue-dark); margin-bottom: 0.5rem;">No Articles Posted Yet</h4>
-          <p style="color: var(--text-muted);">Check back soon or publish an insight from the Administrative Desk.</p>
-        </div>
-      `;
-      return;
-    }
-
-    filtered.forEach(post => {
-      const card = document.createElement('div');
-      card.className = 'blog-card';
-
-      // Determine correct badge classes
-      let badgeClass = 'badge-logistics';
-      if (post.category.includes('Customs')) badgeClass = 'badge-customs';
-      if (post.category.includes('Finance') || post.category.includes('Laws')) badgeClass = 'badge-finance';
-
-      card.innerHTML = `
-        <div class="blog-card-img-wrapper">
-          <img src="${escapeHTML(post.thumbnailImage || post.coverImage)}" alt="${escapeHTML(post.title)}" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
-        </div>
-        <div class="blog-card-body">
-          <div class="blog-card-meta">
-            <span class="blog-category-badge ${badgeClass}">${escapeHTML(post.category)}</span>
-            <span><i class="fa-regular fa-clock"></i> ${escapeHTML(post.readTime)}</span>
-          </div>
-          <h3 class="blog-card-title">${escapeHTML(post.title)}</h3>
-          <p class="blog-card-summary">${escapeHTML(post.teaserSummary)}</p>
-          <div class="blog-card-footer">
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
-              <i class="fa-regular fa-calendar-days" style="margin-right: 0.3rem;"></i> ${escapeHTML(post.dateFormatted || 'Recent')}
-            </span>
-            <span class="blog-read-more">Read Insight <i class="fa-solid fa-arrow-right"></i></span>
-          </div>
-        </div>
-      `;
-
-      card.addEventListener('click', () => {
-        currentBlogPost = post;
-        openArticleReader(post);
-        window.location.hash = 'blog-article';
-      });
-      blogGrid.appendChild(card);
-    });
-    
-  };
-
-  // Open Single View Reader
-  const openArticleReader = (post) => {
-    if (!blogGrid || !blogSingleView || !blogArticleContent) return;
-
-    // Hide grid, show single reader view
-    blogGrid.style.display = 'none';
-    blogSingleView.style.display = 'block';
-
-    let badgeClass = 'badge-logistics';
-    if (post.category.includes('Customs')) badgeClass = 'badge-customs';
-    if (post.category.includes('Finance') || post.category.includes('Laws')) badgeClass = 'badge-finance';
-
-    blogArticleContent.innerHTML = `
-      <div class="blog-article-header">
-        <div class="blog-article-meta">
-          <span class="blog-category-badge ${badgeClass}">${escapeHTML(post.category)}</span>
-          <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="fa-regular fa-calendar-days"></i> Published: ${escapeHTML(post.dateFormatted || 'Recent')}</span>
-          <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="fa-regular fa-clock"></i> Estimated Read: ${escapeHTML(post.readTime)}</span>
-        </div>
-        <h1 class="blog-article-title">${escapeHTML(post.title)}</h1>
-      </div>
-
-      <div class="blog-article-cover-wrapper">
-        <img src="${escapeHTML(post.coverImage)}" alt="${escapeHTML(post.title)}" class="blog-article-cover" onerror="this.src='images/blog_freight.png';">
-      </div>
-
-      <div class="blog-article-content">
-        ${post.bodyContent}
-      </div>
-
-      <!-- Quick Sourcing Handshake CTA Card -->
-      <div class="blog-cta-card">
-        <div class="blog-cta-info">
-          <h4>Procure Premium Spices & Husks</h4>
-          <p>Ready to source internationally with 100% logistics, compliance, and payment security? Connect directly with our sourcing advisors to get a custom commercial quote.</p>
-        </div>
-        <div class="blog-cta-action">
-          <button class="btn btn-primary" id="btnBlogCtaInquire" style="background: var(--accent-yellow); border-color: var(--accent-yellow); color: var(--primary-blue-dark); font-weight: 700;">
-            <i class="fa-solid fa-paper-plane"></i> Start Sourcing Proposal
-          </button>
-        </div>
-      </div>
-    `;
-
-    // Bind inside-article CTA button click
-    const btnBlogCtaInquire = document.getElementById('btnBlogCtaInquire');
-    if (btnBlogCtaInquire) {
-      btnBlogCtaInquire.addEventListener('click', () => {
-        // Pre-fill general enquiry
-        const productDropdown = document.getElementById('productSelected');
-        if (productDropdown) {
-          productDropdown.value = "General Sourcing / Logistics Request";
-        }
-        window.location.hash = 'inquiry';
-        showToast("Welcome to Sourcing Center", "success");
-      });
-    }
-
-    // Scroll reader view smoothly to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-  };
-
-  // Back button event listener
-  if (btnBlogBack) {
-    btnBlogBack.addEventListener('click', () => {
-      window.location.hash = 'blog';
-    });
-  }
-
-  // Dynamically populate Category Filter Toolbar
-  const renderBlogFilters = () => {
-    const filterToolbar = document.querySelector('.blog-filter-toolbar');
-    if (!filterToolbar) return;
-
-    // Default categories
-    const categories = new Set(["Logistics & Shipping", "Customs & Compliance", "Trade Finance & Laws"]);
-
-    // Add custom ones from active blog posts
-    blogPosts.forEach(post => {
-      if (post.category && !categories.has(post.category)) {
-        categories.add(post.category);
-      }
-    });
-
-    filterToolbar.innerHTML = '<button class="blog-filter-btn active" data-blog-category="all">All Insights</button>';
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.className = 'blog-filter-btn';
-      btn.setAttribute('data-blog-category', cat);
-      btn.textContent = cat;
-      filterToolbar.appendChild(btn);
-    });
-
-    // Re-bind events to the new buttons
-    const newFilterButtons = filterToolbar.querySelectorAll('.blog-filter-btn');
-    newFilterButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        newFilterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const cat = btn.getAttribute('data-blog-category');
-        renderBlogGrid(cat);
-      });
-    });
-  };
-
-  // Set default view render of blog cards if view loads
-  renderBlogFilters();
-  renderBlogGrid('all');
 
   // --- 10. Animated Stats Counter Engine (Intersection Observer) ---
   const statsSection = document.getElementById('statsSection');

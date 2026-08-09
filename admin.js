@@ -832,6 +832,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- 5A-2. Official Data Auto-Blog Engine Admin Integration ---
+  const autoBlogToggleCheck = document.getElementById('autoBlogToggleCheck');
+  const btnTriggerAutoBlog = document.getElementById('btnTriggerAutoBlog');
+
+  if (autoBlogToggleCheck && typeof AutoBlogEngine !== 'undefined') {
+    autoBlogToggleCheck.checked = AutoBlogEngine.isAutoPublishEnabled();
+    autoBlogToggleCheck.addEventListener('change', (e) => {
+      const enabled = e.target.checked;
+      AutoBlogEngine.setAutoPublishEnabled(enabled);
+      showToast(enabled ? "Daily Auto-Publishing Enabled" : "Daily Auto-Publishing Paused", enabled ? "success" : "info");
+    });
+  }
+
+  if (btnTriggerAutoBlog && typeof AutoBlogEngine !== 'undefined') {
+    btnTriggerAutoBlog.addEventListener('click', async () => {
+      showToast("Generating Official Trade Report...", "info");
+      const newPost = AutoBlogEngine.generateOfficialPost(new Date());
+
+      if (db) {
+        try {
+          await db.collection('blog_posts').doc(newPost.id).set(newPost);
+        } catch (err) {
+          console.error("Firestore Auto Blog error:", err);
+        }
+      }
+
+      // Check if already in list, if not add
+      const existsIndex = blogPosts.findIndex(p => p && (p.id === newPost.id || p.isoDate === newPost.isoDate));
+      if (existsIndex >= 0) {
+        blogPosts[existsIndex] = newPost;
+      } else {
+        blogPosts.unshift(newPost);
+      }
+
+      saveBlogPosts();
+      loadDatabase();
+      showToast("Official Data Trade Report Generated & Published Live!", "success");
+    });
+  }
+
   // --- 5B. Product Catalog Operations ---
   setupImageSelectorControls(prodImageSelect, prodImageCustom, prodImageFile);
 
