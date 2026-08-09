@@ -1744,19 +1744,12 @@ Time: ${timestamp}`;
         console.warn("Telegram notice error:", tgErr);
       }
 
-      // Step 5: Send to Google Sheets (and relay Telegram server-side as extra backup)
+      // Step 5: Send to Google Sheets (saves data row without duplicating Telegram dispatch)
       if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-        const sheetPayload = {
-          ...newInquiry,
-          telegramToken: TELEGRAM_TOKEN,
-          telegramChatId: TELEGRAM_CHAT_ID,
-          telegramMsgHTML: telegramMsgHTML,
-          telegramMsgPlain: telegramMsgPlain
-        };
         try {
           fetch(GOOGLE_SHEETS_URL, {
             method: "POST",
-            body: JSON.stringify(sheetPayload),
+            body: JSON.stringify(newInquiry),
             keepalive: true
           }).catch(() => {});
         } catch (gsErr) {
