@@ -1637,15 +1637,6 @@ document.addEventListener('DOMContentLoaded', () => {
         db.collection('inquiries').add(newInquiry).catch(err => console.warn("Firestore inquiry sync:", err));
       }
 
-      // Step 3: Show success IMMEDIATELY — never block on any network call
-      if (inquiryCardWrapper) inquiryCardWrapper.style.display = 'none';
-      if (inquirySuccessView) inquirySuccessView.style.display = 'block';
-      showToast("Inquiry submitted successfully!", "success");
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `Submit Inquiry <i class="fa-solid fa-paper-plane"></i>`;
-      }
-
       // Helper function to escape HTML special characters for Telegram HTML mode
       const escapeTelegramHTML = (str) => {
         if (!str) return '';
@@ -1695,7 +1686,7 @@ Time: ${timestamp}`;
       const sendTelegramNotice = async () => {
         const apiUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
         
-        // Tier 1: Standard CORS JSON POST (HTML formatted)
+        // Tier 1: Standard CORS JSON POST (HTML formatted, keepalive enabled)
         try {
           const res = await fetch(apiUrl, {
             method: 'POST',
@@ -1704,7 +1695,8 @@ Time: ${timestamp}`;
               chat_id: TELEGRAM_CHAT_ID,
               text: telegramMsgHTML,
               parse_mode: 'HTML'
-            })
+            }),
+            keepalive: true
           });
           if (res.ok) {
             console.log('Telegram HTML notification dispatched successfully.');
@@ -1723,7 +1715,8 @@ Time: ${timestamp}`;
             body: JSON.stringify({
               chat_id: TELEGRAM_CHAT_ID,
               text: telegramMsgPlain
-            })
+            }),
+            keepalive: true
           });
           if (res2.ok) {
             console.log('Telegram Plain Text notification dispatched successfully.');
@@ -1749,6 +1742,7 @@ Time: ${timestamp}`;
         }
       };
 
+      // Fire dispatches immediately
       sendTelegramNotice();
 
       // Step 5: Send to Google Sheets (and relay Telegram server-side as extra backup)
@@ -1764,8 +1758,18 @@ Time: ${timestamp}`;
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sheetPayload)
+          body: JSON.stringify(sheetPayload),
+          keepalive: true
         }).catch(() => {}); // Silent fail — data already saved locally and dispatched
+      }
+
+      // Step 3: Show success view in UI
+      if (inquiryCardWrapper) inquiryCardWrapper.style.display = 'none';
+      if (inquirySuccessView) inquirySuccessView.style.display = 'block';
+      showToast("Inquiry submitted successfully!", "success");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Submit Inquiry <i class="fa-solid fa-paper-plane"></i>`;
       }
 
     });
