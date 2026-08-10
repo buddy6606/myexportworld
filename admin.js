@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const correctAccessKey = "MYEXPORTWORLD9601343577";
 
   const sampleProducts = [
+    // --- 1. Turmeric ---
     {
       id: "prod_turmeric_finger",
       title: "Dried Turmeric Finger",
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Double Polished",
       image: "images/turmeric_finger.jpg",
-      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin, rich in curcumin content.",
+      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin. Min 3.5% Curcumin.",
       specs: [
         { name: "Curcumin", value: "Min 3.5%" },
         { name: "Origin", value: "Nizamabad / Sangli, India" },
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Ultra-Fine Ground",
       image: "images/turmeric_powder.jpg",
-      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma, essential oils, and curcumin concentration.",
+      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma and essential oils.",
       specs: [
         { name: "Curcumin", value: "Min 3.8%" },
         { name: "Origin", value: "Erode / Nizamabad, India" },
@@ -63,22 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Moisture", value: "Max 9%" }
       ]
     },
-    {
-      id: "prod_turmeric_fresh",
-      title: "Fresh Turmeric",
-      hsCode: "09103010",
-      category: "turmeric",
-      badge: "Organic Harvest",
-      image: "images/turmeric_fresh.jpg",
-      description: "Harvested fresh organic turmeric rhizomes, raw and unprocessed. Retains full therapeutic attributes, juice content, and fresh spice flavor.",
-      specs: [
-        { name: "State", value: "Fresh Raw Rhizomes" },
-        { name: "Origin", value: "Sangli / Erode, India" },
-        { name: "Packing", value: "Crates / Jute Bags" },
-        { name: "Organic Status", value: "100% Organic" },
-        { name: "Curcumin", value: "3% - 4%" }
-      ]
-    },
+
+    // --- 2. Psyllium ---
     {
       id: "prod_psyllium_husk",
       title: "Psyllium Husk Whole",
@@ -86,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "psyllium",
       badge: "99% Ultra-Pure",
       image: "images/psyllium_husk.png",
-      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber. Used widely in food processing and pharmaceuticals.",
+      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber.",
       specs: [
         { name: "Purity Grade", value: "99% (Swell Index 45ml/g)" },
         { name: "Origin", value: "Gujarat / Rajasthan, India" },
@@ -102,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "psyllium",
       badge: "Milled Fiber",
       image: "images/psyllium_powder.png",
-      description: "Fine ground psyllium husk powder, ideal for easy blending into dietary supplements, bakery products, and pharmaceutical formulations.",
+      description: "Fine ground psyllium husk powder, ideal for easy blending into dietary supplements and bakery products.",
       specs: [
         { name: "Purity Grade", value: "98% (40-60 mesh)" },
         { name: "Origin", value: "Gujarat, India" },
@@ -111,6 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Swell Volume", value: "Min 35 ml / gram" }
       ]
     },
+
+    // --- 3. Cumin ---
     {
       id: "prod_cumin_seeds",
       title: "Cumin Seeds",
@@ -118,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "cumin",
       badge: "Sortex Cleaned",
       image: "images/cumin_seeds.png",
-      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds. Rich in essential oils and thymol content.",
+      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds.",
       specs: [
         { name: "Purity", value: "Min 99%" },
         { name: "Origin", value: "Gujarat / Rajasthan, India" },
@@ -134,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "cumin",
       badge: "Aromatic Ground",
       image: "images/cumin_powder.png",
-      description: "Pure ground cumin spice, milled under cold processing to preserve natural volatile oils, rich earthy flavor, and warming aroma.",
+      description: "Pure ground cumin spice, milled under cold processing to preserve natural volatile oils.",
       specs: [
         { name: "Volatile Oil", value: "Min 1.5%" },
         { name: "Origin", value: "Gujarat, India" },
@@ -143,6 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Moisture", value: "Max 8%" }
       ]
     },
+
+    // --- 4. Red Chilli ---
     {
       id: "prod_red_chilli",
       title: "Dry Red Chilli",
@@ -150,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "chilli",
       badge: "Stemless Grade-A",
       image: "images/chilli_whole.png",
-      description: "Premium sun-dried whole red chilli pods, stemless, featuring vibrant deep red color and hot pungency rating. Selected carefully from Guntur origins.",
+      description: "Premium sun-dried stemless red chilli pods featuring deep color and pungency rating.",
       specs: [
         { name: "Variety", value: "Guntur S17 / Teja" },
         { name: "Origin", value: "Andhra Pradesh, India" },
@@ -166,13 +157,201 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "chilli",
       badge: "Vibrant Pungent",
       image: "images/chilli_powder.png",
-      description: "Finely ground premium red chilli powder, delivering consistent heat and rich red coloring. Hygienically processed without artificial colorings.",
+      description: "Finely ground premium red chilli powder, delivering consistent heat and rich red coloring.",
       specs: [
         { name: "Pungency", value: "60,000 - 80,000 SHU" },
         { name: "Origin", value: "Guntur, India" },
         { name: "Packing", value: "20 / 25 kg PP Bags" },
         { name: "Purity", value: "100% Natural" },
         { name: "Moisture", value: "Max 9.5%" }
+      ]
+    },
+
+    // --- 5. Cardamom ---
+    {
+      id: "prod_cardamom_whole",
+      title: "Cardamom (Whole Green Pods)",
+      hsCode: "09083110",
+      category: "cardamom",
+      badge: "Bold Green Pods",
+      image: "images/cardamom_whole.jpg",
+      description: "Handpicked premium green cardamom pods with intense aroma and high essential oil content.",
+      specs: [
+        { name: "Grade", value: "7mm - 8mm Bold" },
+        { name: "Volatile Oil", value: "Min 6.0%" },
+        { name: "Origin", value: "Idukki, Kerala, India" },
+        { name: "Packing", value: "10 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+    {
+      id: "prod_cardamom_powder",
+      title: "Cardamom Powder",
+      hsCode: "09083200",
+      category: "cardamom",
+      badge: "Aromatic Ground",
+      image: "images/cardamom_powder.jpg",
+      description: "Freshly ground pure cardamom spice, milled from whole green pods to retain volatile aroma.",
+      specs: [
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Origin", value: "Kerala, India" },
+        { name: "Packing", value: "10 / 25 kg Foil Bags" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+
+    // --- 6. Black Pepper ---
+    {
+      id: "prod_black_pepper_whole",
+      title: "Black Pepper (Whole Seeds)",
+      hsCode: "09041110",
+      category: "black_pepper",
+      badge: "Tellicherry / MG1",
+      image: "images/black_pepper.jpg",
+      description: "Sun-dried whole black peppercorns harvested from Kerala's Malabar coast. High piperine pungency.",
+      specs: [
+        { name: "Density", value: "550 - 600 g/l" },
+        { name: "Piperine", value: "Min 4.5%" },
+        { name: "Origin", value: "Malabar / Kerala, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Moisture", value: "Max 11%" }
+      ]
+    },
+    {
+      id: "prod_black_pepper_powder",
+      title: "Black Pepper Powder",
+      hsCode: "09041200",
+      category: "black_pepper",
+      badge: "Pure Ground Pepper",
+      image: "images/black_pepper_powder.jpg",
+      description: "Finely ground pure black pepper powder delivering sharp pungency and rich woody aroma.",
+      specs: [
+        { name: "Piperine", value: "Min 4.0%" },
+        { name: "Mesh Size", value: "40 - 60 mesh" },
+        { name: "Origin", value: "Kerala, India" },
+        { name: "Packing", value: "20 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+
+    // --- 7. Ajwain ---
+    {
+      id: "prod_ajwain_seeds",
+      title: "Ajwain (Carom Seeds Whole)",
+      hsCode: "09109914",
+      category: "ajwain",
+      badge: "Sortex Cleaned",
+      image: "images/ajwain_seeds.jpg",
+      description: "Machine-cleaned aromatic Carom seeds rich in essential thymol oils and medicinal warmth.",
+      specs: [
+        { name: "Thymol Content", value: "Min 3.5%" },
+        { name: "Purity", value: "Min 99%" },
+        { name: "Origin", value: "Gujarat / Rajasthan, India" },
+        { name: "Packing", value: "25 kg Jute Bags" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_ajwain_powder",
+      title: "Ajwain (Carom Seeds) Powder",
+      hsCode: "09109990",
+      category: "ajwain",
+      badge: "Herbal Ground",
+      image: "images/ajwain_powder.jpg",
+      description: "Hygienically milled pure Carom seed powder, retaining active essential oil and pungent aroma.",
+      specs: [
+        { name: "Thymol Value", value: "High Potency" },
+        { name: "Origin", value: "Gujarat, India" },
+        { name: "Packing", value: "20 / 25 kg Bags" },
+        { name: "Purity", value: "100% Natural" },
+        { name: "Moisture", value: "Max 8.5%" }
+      ]
+    },
+
+    // --- 8. Curry Leaves ---
+    {
+      id: "prod_curry_leaves_crushed",
+      title: "Crushed Curry Leaves",
+      hsCode: "09109929",
+      category: "curry_leaves",
+      badge: "Shade Dried",
+      image: "images/curry_leaves_crushed.jpg",
+      description: "Shade-dried crushed green curry leaves, preserving natural green color and pungent herbal aroma.",
+      specs: [
+        { name: "Process", value: "Low-Temp Shade Dried" },
+        { name: "Color", value: "Deep Natural Green" },
+        { name: "Origin", value: "Tamil Nadu / Andhra, India" },
+        { name: "Packing", value: "15 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 8%" }
+      ]
+    },
+    {
+      id: "prod_curry_leaves_powder",
+      title: "Crushed Curry Leaves Powder",
+      hsCode: "09109990",
+      category: "curry_leaves",
+      badge: "Micro-Fine Powder",
+      image: "images/curry_leaves_powder.jpg",
+      description: "Fine ground curry leaf powder, rich in natural antioxidants and essential culinary aroma.",
+      specs: [
+        { name: "Mesh Size", value: "60 - 80 mesh" },
+        { name: "Color", value: "Natural Green" },
+        { name: "Origin", value: "South India" },
+        { name: "Packing", value: "15 / 25 kg Foil Bags" },
+        { name: "Moisture", value: "Max 7.5%" }
+      ]
+    },
+
+    // --- 9. Clove ---
+    {
+      id: "prod_clove_whole",
+      title: "Clove (Whole Cloves)",
+      hsCode: "09071000",
+      category: "clove",
+      badge: "Handpicked Headed",
+      image: "images/clove_whole.jpg",
+      description: "Sun-dried whole cloves with intact heads, rich in natural eugenol oil and warming aroma.",
+      specs: [
+        { name: "Eugenol Content", value: "Min 15% - 18%" },
+        { name: "Head Intactness", value: "Min 95%" },
+        { name: "Origin", value: "Kerala / Tamil Nadu, India" },
+        { name: "Packing", value: "10 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+    {
+      id: "prod_clove_powder",
+      title: "Clove Powder",
+      hsCode: "09072000",
+      category: "clove",
+      badge: "High Oil Ground",
+      image: "images/clove_powder.jpg",
+      description: "Finely milled pure clove powder delivering concentrated eugenol aroma and warm spicy pungency.",
+      specs: [
+        { name: "Eugenol Value", value: "Min 14%" },
+        { name: "Mesh Size", value: "40 - 60 mesh" },
+        { name: "Origin", value: "India" },
+        { name: "Packing", value: "20 kg Foil-Lined Bags" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+
+    // --- 10. Mustard ---
+    {
+      id: "prod_mustard_seeds",
+      title: "Mustard Seeds (Yellow & Black)",
+      hsCode: "12075090",
+      category: "mustard",
+      badge: "Bold Sortex Cleaned",
+      image: "images/mustard_seeds.jpg",
+      description: "Machine-cleaned and Sortex-purified bold yellow and small black mustard seeds. High oil yield.",
+      specs: [
+        { name: "Variety", value: "Bold Yellow & Small Black" },
+        { name: "Oil Content", value: "Min 38% - 42%" },
+        { name: "Origin", value: "Rajasthan / Gujarat, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Purity", value: "Min 99.5%" }
       ]
     }
   ];
@@ -301,12 +480,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       db.collection('products').onSnapshot(snapshot => {
+        let remoteProducts = [];
         if (!snapshot.empty) {
-          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
-          renderProductsTable();
-          updateStatistics();
+          remoteProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(p => p.id !== 'prod_turmeric_fresh');
         }
+        const productMap = new Map();
+        sampleProducts.forEach(p => productMap.set(p.id, p));
+        remoteProducts.forEach(p => productMap.set(p.id, p));
+
+        products = Array.from(productMap.values());
+        localStorage.setItem('myexportworld_products', JSON.stringify(products));
+        renderProductsTable();
+        updateStatistics();
       });
     }
 

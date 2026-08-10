@@ -142,6 +142,18 @@
       
       <div class="flex-center" style="gap: 1.2rem;">
         
+        <!-- Language Selector -->
+        <div class="lang-selector" id="langSelector">
+          <button class="lang-btn" id="langToggleBtn" aria-label="Select Language">
+            <i class="fa-solid fa-globe"></i>
+            <span class="lang-btn-label" id="langBtnLabel">EN</span>
+            <i class="fa-solid fa-chevron-down lang-chevron"></i>
+          </button>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-dropdown-header">Select Language</div>
+            <div class="lang-dropdown-list" id="langDropdownList"></div>
+          </div>
+        </div>
 
         <a href="inquiry.html" class="nav-cta" id="navCtaBtn" aria-label="Request Quote from Indian Spices Wholesale Exporter">Inquire Now</a>
         <!-- Mobile Nav Toggle -->
@@ -371,12 +383,22 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   
-  <!-- Hidden Google Translate Element Container -->
-  
+  <!-- Hidden Google Translate Element (invisible, used by API) -->
+  <div id="google_translate_element" style="display:none;"></div>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'ar,bn,zh-CN,nl,fr,de,hi,id,ja,ko,ms,pt,ru,es,sw,th,tr,ur,vi',
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
 
   <!-- JavaScript Logics -->
   <script src="auto-blog-engine.js"></script>
-  <script src="script.js?v=20260809-10"></script>
+  <script src="script.js?v=20260810-11"></script>
   
 </body>
 </html>

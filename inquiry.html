@@ -142,6 +142,18 @@
       
       <div class="flex-center" style="gap: 1.2rem;">
         
+        <!-- Language Selector -->
+        <div class="lang-selector" id="langSelector">
+          <button class="lang-btn" id="langToggleBtn" aria-label="Select Language">
+            <i class="fa-solid fa-globe"></i>
+            <span class="lang-btn-label" id="langBtnLabel">EN</span>
+            <i class="fa-solid fa-chevron-down lang-chevron"></i>
+          </button>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-dropdown-header">Select Language</div>
+            <div class="lang-dropdown-list" id="langDropdownList"></div>
+          </div>
+        </div>
 
         <a href="inquiry.html" class="nav-cta" id="navCtaBtn" aria-label="Request Quote from Indian Spices Wholesale Exporter">Inquire Now</a>
         <!-- Mobile Nav Toggle -->
@@ -234,13 +246,25 @@
                   <label for="productSelected" class="form-label">Specific Product <span>*</span></label>
                   <select id="productSelected" class="form-select" required>
                     <option value="" disabled selected>-- Select a Commodity --</option>
+                    <option value="Dried Turmeric Finger (09103020)">Dried Turmeric Finger (09103020)</option>
                     <option value="Turmeric Powder (09103030)">Turmeric Powder (09103030)</option>
-                    <option value="Turmeric Finger Dried (09103020)">Turmeric Finger Dried (09103020)</option>
-                    <option value="Fresh Turmeric (09103010)">Fresh Turmeric (09103010)</option>
                     <option value="Psyllium Husk Whole (12119032)">Psyllium Husk Whole (12119032)</option>
                     <option value="Psyllium Husk Powder (12119033)">Psyllium Husk Powder (12119033)</option>
-                    <option value="Natural Raw Honey (04090000)">Natural Raw Honey (04090000)</option>
-                    <option value="Acacia Honey (04090000)">Acacia Honey (04090000)</option>
+                    <option value="Cumin Seeds (09093120)">Cumin Seeds (09093120)</option>
+                    <option value="Cumin Powder (09093200)">Cumin Powder (09093200)</option>
+                    <option value="Dry Red Chilli (09042211)">Dry Red Chilli (09042211)</option>
+                    <option value="Red Chilli Powder (09042212)">Red Chilli Powder (09042212)</option>
+                    <option value="Cardamom Whole (09083110)">Cardamom Whole (09083110)</option>
+                    <option value="Cardamom Powder (09083200)">Cardamom Powder (09083200)</option>
+                    <option value="Black Pepper Whole (09041110)">Black Pepper Whole (09041110)</option>
+                    <option value="Black Pepper Powder (09041200)">Black Pepper Powder (09041200)</option>
+                    <option value="Ajwain Carom Seeds (09109914)">Ajwain Carom Seeds (09109914)</option>
+                    <option value="Ajwain Powder (09109990)">Ajwain Powder (09109990)</option>
+                    <option value="Crushed Curry Leaves (09109929)">Crushed Curry Leaves (09109929)</option>
+                    <option value="Curry Leaves Powder (09109990)">Curry Leaves Powder (09109990)</option>
+                    <option value="Clove Whole (09071000)">Clove Whole (09071000)</option>
+                    <option value="Clove Powder (09072000)">Clove Powder (09072000)</option>
+                    <option value="Mustard Seeds (12075090)">Mustard Seeds (12075090)</option>
                     <option value="Other Agricultural Inquiry">Other / Bulk Spices Inquiry</option>
                   </select>
                 </div>
@@ -369,12 +393,22 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   
-  <!-- Hidden Google Translate Element Container -->
-  
+  <!-- Hidden Google Translate Element (invisible, used by API) -->
+  <div id="google_translate_element" style="display:none;"></div>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'ar,bn,zh-CN,nl,fr,de,hi,id,ja,ko,ms,pt,ru,es,sw,th,tr,ur,vi',
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
 
   <!-- JavaScript Logics -->
   <script src="auto-blog-engine.js"></script>
-  <script src="script.js?v=20260809-10"></script>
+  <script src="script.js?v=20260810-11"></script>
   
 </body>
 </html>

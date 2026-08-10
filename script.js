@@ -81,6 +81,158 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
+  // ==========================================================================
+  //  MULTI-LANGUAGE SELECTOR (Google Translate Seamless Integration)
+  // ==========================================================================
+  (function initLanguageSelector() {
+    const LANGUAGES = [
+      { code: 'en', name: 'English', flag: '🇬🇧', label: 'EN' },
+      { code: 'hi', name: 'हिन्दी (Hindi)', flag: '🇮🇳', label: 'HI' },
+      { code: 'ar', name: 'العربية (Arabic)', flag: '🇸🇦', label: 'AR' },
+      { code: 'bn', name: 'বাংলা (Bengali)', flag: '🇧🇩', label: 'BN' },
+      { code: 'zh-CN', name: '中文 (Chinese)', flag: '🇨🇳', label: 'ZH' },
+      { code: 'nl', name: 'Nederlands (Dutch)', flag: '🇳🇱', label: 'NL' },
+      { code: 'fr', name: 'Français (French)', flag: '🇫🇷', label: 'FR' },
+      { code: 'de', name: 'Deutsch (German)', flag: '🇩🇪', label: 'DE' },
+      { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩', label: 'ID' },
+      { code: 'ja', name: '日本語 (Japanese)', flag: '🇯🇵', label: 'JA' },
+      { code: 'ko', name: '한국어 (Korean)', flag: '🇰🇷', label: 'KO' },
+      { code: 'ms', name: 'Bahasa Melayu', flag: '🇲🇾', label: 'MS' },
+      { code: 'pt', name: 'Português', flag: '🇧🇷', label: 'PT' },
+      { code: 'ru', name: 'Русский (Russian)', flag: '🇷🇺', label: 'RU' },
+      { code: 'es', name: 'Español (Spanish)', flag: '🇪🇸', label: 'ES' },
+      { code: 'sw', name: 'Kiswahili (Swahili)', flag: '🇰🇪', label: 'SW' },
+      { code: 'th', name: 'ไทย (Thai)', flag: '🇹🇭', label: 'TH' },
+      { code: 'tr', name: 'Türkçe (Turkish)', flag: '🇹🇷', label: 'TR' },
+      { code: 'ur', name: 'اردو (Urdu)', flag: '🇵🇰', label: 'UR' },
+      { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳', label: 'VI' }
+    ];
+
+    const selector = document.getElementById('langSelector');
+    const toggleBtn = document.getElementById('langToggleBtn');
+    const btnLabel = document.getElementById('langBtnLabel');
+    const dropdown = document.getElementById('langDropdown');
+    const listContainer = document.getElementById('langDropdownList');
+
+    if (!selector || !toggleBtn || !listContainer) return;
+
+    // Detect current language from localStorage first, then cookie, fallback to 'en'
+    function getCurrentLang() {
+      const stored = localStorage.getItem('myexportworld_selected_lang');
+      if (stored) return stored;
+      const match = document.cookie.match(/googtrans=\/en\/([^;]+)/);
+      return match ? match[1] : 'en';
+    }
+
+    // Build the dropdown options
+    function buildDropdown() {
+      const currentLang = getCurrentLang();
+      listContainer.innerHTML = '';
+
+      LANGUAGES.forEach(lang => {
+        const option = document.createElement('button');
+        option.className = 'lang-option' + (lang.code === currentLang ? ' active' : '');
+        option.setAttribute('data-lang', lang.code);
+        option.innerHTML = `
+          <span class="lang-option-flag">${lang.flag}</span>
+          <span class="lang-option-name">${lang.name}</span>
+        `;
+        option.addEventListener('click', () => selectLanguage(lang.code));
+        listContainer.appendChild(option);
+      });
+
+      // Update button label to current language
+      const activeLang = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0];
+      btnLabel.textContent = activeLang.label;
+    }
+
+    // Set Google Translate cookie + localStorage and trigger translation
+    function selectLanguage(langCode) {
+      localStorage.setItem('myexportworld_selected_lang', langCode);
+
+      if (langCode === 'en') {
+        // Reset to English — clear cookie and reload
+        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
+        selector.classList.remove('open');
+        window.location.reload();
+        return;
+      }
+
+      // Set the googtrans cookie for the target language
+      document.cookie = 'googtrans=/en/' + langCode + '; path=/';
+      document.cookie = 'googtrans=/en/' + langCode + '; path=/; domain=' + window.location.hostname;
+      selector.classList.remove('open');
+
+      // Try programmatic translation via Google Translate widget
+      const gtCombo = document.querySelector('.goog-te-combo');
+      if (gtCombo) {
+        gtCombo.value = langCode;
+        gtCombo.dispatchEvent(new Event('change'));
+        // Update UI after translation starts
+        setTimeout(() => {
+          buildDropdown();
+        }, 800);
+      } else {
+        // Fallback: reload to apply the cookie
+        window.location.reload();
+      }
+    }
+
+    // Ensure cookie is synchronized on page load if saved in localStorage
+    const initialLang = getCurrentLang();
+    if (initialLang && initialLang !== 'en') {
+      document.cookie = 'googtrans=/en/' + initialLang + '; path=/';
+      document.cookie = 'googtrans=/en/' + initialLang + '; path=/; domain=' + window.location.hostname;
+    }
+
+    // Toggle dropdown open/close
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selector.classList.toggle('open');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!selector.contains(e.target)) {
+        selector.classList.remove('open');
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        selector.classList.remove('open');
+      }
+    });
+
+    // Build dropdown on load
+    buildDropdown();
+
+    // Re-sync UI and force-apply stored language on every page load as soon as Google Translate element renders
+    let syncAttempts = 0;
+    const gtCheckInterval = setInterval(() => {
+      syncAttempts++;
+      const gtCombo = document.querySelector('.goog-te-combo');
+      const savedLang = getCurrentLang();
+
+      if (gtCombo) {
+        if (savedLang && savedLang !== 'en' && gtCombo.value !== savedLang) {
+          gtCombo.value = savedLang;
+          gtCombo.dispatchEvent(new Event('change'));
+        }
+        buildDropdown();
+        if (syncAttempts > 10) {
+          clearInterval(gtCheckInterval);
+        }
+      }
+    }, 300);
+
+    // Clear polling safety timeout after 12 seconds
+    setTimeout(() => clearInterval(gtCheckInterval), 12000);
+  })();
+
+
   // --- 0. Global Utility Helpers ---
   const escapeHTML = (str) => {
     if (str === null || str === undefined) return '';
@@ -892,6 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let products = [];
 
   const sampleProducts = [
+    // --- 1. Turmeric ---
     {
       id: "prod_turmeric_finger",
       title: "Dried Turmeric Finger",
@@ -899,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Double Polished",
       image: "images/turmeric_finger.jpg",
-      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin. Sourced from Nizamabad and Sangli as a premier dried turmeric finger exporter and global turmeric supplier india.",
+      description: "Premium quality dried whole turmeric rhizomes, double polished to yield bright yellow-gold skin. Min 3.5% Curcumin.",
       specs: [
         { name: "Curcumin", value: "Min 3.5%" },
         { name: "Origin", value: "Nizamabad / Sangli, India" },
@@ -915,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "turmeric",
       badge: "Ultra-Fine Ground",
       image: "images/turmeric_powder.jpg",
-      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma and essential oils. Managed by a leading turmeric powder exporter india.",
+      description: "Pure ground turmeric spice, processed under hygienic conditions to preserve active aroma and essential oils.",
       specs: [
         { name: "Curcumin", value: "Min 3.8%" },
         { name: "Origin", value: "Erode / Nizamabad, India" },
@@ -924,22 +1077,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Moisture", value: "Max 9%" }
       ]
     },
-    {
-      id: "prod_turmeric_fresh",
-      title: "Fresh Turmeric",
-      hsCode: "09103010",
-      category: "turmeric",
-      badge: "Organic Harvest",
-      image: "images/turmeric_fresh.jpg",
-      description: "Harvested fresh organic turmeric rhizomes, raw and unprocessed. Exported worldwide by a trusted fresh turmeric exporter india and premium turmeric exporter from india.",
-      specs: [
-        { name: "State", value: "Fresh Raw Rhizomes" },
-        { name: "Origin", value: "Sangli / Erode, India" },
-        { name: "Packing", value: "Crates / Jute Bags" },
-        { name: "Organic Status", value: "100% Organic" },
-        { name: "Curcumin", value: "3% - 4%" }
-      ]
-    },
+
+    // --- 2. Psyllium ---
     {
       id: "prod_psyllium_husk",
       title: "Psyllium Husk Whole",
@@ -947,7 +1086,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "psyllium",
       badge: "99% Ultra-Pure",
       image: "images/psyllium_husk.png",
-      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber. Sourced by a verified psyllium husk exporter india and trusted psyllium husk supplier india.",
+      description: "Premium whole seed husks of Plantago ovata, serving as an exceptional soluble dietary fiber.",
       specs: [
         { name: "Purity Grade", value: "99% (Swell Index 45ml/g)" },
         { name: "Origin", value: "Gujarat / Rajasthan, India" },
@@ -963,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "psyllium",
       badge: "Milled Fiber",
       image: "images/psyllium_powder.png",
-      description: "Fine ground psyllium husk powder, ideal for dietary supplements. Exported globally by a recognized psyllium husk powder exporter and leading isabgol exporter india.",
+      description: "Fine ground psyllium husk powder, ideal for easy blending into dietary supplements and bakery products.",
       specs: [
         { name: "Purity Grade", value: "98% (40-60 mesh)" },
         { name: "Origin", value: "Gujarat, India" },
@@ -972,6 +1111,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Swell Volume", value: "Min 35 ml / gram" }
       ]
     },
+
+    // --- 3. Cumin ---
     {
       id: "prod_cumin_seeds",
       title: "Cumin Seeds",
@@ -979,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "cumin",
       badge: "Sortex Cleaned",
       image: "images/cumin_seeds.png",
-      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds. Sourced directly by a leading cumin seeds exporter india and premier cumin supplier india.",
+      description: "Premium grade machine-cleaned and Sortex-purified dry cumin seeds.",
       specs: [
         { name: "Purity", value: "Min 99%" },
         { name: "Origin", value: "Gujarat / Rajasthan, India" },
@@ -995,7 +1136,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "cumin",
       badge: "Aromatic Ground",
       image: "images/cumin_powder.png",
-      description: "Pure ground cumin spice, milled under cold processing. Supplied worldwide by a certified cumin powder exporter india and premium jeera exporter india.",
+      description: "Pure ground cumin spice, milled under cold processing to preserve natural volatile oils.",
       specs: [
         { name: "Volatile Oil", value: "Min 1.5%" },
         { name: "Origin", value: "Gujarat, India" },
@@ -1004,6 +1145,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Moisture", value: "Max 8%" }
       ]
     },
+
+    // --- 4. Red Chilli ---
     {
       id: "prod_red_chilli",
       title: "Dry Red Chilli",
@@ -1011,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "chilli",
       badge: "Stemless Grade-A",
       image: "images/chilli_whole.png",
-      description: "Premium sun-dried stemless red chilli pods, featuring deep color and pungency rating. Exported globally by a leading dry red chilli exporter and red chilli exporter india.",
+      description: "Premium sun-dried stemless red chilli pods featuring deep color and pungency rating.",
       specs: [
         { name: "Variety", value: "Guntur S17 / Teja" },
         { name: "Origin", value: "Andhra Pradesh, India" },
@@ -1027,13 +1170,201 @@ document.addEventListener('DOMContentLoaded', () => {
       category: "chilli",
       badge: "Vibrant Pungent",
       image: "images/chilli_powder.png",
-      description: "Finely ground premium red chilli powder, delivering consistent heat. Sourced and processed by a dedicated red chilli powder exporter india.",
+      description: "Finely ground premium red chilli powder, delivering consistent heat and rich red coloring.",
       specs: [
         { name: "Pungency", value: "60,000 - 80,000 SHU" },
         { name: "Origin", value: "Guntur, India" },
         { name: "Packing", value: "20 / 25 kg PP Bags" },
         { name: "Purity", value: "100% Natural" },
         { name: "Moisture", value: "Max 9.5%" }
+      ]
+    },
+
+    // --- 5. Cardamom ---
+    {
+      id: "prod_cardamom_whole",
+      title: "Cardamom (Whole Green Pods)",
+      hsCode: "09083110",
+      category: "cardamom",
+      badge: "Bold Green Pods",
+      image: "images/cardamom_whole.jpg",
+      description: "Handpicked premium green cardamom pods with intense aroma and high essential oil content.",
+      specs: [
+        { name: "Grade", value: "7mm - 8mm Bold" },
+        { name: "Volatile Oil", value: "Min 6.0%" },
+        { name: "Origin", value: "Idukki, Kerala, India" },
+        { name: "Packing", value: "10 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+    {
+      id: "prod_cardamom_powder",
+      title: "Cardamom Powder",
+      hsCode: "09083200",
+      category: "cardamom",
+      badge: "Aromatic Ground",
+      image: "images/cardamom_powder.jpg",
+      description: "Freshly ground pure cardamom spice, milled from whole green pods to retain volatile aroma.",
+      specs: [
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Origin", value: "Kerala, India" },
+        { name: "Packing", value: "10 / 25 kg Foil Bags" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+
+    // --- 6. Black Pepper ---
+    {
+      id: "prod_black_pepper_whole",
+      title: "Black Pepper (Whole Seeds)",
+      hsCode: "09041110",
+      category: "black_pepper",
+      badge: "Tellicherry / MG1",
+      image: "images/black_pepper.jpg",
+      description: "Sun-dried whole black peppercorns harvested from Kerala's Malabar coast. High piperine pungency.",
+      specs: [
+        { name: "Density", value: "550 - 600 g/l" },
+        { name: "Piperine", value: "Min 4.5%" },
+        { name: "Origin", value: "Malabar / Kerala, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Moisture", value: "Max 11%" }
+      ]
+    },
+    {
+      id: "prod_black_pepper_powder",
+      title: "Black Pepper Powder",
+      hsCode: "09041200",
+      category: "black_pepper",
+      badge: "Pure Ground Pepper",
+      image: "images/black_pepper_powder.jpg",
+      description: "Finely ground pure black pepper powder delivering sharp pungency and rich woody aroma.",
+      specs: [
+        { name: "Piperine", value: "Min 4.0%" },
+        { name: "Mesh Size", value: "40 - 60 mesh" },
+        { name: "Origin", value: "Kerala, India" },
+        { name: "Packing", value: "20 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+
+    // --- 7. Ajwain ---
+    {
+      id: "prod_ajwain_seeds",
+      title: "Ajwain (Carom Seeds Whole)",
+      hsCode: "09109914",
+      category: "ajwain",
+      badge: "Sortex Cleaned",
+      image: "images/ajwain_seeds.jpg",
+      description: "Machine-cleaned aromatic Carom seeds rich in essential thymol oils and medicinal warmth.",
+      specs: [
+        { name: "Thymol Content", value: "Min 3.5%" },
+        { name: "Purity", value: "Min 99%" },
+        { name: "Origin", value: "Gujarat / Rajasthan, India" },
+        { name: "Packing", value: "25 kg Jute Bags" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_ajwain_powder",
+      title: "Ajwain (Carom Seeds) Powder",
+      hsCode: "09109990",
+      category: "ajwain",
+      badge: "Herbal Ground",
+      image: "images/ajwain_powder.jpg",
+      description: "Hygienically milled pure Carom seed powder, retaining active essential oil and pungent aroma.",
+      specs: [
+        { name: "Thymol Value", value: "High Potency" },
+        { name: "Origin", value: "Gujarat, India" },
+        { name: "Packing", value: "20 / 25 kg Bags" },
+        { name: "Purity", value: "100% Natural" },
+        { name: "Moisture", value: "Max 8.5%" }
+      ]
+    },
+
+    // --- 8. Curry Leaves ---
+    {
+      id: "prod_curry_leaves_crushed",
+      title: "Crushed Curry Leaves",
+      hsCode: "09109929",
+      category: "curry_leaves",
+      badge: "Shade Dried",
+      image: "images/curry_leaves_crushed.jpg",
+      description: "Shade-dried crushed green curry leaves, preserving natural green color and pungent herbal aroma.",
+      specs: [
+        { name: "Process", value: "Low-Temp Shade Dried" },
+        { name: "Color", value: "Deep Natural Green" },
+        { name: "Origin", value: "Tamil Nadu / Andhra, India" },
+        { name: "Packing", value: "15 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 8%" }
+      ]
+    },
+    {
+      id: "prod_curry_leaves_powder",
+      title: "Crushed Curry Leaves Powder",
+      hsCode: "09109990",
+      category: "curry_leaves",
+      badge: "Micro-Fine Powder",
+      image: "images/curry_leaves_powder.jpg",
+      description: "Fine ground curry leaf powder, rich in natural antioxidants and essential culinary aroma.",
+      specs: [
+        { name: "Mesh Size", value: "60 - 80 mesh" },
+        { name: "Color", value: "Natural Green" },
+        { name: "Origin", value: "South India" },
+        { name: "Packing", value: "15 / 25 kg Foil Bags" },
+        { name: "Moisture", value: "Max 7.5%" }
+      ]
+    },
+
+    // --- 9. Clove ---
+    {
+      id: "prod_clove_whole",
+      title: "Clove (Whole Cloves)",
+      hsCode: "09071000",
+      category: "clove",
+      badge: "Handpicked Headed",
+      image: "images/clove_whole.jpg",
+      description: "Sun-dried whole cloves with intact heads, rich in natural eugenol oil and warming aroma.",
+      specs: [
+        { name: "Eugenol Content", value: "Min 15% - 18%" },
+        { name: "Head Intactness", value: "Min 95%" },
+        { name: "Origin", value: "Kerala / Tamil Nadu, India" },
+        { name: "Packing", value: "10 / 25 kg Bags" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
+    },
+    {
+      id: "prod_clove_powder",
+      title: "Clove Powder",
+      hsCode: "09072000",
+      category: "clove",
+      badge: "High Oil Ground",
+      image: "images/clove_powder.jpg",
+      description: "Finely milled pure clove powder delivering concentrated eugenol aroma and warm spicy pungency.",
+      specs: [
+        { name: "Eugenol Value", value: "Min 14%" },
+        { name: "Mesh Size", value: "40 - 60 mesh" },
+        { name: "Origin", value: "India" },
+        { name: "Packing", value: "20 kg Foil-Lined Bags" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+
+    // --- 10. Mustard ---
+    {
+      id: "prod_mustard_seeds",
+      title: "Mustard Seeds (Yellow & Black)",
+      hsCode: "12075090",
+      category: "mustard",
+      badge: "Bold Sortex Cleaned",
+      image: "images/mustard_seeds.jpg",
+      description: "Machine-cleaned and Sortex-purified bold yellow and small black mustard seeds. High oil yield.",
+      specs: [
+        { name: "Variety", value: "Bold Yellow & Small Black" },
+        { name: "Oil Content", value: "Min 38% - 42%" },
+        { name: "Origin", value: "Rajasthan / Gujarat, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Purity", value: "Min 99.5%" }
       ]
     }
   ];
@@ -1050,7 +1381,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (categoryFilter === 'all') {
         match = true;
       } else if (categoryFilter.toLowerCase() === 'spices') {
-        match = ['turmeric', 'cumin', 'chilli'].includes(prod.category.toLowerCase());
+        match = ['turmeric', 'cumin', 'chilli', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard'].includes(prod.category.toLowerCase());
       } else {
         match = prod.category.toLowerCase() === categoryFilter.toLowerCase();
       }
@@ -1074,14 +1405,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const productCategorySelect = document.getElementById('productCategory');
     if (!productCategorySelect) return;
 
-    // Get unique categories from active products list
     const categories = new Set();
     categories.add("Spices");
     categories.add("Psyllium");
 
     products.forEach(p => {
       const cat = p.category;
-      if (cat && !['turmeric', 'cumin', 'chilli', 'psyllium'].includes(cat.toLowerCase())) {
+      if (cat && !['turmeric', 'cumin', 'chilli', 'psyllium', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard'].includes(cat.toLowerCase())) {
         const formattedCat = cat.charAt(0).toUpperCase() + cat.slice(1);
         categories.add(formattedCat);
       }
@@ -1092,7 +1422,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const opt = document.createElement('option');
       if (cat === "Spices") {
         opt.value = "Spices";
-        opt.textContent = "Spices (Turmeric, Cumin, Chilli)";
+        opt.textContent = "Spices (All Spice Commodities)";
       } else if (cat === "Psyllium") {
         opt.value = "Psyllium";
         opt.textContent = "Dietary Fiber (Psyllium)";
@@ -1119,13 +1449,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridPsyllium = document.getElementById('gridPsyllium');
     const gridCumin = document.getElementById('gridCumin');
     const gridChilli = document.getElementById('gridChilli');
+    const gridCardamom = document.getElementById('gridCardamom');
+    const gridBlackPepper = document.getElementById('gridBlackPepper');
+    const gridAjwain = document.getElementById('gridAjwain');
+    const gridCurryLeaves = document.getElementById('gridCurryLeaves');
+    const gridClove = document.getElementById('gridClove');
+    const gridMustard = document.getElementById('gridMustard');
 
-    if (!gridsWrapper || !gridTurmeric || !gridPsyllium || !gridCumin || !gridChilli) return;
+    if (!gridsWrapper) return;
 
-    gridTurmeric.innerHTML = '';
-    gridPsyllium.innerHTML = '';
-    gridCumin.innerHTML = '';
-    gridChilli.innerHTML = '';
+    if (gridTurmeric) gridTurmeric.innerHTML = '';
+    if (gridPsyllium) gridPsyllium.innerHTML = '';
+    if (gridCumin) gridCumin.innerHTML = '';
+    if (gridChilli) gridChilli.innerHTML = '';
+    if (gridCardamom) gridCardamom.innerHTML = '';
+    if (gridBlackPepper) gridBlackPepper.innerHTML = '';
+    if (gridAjwain) gridAjwain.innerHTML = '';
+    if (gridCurryLeaves) gridCurryLeaves.innerHTML = '';
+    if (gridClove) gridClove.innerHTML = '';
+    if (gridMustard) gridMustard.innerHTML = '';
 
     // Remove any previously generated custom category sections
     document.querySelectorAll('.commodity-section-custom').forEach(el => el.remove());
@@ -1166,17 +1508,30 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      if (prod.category === 'turmeric') {
+      const cat = prod.category ? prod.category.toLowerCase() : '';
+      if (cat === 'turmeric' && gridTurmeric) {
         gridTurmeric.appendChild(card);
-      } else if (prod.category === 'psyllium') {
+      } else if (cat === 'psyllium' && gridPsyllium) {
         gridPsyllium.appendChild(card);
-      } else if (prod.category === 'cumin') {
+      } else if (cat === 'cumin' && gridCumin) {
         gridCumin.appendChild(card);
-      } else if (prod.category === 'chilli') {
+      } else if (cat === 'chilli' && gridChilli) {
         gridChilli.appendChild(card);
+      } else if (cat === 'cardamom' && gridCardamom) {
+        gridCardamom.appendChild(card);
+      } else if (cat === 'black_pepper' && gridBlackPepper) {
+        gridBlackPepper.appendChild(card);
+      } else if (cat === 'ajwain' && gridAjwain) {
+        gridAjwain.appendChild(card);
+      } else if (cat === 'curry_leaves' && gridCurryLeaves) {
+        gridCurryLeaves.appendChild(card);
+      } else if (cat === 'clove' && gridClove) {
+        gridClove.appendChild(card);
+      } else if (cat === 'mustard' && gridMustard) {
+        gridMustard.appendChild(card);
       } else {
         // Render Custom Commodity Group Grid
-        const categoryId = `section_custom_${prod.category.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+        const categoryId = `section_custom_${cat.replace(/[^a-z0-9]/g, '_')}`;
         let customSection = document.getElementById(categoryId);
         if (!customSection) {
           customSection = document.createElement('div');
@@ -1200,7 +1555,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const checkEmptyGrid = (grid) => {
-      if (grid.children.length === 0) {
+      if (grid && grid.children.length === 0) {
         grid.innerHTML = `
           <div style="grid-column: span 3; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-light); width: 100%;">
             <i class="fa-solid fa-wheat-awn" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
@@ -1210,43 +1565,68 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
     };
-    checkEmptyGrid(gridTurmeric);
-    checkEmptyGrid(gridPsyllium);
-    checkEmptyGrid(gridCumin);
-    checkEmptyGrid(gridChilli);
-    
+    if (gridTurmeric) checkEmptyGrid(gridTurmeric);
+    if (gridPsyllium) checkEmptyGrid(gridPsyllium);
+    if (gridCumin) checkEmptyGrid(gridCumin);
+    if (gridChilli) checkEmptyGrid(gridChilli);
+    if (gridCardamom) checkEmptyGrid(gridCardamom);
+    if (gridBlackPepper) checkEmptyGrid(gridBlackPepper);
+    if (gridAjwain) checkEmptyGrid(gridAjwain);
+    if (gridCurryLeaves) checkEmptyGrid(gridCurryLeaves);
+    if (gridClove) checkEmptyGrid(gridClove);
+    if (gridMustard) checkEmptyGrid(gridMustard);
   };
 
   const loadProducts = () => {
-    // 1. Synchronous instant initialization
+    // 1. Synchronous instant initialization with force update key check
     try {
-      const stored = localStorage.getItem('myexportworld_products');
+      const stored = localStorage.getItem('myexportworld_products_v5');
       if (stored) {
         products = JSON.parse(stored);
       } else {
         products = [...sampleProducts];
+        localStorage.setItem('myexportworld_products_v5', JSON.stringify(products));
       }
     } catch (e) {
       products = [...sampleProducts];
+    }
+
+    // Double check if products contains Fresh Turmeric or lacks new items
+    if (products.some(p => p.id === 'prod_turmeric_fresh') || !products.some(p => p.id === 'prod_clove_whole')) {
+      products = [...sampleProducts];
+      try {
+        localStorage.setItem('myexportworld_products_v5', JSON.stringify(products));
+      } catch (e) {}
     }
 
     renderPublicProducts();
     populateProductDropdown();
     populateProductCategorySelect();
 
-    // 2. Asynchronous Firestore background sync
+    // 2. Asynchronous Firestore background sync with safe map merge
     if (db) {
       db.collection('products').onSnapshot(snapshot => {
+        let remoteProducts = [];
         if (!snapshot.empty) {
-          products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        } else {
-          products = [...sampleProducts];
+          remoteProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(p => p.id !== 'prod_turmeric_fresh');
+        }
+
+        // Merge sampleProducts with remote products so default commodities are NEVER deleted
+        const productMap = new Map();
+        sampleProducts.forEach(p => productMap.set(p.id, p));
+        remoteProducts.forEach(p => productMap.set(p.id, p));
+
+        products = Array.from(productMap.values());
+
+        // Sync any missing sample products to Firestore doc collection
+        if (remoteProducts.length < sampleProducts.length) {
           sampleProducts.forEach(p => {
             db.collection('products').doc(p.id).set(p).catch(() => {});
           });
         }
+
         try {
-          localStorage.setItem('myexportworld_products', JSON.stringify(products));
+          localStorage.setItem('myexportworld_products_v5', JSON.stringify(products));
         } catch (e) {}
         renderPublicProducts();
         populateProductDropdown();
@@ -1321,7 +1701,13 @@ document.addEventListener('DOMContentLoaded', () => {
     'turmeric': 'Turmeric (Haldi)',
     'psyllium': 'Psyllium Husk (Isabgol)',
     'cumin': 'Cumin Seeds & Powder',
-    'chilli': 'Red Chilli & Powder'
+    'chilli': 'Red Chilli & Powder',
+    'cardamom': 'Cardamom & Powder',
+    'black_pepper': 'Black Pepper & Powder',
+    'ajwain': 'Ajwain (Carom Seeds)',
+    'curry_leaves': 'Curry Leaves & Powder',
+    'clove': 'Clove & Powder',
+    'mustard': 'Mustard Seeds'
   };
 
   const navigateToLevel3 = (filterCategory = 'all') => {
@@ -1373,6 +1759,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionPsyllium = document.getElementById('sectionPsyllium');
     const sectionCumin = document.getElementById('sectionCumin');
     const sectionChilli = document.getElementById('sectionChilli');
+    const sectionCardamom = document.getElementById('sectionCardamom');
+    const sectionBlackPepper = document.getElementById('sectionBlackPepper');
+    const sectionAjwain = document.getElementById('sectionAjwain');
+    const sectionCurryLeaves = document.getElementById('sectionCurryLeaves');
+    const sectionClove = document.getElementById('sectionClove');
+    const sectionMustard = document.getElementById('sectionMustard');
     const customSections = document.querySelectorAll('.commodity-section-custom');
 
     if (catLower === 'all') {
@@ -1380,12 +1772,24 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
       if (sectionCumin) sectionCumin.classList.remove('hidden');
       if (sectionChilli) sectionChilli.classList.remove('hidden');
+      if (sectionCardamom) sectionCardamom.classList.remove('hidden');
+      if (sectionBlackPepper) sectionBlackPepper.classList.remove('hidden');
+      if (sectionAjwain) sectionAjwain.classList.remove('hidden');
+      if (sectionCurryLeaves) sectionCurryLeaves.classList.remove('hidden');
+      if (sectionClove) sectionClove.classList.remove('hidden');
+      if (sectionMustard) sectionMustard.classList.remove('hidden');
       customSections.forEach(sec => sec.classList.remove('hidden'));
     } else {
       if (sectionTurmeric) sectionTurmeric.classList.toggle('hidden', catLower !== 'turmeric');
       if (sectionPsyllium) sectionPsyllium.classList.toggle('hidden', catLower !== 'psyllium');
       if (sectionCumin) sectionCumin.classList.toggle('hidden', catLower !== 'cumin');
       if (sectionChilli) sectionChilli.classList.toggle('hidden', catLower !== 'chilli');
+      if (sectionCardamom) sectionCardamom.classList.toggle('hidden', catLower !== 'cardamom');
+      if (sectionBlackPepper) sectionBlackPepper.classList.toggle('hidden', catLower !== 'black_pepper');
+      if (sectionAjwain) sectionAjwain.classList.toggle('hidden', catLower !== 'ajwain');
+      if (sectionCurryLeaves) sectionCurryLeaves.classList.toggle('hidden', catLower !== 'curry_leaves');
+      if (sectionClove) sectionClove.classList.toggle('hidden', catLower !== 'clove');
+      if (sectionMustard) sectionMustard.classList.toggle('hidden', catLower !== 'mustard');
       customSections.forEach(sec => {
         const customCat = sec.id.replace('section_custom_', '');
         sec.classList.toggle('hidden', customCat !== catLower);
@@ -1439,6 +1843,12 @@ document.addEventListener('DOMContentLoaded', () => {
   bindSpotlightClick('btnSelectPsyllium', 'spotlightCardPsyllium', 'psyllium');
   bindSpotlightClick('btnSelectCumin', 'spotlightCardCumin', 'cumin');
   bindSpotlightClick('btnSelectChilli', 'spotlightCardChilli', 'chilli');
+  bindSpotlightClick('btnSelectCardamom', 'spotlightCardCardamom', 'cardamom');
+  bindSpotlightClick('btnSelectBlackPepper', 'spotlightCardBlackPepper', 'black_pepper');
+  bindSpotlightClick('btnSelectAjwain', 'spotlightCardAjwain', 'ajwain');
+  bindSpotlightClick('btnSelectCurryLeaves', 'spotlightCardCurryLeaves', 'curry_leaves');
+  bindSpotlightClick('btnSelectClove', 'spotlightCardClove', 'clove');
+  bindSpotlightClick('btnSelectMustard', 'spotlightCardMustard', 'mustard');
 
   // Level 2 Back click -> Returns to Level 1
   const btnBackToLevel1 = document.getElementById('btnBackToLevel1');
@@ -1504,6 +1914,18 @@ document.addEventListener('DOMContentLoaded', () => {
       navigateToLevel3('cumin');
     } else if (hash === '#chilli' || hash === '#red-chilli') {
       navigateToLevel3('chilli');
+    } else if (hash === '#cardamom') {
+      navigateToLevel3('cardamom');
+    } else if (hash === '#black_pepper' || hash === '#black-pepper') {
+      navigateToLevel3('black_pepper');
+    } else if (hash === '#ajwain') {
+      navigateToLevel3('ajwain');
+    } else if (hash === '#curry_leaves' || hash === '#curry-leaves') {
+      navigateToLevel3('curry_leaves');
+    } else if (hash === '#clove') {
+      navigateToLevel3('clove');
+    } else if (hash === '#mustard') {
+      navigateToLevel3('mustard');
     } else if (hash === '#product-details' || hash === '#all') {
       navigateToLevel3('all');
     } else {
@@ -1796,8 +2218,5 @@ document.addEventListener('DOMContentLoaded', () => {
       return e.returnValue;
     }
   });
-
-
-
 
 });
