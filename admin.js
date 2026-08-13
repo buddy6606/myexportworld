@@ -5,6 +5,20 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --- Clean URL Address Bar Extension Handler ---
+  (function handleCleanUrls() {
+    if (window.location.protocol !== 'file:') {
+      let path = window.location.pathname;
+      if (path.endsWith('.html')) {
+        let clean = path.replace(/\.html$/, '');
+        if (clean.endsWith('/index')) {
+          clean = clean.replace(/\/index$/, '/');
+        }
+        window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+      }
+    }
+  })();
+
   // --- Firebase Cloud Database Setup ---
   const firebaseConfig = {
     apiKey: "AIzaSyDghJ_xAllf53HxEVdGVgAPlM2-hWJVI14",

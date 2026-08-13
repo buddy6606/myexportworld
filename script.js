@@ -11,6 +11,55 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --- Clean URL Address Bar Extension Handler ---
+  (function handleCleanUrls() {
+    let path = window.location.pathname;
+    if (path.endsWith('.html')) {
+      let clean = path.replace(/\.html$/, '');
+      if (clean.endsWith('/index')) {
+        clean = clean.replace(/\/index$/, '/');
+      }
+      if (window.location.protocol.startsWith('http')) {
+        window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+      }
+    }
+  })();
+
+  // --- Smooth Scroll Reveal & Entrance Rendering Animations ---
+  (function initScrollReveal() {
+    const targetElements = document.querySelectorAll(
+      '.product-card, .stat-counter-card, .pillar-card, .term-card, .certificate-card, .blog-card, .partner-card, .section-header, .about-intro-grid, .contact-card, .reveal-on-scroll'
+    );
+
+    targetElements.forEach((el, idx) => {
+      if (!el.classList.contains('reveal-on-scroll')) {
+        el.classList.add('reveal-on-scroll');
+      }
+      const staggerClass = `reveal-delay-${(idx % 4) + 1}`;
+      if (!el.classList.contains('reveal-delay-1') && !el.classList.contains('reveal-delay-2') && !el.classList.contains('reveal-delay-3') && !el.classList.contains('reveal-delay-4')) {
+        el.classList.add(staggerClass);
+      }
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+    } else {
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => el.classList.add('reveal-visible'));
+    }
+  })();
+
   // --- Firebase Cloud Database Setup ---
   const firebaseConfig = {
     apiKey: "AIzaSyDghJ_xAllf53HxEVdGVgAPlM2-hWJVI14",
@@ -79,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
       navMenu.appendChild(inquiryLi);
     }
   }
+
 
 
   // ==========================================================================
@@ -2130,7 +2180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const productName = btn.getAttribute('data-product');
       if (productName) {
         localStorage.setItem('inquiry_product', productName);
-        window.location.href = 'inquiry.html';
+        window.location.href = 'inquiry';
       }
     }
   });

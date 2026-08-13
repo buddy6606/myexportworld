@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /
+
+# Rewrite clean URLs to .html files transparently
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^([^/]+)$ $1.html [L]
+
+# Custom rewrites for home
+RewriteRule ^home$ index.html [L]
