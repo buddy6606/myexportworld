@@ -1366,6 +1366,108 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Packing", value: "25 / 50 kg PP Bags" },
         { name: "Purity", value: "Min 99.5%" }
       ]
+    },
+
+    // --- 11. Fennel ---
+    {
+      id: "prod_fennel_seeds",
+      title: "Fennel Seeds (Saunf Whole)",
+      hsCode: "09096130",
+      category: "fennel",
+      badge: "Sortex Cleaned",
+      image: "images/fennel_seeds.png",
+      description: "Machine-cleaned and Sortex-purified aromatic green Fennel seeds (Saunf). Sourced from Gujarat and Rajasthan.",
+      specs: [
+        { name: "Purity", value: "Min 99%" },
+        { name: "Origin", value: "Gujarat / Rajasthan, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Volatile Oil", value: "Min 1.2%" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_fennel_powder",
+      title: "Fennel Seeds Powder (Saunf Powder)",
+      hsCode: "09096230",
+      category: "fennel",
+      badge: "Aromatic Ground",
+      image: "images/fennel_powder.png",
+      description: "Finely ground pure fennel seed spice, cool milled to preserve sweet aromatic flavor and essential anise oils.",
+      specs: [
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Origin", value: "Gujarat, India" },
+        { name: "Packing", value: "20 / 25 kg PP Bags" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 8.5%" }
+      ]
+    },
+
+    // --- 12. Coriander ---
+    {
+      id: "prod_coriander_seeds",
+      title: "Coriander Seeds (Dhana Whole)",
+      hsCode: "09092110",
+      category: "coriander",
+      badge: "Green Eagle Quality",
+      image: "images/coriander_seeds.png",
+      description: "Whole sun-dried golden and green coriander seeds, thoroughly machine cleaned and graded for export.",
+      specs: [
+        { name: "Variety", value: "Eagle / Scoop / Super Green" },
+        { name: "Origin", value: "Rajasthan / MP, India" },
+        { name: "Packing", value: "25 / 40 kg Jute/PP Bags" },
+        { name: "Purity", value: "Min 98.5% - 99%" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_coriander_powder",
+      title: "Coriander Seed Powder (Dhana Powder)",
+      hsCode: "09092200",
+      category: "coriander",
+      badge: "Cold Milled",
+      image: "images/coriander_powder.png",
+      description: "Hygienically cold-milled pure coriander seed powder, preserving fresh herbal aroma and citrus notes.",
+      specs: [
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Origin", value: "Rajasthan, India" },
+        { name: "Packing", value: "25 kg PP Bags with Liner" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+
+    // --- 13. Cinnamon ---
+    {
+      id: "prod_cinnamon_whole",
+      title: "Cinnamon Quills / Sticks (Dalchini)",
+      hsCode: "09061110",
+      category: "cinnamon",
+      badge: "Ceylonese / Cassia Grade",
+      image: "images/cinnamon_sticks.png",
+      description: "Premium whole rolled cinnamon bark quills with rich sweet woody aroma and high cinnamaldehyde oil content.",
+      specs: [
+        { name: "Grade", value: "ALBA / C5 Special / Bold Cassia" },
+        { name: "Origin", value: "Kerala / South India" },
+        { name: "Packing", value: "10 / 25 kg Cartons/Bags" },
+        { name: "Volatile Oil", value: "Min 2.0%" },
+        { name: "Moisture", value: "Max 12%" }
+      ]
+    },
+    {
+      id: "prod_cinnamon_powder",
+      title: "Cinnamon Powder (Dalchini Powder)",
+      hsCode: "09062000",
+      category: "cinnamon",
+      badge: "Sweet Spicy Ground",
+      image: "images/cinnamon_powder.png",
+      description: "Pure finely ground cinnamon powder milled from selected bark quills, delivering intense sweet spice aroma.",
+      specs: [
+        { name: "Mesh Size", value: "60 - 80 mesh" },
+        { name: "Origin", value: "India" },
+        { name: "Packing", value: "15 / 25 kg Foil-Lined Bags" },
+        { name: "Purity", value: "100% Pure Natural" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
     }
   ];
 
@@ -1381,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (categoryFilter === 'all') {
         match = true;
       } else if (categoryFilter.toLowerCase() === 'spices') {
-        match = ['turmeric', 'cumin', 'chilli', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard'].includes(prod.category.toLowerCase());
+        match = ['turmeric', 'cumin', 'chilli', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard', 'fennel', 'coriander', 'cinnamon'].includes(prod.category.toLowerCase());
       } else {
         match = prod.category.toLowerCase() === categoryFilter.toLowerCase();
       }
@@ -1411,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     products.forEach(p => {
       const cat = p.category;
-      if (cat && !['turmeric', 'cumin', 'chilli', 'psyllium', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard'].includes(cat.toLowerCase())) {
+      if (cat && !['turmeric', 'cumin', 'chilli', 'psyllium', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard', 'fennel', 'coriander', 'cinnamon'].includes(cat.toLowerCase())) {
         const formattedCat = cat.charAt(0).toUpperCase() + cat.slice(1);
         categories.add(formattedCat);
       }
@@ -1455,6 +1557,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridCurryLeaves = document.getElementById('gridCurryLeaves');
     const gridClove = document.getElementById('gridClove');
     const gridMustard = document.getElementById('gridMustard');
+    const gridFennel = document.getElementById('gridFennel');
+    const gridCoriander = document.getElementById('gridCoriander');
+    const gridCinnamon = document.getElementById('gridCinnamon');
 
     if (!gridsWrapper) return;
 
@@ -1468,6 +1573,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gridCurryLeaves) gridCurryLeaves.innerHTML = '';
     if (gridClove) gridClove.innerHTML = '';
     if (gridMustard) gridMustard.innerHTML = '';
+    if (gridFennel) gridFennel.innerHTML = '';
+    if (gridCoriander) gridCoriander.innerHTML = '';
+    if (gridCinnamon) gridCinnamon.innerHTML = '';
 
     // Remove any previously generated custom category sections
     document.querySelectorAll('.commodity-section-custom').forEach(el => el.remove());
@@ -1529,6 +1637,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gridClove.appendChild(card);
       } else if (cat === 'mustard' && gridMustard) {
         gridMustard.appendChild(card);
+      } else if (cat === 'fennel' && gridFennel) {
+        gridFennel.appendChild(card);
+      } else if (cat === 'coriander' && gridCoriander) {
+        gridCoriander.appendChild(card);
+      } else if (cat === 'cinnamon' && gridCinnamon) {
+        gridCinnamon.appendChild(card);
       } else {
         // Render Custom Commodity Group Grid
         const categoryId = `section_custom_${cat.replace(/[^a-z0-9]/g, '_')}`;
@@ -1575,6 +1689,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gridCurryLeaves) checkEmptyGrid(gridCurryLeaves);
     if (gridClove) checkEmptyGrid(gridClove);
     if (gridMustard) checkEmptyGrid(gridMustard);
+    if (gridFennel) checkEmptyGrid(gridFennel);
+    if (gridCoriander) checkEmptyGrid(gridCoriander);
+    if (gridCinnamon) checkEmptyGrid(gridCinnamon);
   };
 
   const loadProducts = () => {
@@ -1707,7 +1824,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'ajwain': 'Ajwain (Carom Seeds)',
     'curry_leaves': 'Curry Leaves & Powder',
     'clove': 'Clove & Powder',
-    'mustard': 'Mustard Seeds'
+    'mustard': 'Mustard Seeds',
+    'fennel': 'Fennel Seeds (Saunf)',
+    'coriander': 'Coriander Seeds & Powder',
+    'cinnamon': 'Cinnamon & Powder'
   };
 
   const navigateToLevel3 = (filterCategory = 'all') => {
@@ -1765,6 +1885,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionCurryLeaves = document.getElementById('sectionCurryLeaves');
     const sectionClove = document.getElementById('sectionClove');
     const sectionMustard = document.getElementById('sectionMustard');
+    const sectionFennel = document.getElementById('sectionFennel');
+    const sectionCoriander = document.getElementById('sectionCoriander');
+    const sectionCinnamon = document.getElementById('sectionCinnamon');
     const customSections = document.querySelectorAll('.commodity-section-custom');
 
     if (catLower === 'all') {
@@ -1778,6 +1901,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sectionCurryLeaves) sectionCurryLeaves.classList.remove('hidden');
       if (sectionClove) sectionClove.classList.remove('hidden');
       if (sectionMustard) sectionMustard.classList.remove('hidden');
+      if (sectionFennel) sectionFennel.classList.remove('hidden');
+      if (sectionCoriander) sectionCoriander.classList.remove('hidden');
+      if (sectionCinnamon) sectionCinnamon.classList.remove('hidden');
       customSections.forEach(sec => sec.classList.remove('hidden'));
     } else {
       if (sectionTurmeric) sectionTurmeric.classList.toggle('hidden', catLower !== 'turmeric');
@@ -1790,6 +1916,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sectionCurryLeaves) sectionCurryLeaves.classList.toggle('hidden', catLower !== 'curry_leaves');
       if (sectionClove) sectionClove.classList.toggle('hidden', catLower !== 'clove');
       if (sectionMustard) sectionMustard.classList.toggle('hidden', catLower !== 'mustard');
+      if (sectionFennel) sectionFennel.classList.toggle('hidden', catLower !== 'fennel');
+      if (sectionCoriander) sectionCoriander.classList.toggle('hidden', catLower !== 'coriander');
+      if (sectionCinnamon) sectionCinnamon.classList.toggle('hidden', catLower !== 'cinnamon');
       customSections.forEach(sec => {
         const customCat = sec.id.replace('section_custom_', '');
         sec.classList.toggle('hidden', customCat !== catLower);
@@ -1849,6 +1978,9 @@ document.addEventListener('DOMContentLoaded', () => {
   bindSpotlightClick('btnSelectCurryLeaves', 'spotlightCardCurryLeaves', 'curry_leaves');
   bindSpotlightClick('btnSelectClove', 'spotlightCardClove', 'clove');
   bindSpotlightClick('btnSelectMustard', 'spotlightCardMustard', 'mustard');
+  bindSpotlightClick('btnSelectFennel', 'spotlightCardFennel', 'fennel');
+  bindSpotlightClick('btnSelectCoriander', 'spotlightCardCoriander', 'coriander');
+  bindSpotlightClick('btnSelectCinnamon', 'spotlightCardCinnamon', 'cinnamon');
 
   // Level 2 Back click -> Returns to Level 1
   const btnBackToLevel1 = document.getElementById('btnBackToLevel1');

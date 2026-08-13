@@ -353,6 +353,108 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Packing", value: "25 / 50 kg PP Bags" },
         { name: "Purity", value: "Min 99.5%" }
       ]
+    },
+
+    // --- 11. Fennel ---
+    {
+      id: "prod_fennel_seeds",
+      title: "Fennel Seeds (Saunf Whole)",
+      hsCode: "09096130",
+      category: "fennel",
+      badge: "Sortex Cleaned",
+      image: "images/fennel_seeds.png",
+      description: "Machine-cleaned and Sortex-purified aromatic green Fennel seeds (Saunf). Sourced from Gujarat and Rajasthan.",
+      specs: [
+        { name: "Purity", value: "Min 99%" },
+        { name: "Origin", value: "Gujarat / Rajasthan, India" },
+        { name: "Packing", value: "25 / 50 kg PP Bags" },
+        { name: "Volatile Oil", value: "Min 1.2%" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_fennel_powder",
+      title: "Fennel Seeds Powder (Saunf Powder)",
+      hsCode: "09096230",
+      category: "fennel",
+      badge: "Aromatic Ground",
+      image: "images/fennel_powder.png",
+      description: "Finely ground pure fennel seed spice, cool milled to preserve sweet aromatic flavor and essential anise oils.",
+      specs: [
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Origin", value: "Gujarat, India" },
+        { name: "Packing", value: "20 / 25 kg PP Bags" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 8.5%" }
+      ]
+    },
+
+    // --- 12. Coriander ---
+    {
+      id: "prod_coriander_seeds",
+      title: "Coriander Seeds (Dhana Whole)",
+      hsCode: "09092110",
+      category: "coriander",
+      badge: "Green Eagle Quality",
+      image: "images/coriander_seeds.png",
+      description: "Whole sun-dried golden and green coriander seeds, thoroughly machine cleaned and graded for export.",
+      specs: [
+        { name: "Variety", value: "Eagle / Scoop / Super Green" },
+        { name: "Origin", value: "Rajasthan / MP, India" },
+        { name: "Packing", value: "25 / 40 kg Jute/PP Bags" },
+        { name: "Purity", value: "Min 98.5% - 99%" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+    {
+      id: "prod_coriander_powder",
+      title: "Coriander Seed Powder (Dhana Powder)",
+      hsCode: "09092200",
+      category: "coriander",
+      badge: "Cold Milled",
+      image: "images/coriander_powder.png",
+      description: "Hygienically cold-milled pure coriander seed powder, preserving fresh herbal aroma and citrus notes.",
+      specs: [
+        { name: "Mesh Size", value: "50 - 60 mesh" },
+        { name: "Origin", value: "Rajasthan, India" },
+        { name: "Packing", value: "25 kg PP Bags with Liner" },
+        { name: "Purity", value: "100% Pure, No Additives" },
+        { name: "Moisture", value: "Max 9%" }
+      ]
+    },
+
+    // --- 13. Cinnamon ---
+    {
+      id: "prod_cinnamon_whole",
+      title: "Cinnamon Quills / Sticks (Dalchini)",
+      hsCode: "09061110",
+      category: "cinnamon",
+      badge: "Ceylonese / Cassia Grade",
+      image: "images/cinnamon_sticks.png",
+      description: "Premium whole rolled cinnamon bark quills with rich sweet woody aroma and high cinnamaldehyde oil content.",
+      specs: [
+        { name: "Grade", value: "ALBA / C5 Special / Bold Cassia" },
+        { name: "Origin", value: "Kerala / South India" },
+        { name: "Packing", value: "10 / 25 kg Cartons/Bags" },
+        { name: "Volatile Oil", value: "Min 2.0%" },
+        { name: "Moisture", value: "Max 12%" }
+      ]
+    },
+    {
+      id: "prod_cinnamon_powder",
+      title: "Cinnamon Powder (Dalchini Powder)",
+      hsCode: "09062000",
+      category: "cinnamon",
+      badge: "Sweet Spicy Ground",
+      image: "images/cinnamon_powder.png",
+      description: "Pure finely ground cinnamon powder milled from selected bark quills, delivering intense sweet spice aroma.",
+      specs: [
+        { name: "Mesh Size", value: "60 - 80 mesh" },
+        { name: "Origin", value: "India" },
+        { name: "Packing", value: "15 / 25 kg Foil-Lined Bags" },
+        { name: "Purity", value: "100% Pure Natural" },
+        { name: "Moisture", value: "Max 10%" }
+      ]
     }
   ];
 
@@ -575,6 +677,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (document.getElementById('adminStatProductsChilli')) {
       document.getElementById('adminStatProductsChilli').textContent = products.filter(p => p.category === 'chilli').length;
+    }
+    if (document.getElementById('adminStatProductsFennel')) {
+      document.getElementById('adminStatProductsFennel').textContent = products.filter(p => p.category === 'fennel').length;
+    }
+    if (document.getElementById('adminStatProductsCoriander')) {
+      document.getElementById('adminStatProductsCoriander').textContent = products.filter(p => p.category === 'coriander').length;
+    }
+    if (document.getElementById('adminStatProductsCinnamon')) {
+      document.getElementById('adminStatProductsCinnamon').textContent = products.filter(p => p.category === 'cinnamon').length;
     }
   };
 
@@ -1115,6 +1226,15 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (prod.category === 'turmeric') {
         categoryLabel = 'Turmeric';
         categoryClass = 'style="background-color:rgba(255, 170, 0, 0.05); color:var(--accent-yellow); border-color:rgba(255, 170, 0, 0.1);"';
+      } else if (prod.category === 'fennel') {
+        categoryLabel = 'Fennel Seeds (Saunf)';
+        categoryClass = 'style="background-color:rgba(16, 185, 129, 0.05); color:var(--success); border-color:rgba(16, 185, 129, 0.1);"';
+      } else if (prod.category === 'coriander') {
+        categoryLabel = 'Coriander Seeds (Dhana)';
+        categoryClass = 'style="background-color:rgba(255, 170, 0, 0.05); color:var(--accent-yellow); border-color:rgba(255, 170, 0, 0.1);"';
+      } else if (prod.category === 'cinnamon') {
+        categoryLabel = 'Cinnamon Quills (Dalchini)';
+        categoryClass = 'style="background-color:rgba(214, 28, 44, 0.05); color:var(--accent-red); border-color:rgba(214, 28, 44, 0.1);"';
       } else {
         // Custom Category
         categoryClass = 'style="background-color:rgba(11, 60, 155, 0.05); color:var(--primary-blue); border-color:rgba(11, 60, 155, 0.1);"';
