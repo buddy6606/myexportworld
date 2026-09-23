@@ -166,6 +166,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!selector || !toggleBtn || !listContainer) return;
 
+    /**
+     * Aggressively clear ALL googtrans cookie variants.
+     * Google Translate sets this cookie inconsistently across browsers
+     * on different domain/path combinations. We must nuke them all.
+     */
+    function clearAllGoogTransCookies() {
+      const expiry = 'expires=Thu, 01 Jan 1970 00:00:00 UTC';
+      const hostname = window.location.hostname;
+      // Compute dot-prefixed domain (e.g. ".myexportworld.com")
+      const dotDomain = hostname.startsWith('.') ? hostname : '.' + hostname;
+      // Extract root domain from subdomains (e.g. "www.myexportworld.com" → ".myexportworld.com")
+      const parts = hostname.split('.');
+      const rootDomain = parts.length > 2 ? '.' + parts.slice(-2).join('.') : dotDomain;
+
+      const paths = ['/', ''];
+      const domains = ['', hostname, dotDomain, rootDomain];
+
+      paths.forEach(p => {
+        domains.forEach(d => {
+          let cookieStr = 'googtrans=; ' + expiry;
+          if (p) cookieStr += '; path=' + p;
+          if (d) cookieStr += '; domain=' + d;
+          document.cookie = cookieStr;
+        });
+      });
+    }
+
+    /**
+     * Set googtrans cookie on all domain/path variants to ensure
+     * Google Translate picks it up regardless of which one it reads.
+     */
+    function setGoogTransCookie(langCode) {
+      const value = '/en/' + langCode;
+      const hostname = window.location.hostname;
+      const dotDomain = hostname.startsWith('.') ? hostname : '.' + hostname;
+      const parts = hostname.split('.');
+      const rootDomain = parts.length > 2 ? '.' + parts.slice(-2).join('.') : dotDomain;
+
+      document.cookie = 'googtrans=' + value + '; path=/';
+      document.cookie = 'googtrans=' + value + '; path=/; domain=' + hostname;
+      document.cookie = 'googtrans=' + value + '; path=/; domain=' + dotDomain;
+      if (rootDomain !== dotDomain) {
+        document.cookie = 'googtrans=' + value + '; path=/; domain=' + rootDomain;
+      }
+    }
+
     // Detect current language from localStorage first, then cookie, fallback to 'en'
     function getCurrentLang() {
       const stored = localStorage.getItem('myexportworld_selected_lang');
@@ -198,21 +244,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set Google Translate cookie + localStorage and trigger translation
     function selectLanguage(langCode) {
-      localStorage.setItem('myexportworld_selected_lang', langCode);
+      selector.classList.remove('open');
+
+      // Always clear existing cookies first to prevent stale state
+      clearAllGoogTransCookies();
 
       if (langCode === 'en') {
-        // Reset to English — clear cookie and reload
-        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
-        selector.classList.remove('open');
-        window.location.reload();
+        // Reset to English — clear storage, clear cookies, restore DOM, then reload
+        localStorage.setItem('myexportworld_selected_lang', 'en');
+
+        // Remove Google Translate's class from <html> element (it adds "translated-ltr" / "translated-rtl")
+        const htmlEl = document.documentElement;
+        htmlEl.classList.forEach(cls => {
+          if (cls.startsWith('translated')) {
+            htmlEl.classList.remove(cls);
+          }
+        });
+
+        // Also try resetting via the combo box before reload (helps clear GT internal state)
+        const gtCombo = document.querySelector('.goog-te-combo');
+        if (gtCombo) {
+          gtCombo.value = '';
+          gtCombo.dispatchEvent(new Event('change'));
+        }
+
+        // Remove the GT banner iframe body offset
+        document.body.style.top = '0px';
+
+        // Reload after a tiny delay to let cookie clearing propagate
+        setTimeout(() => {
+          window.location.reload();
+        }, 50);
         return;
       }
 
-      // Set the googtrans cookie for the target language
-      document.cookie = 'googtrans=/en/' + langCode + '; path=/';
-      document.cookie = 'googtrans=/en/' + langCode + '; path=/; domain=' + window.location.hostname;
-      selector.classList.remove('open');
+      // Switching to a non-English language
+      localStorage.setItem('myexportworld_selected_lang', langCode);
+      setGoogTransCookie(langCode);
 
       // Try programmatic translation via Google Translate widget
       const gtCombo = document.querySelector('.goog-te-combo');
@@ -224,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
           buildDropdown();
         }, 800);
       } else {
-        // Fallback: reload to apply the cookie
+        // Widget not loaded yet — reload to apply the cookie-based translation
         window.location.reload();
       }
     }
@@ -232,8 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure cookie is synchronized on page load if saved in localStorage
     const initialLang = getCurrentLang();
     if (initialLang && initialLang !== 'en') {
-      document.cookie = 'googtrans=/en/' + initialLang + '; path=/';
-      document.cookie = 'googtrans=/en/' + initialLang + '; path=/; domain=' + window.location.hostname;
+      // Set cookie on all domain variants so GT picks it up on this page
+      setGoogTransCookie(initialLang);
+    } else if (initialLang === 'en') {
+      // If English is selected, ensure all stale cookies are cleared
+      clearAllGoogTransCookies();
     }
 
     // Toggle dropdown open/close
@@ -259,27 +330,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // Build dropdown on load
     buildDropdown();
 
-    // Re-sync UI and force-apply stored language on every page load as soon as Google Translate element renders
+    // Re-sync UI and force-apply stored language on every page load
+    // as soon as Google Translate element renders in the DOM
     let syncAttempts = 0;
+    let syncApplied = false;
     const gtCheckInterval = setInterval(() => {
       syncAttempts++;
       const gtCombo = document.querySelector('.goog-te-combo');
       const savedLang = getCurrentLang();
 
       if (gtCombo) {
-        if (savedLang && savedLang !== 'en' && gtCombo.value !== savedLang) {
-          gtCombo.value = savedLang;
-          gtCombo.dispatchEvent(new Event('change'));
+        // Only force-apply if we haven't successfully synced yet
+        if (!syncApplied && savedLang && savedLang !== 'en') {
+          if (gtCombo.value !== savedLang) {
+            gtCombo.value = savedLang;
+            gtCombo.dispatchEvent(new Event('change'));
+          }
+          syncApplied = true;
+        } else if (!syncApplied && savedLang === 'en') {
+          // English selected but GT might have a stale translation active
+          if (gtCombo.value && gtCombo.value !== '') {
+            gtCombo.value = '';
+            gtCombo.dispatchEvent(new Event('change'));
+          }
+          syncApplied = true;
         }
         buildDropdown();
-        if (syncAttempts > 10) {
-          clearInterval(gtCheckInterval);
-        }
       }
-    }, 300);
 
-    // Clear polling safety timeout after 12 seconds
-    setTimeout(() => clearInterval(gtCheckInterval), 12000);
+      // Stop polling after enough attempts
+      if (syncAttempts >= 20 || syncApplied) {
+        clearInterval(gtCheckInterval);
+      }
+    }, 400);
+
+    // Safety timeout to stop polling after 15 seconds
+    setTimeout(() => clearInterval(gtCheckInterval), 15000);
   })();
 
 
@@ -886,7 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       card.innerHTML = `
         <div class="blog-card-img-wrapper">
-          <img src="${escapeHTML(post.thumbnailImage || post.coverImage)}" alt="${escapeHTML(post.title)}" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
+          <img src="${escapeHTML(post.thumbnailImage || post.coverImage)}" alt="${escapeHTML(post.title)}" title="${escapeHTML(post.title)}" loading="lazy" class="blog-card-img" onerror="this.src='images/blog_freight.png';">
         </div>
         <div class="blog-card-body">
           <div class="blog-card-meta">
@@ -1650,7 +1736,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       card.innerHTML = `
         <div class="product-img-wrapper">
-          <img src="${escapeHTML(prod.image)}" alt="${escapeHTML(prod.title)}" class="product-img" onerror="this.src='images/logo.png';">
+          <img src="${escapeHTML(prod.image)}" alt="${escapeHTML(prod.title)}" title="${escapeHTML(prod.title)}" loading="lazy" class="product-img" onerror="this.src='images/logo.png';">
           ${prod.badge ? `<span class="product-badge">${escapeHTML(prod.badge)}</span>` : ''}
         </div>
         <div class="product-info">
@@ -2108,6 +2194,12 @@ document.addEventListener('DOMContentLoaded', () => {
       navigateToLevel3('clove');
     } else if (hash === '#mustard') {
       navigateToLevel3('mustard');
+    } else if (hash === '#fennel') {
+      navigateToLevel3('fennel');
+    } else if (hash === '#coriander') {
+      navigateToLevel3('coriander');
+    } else if (hash === '#cinnamon') {
+      navigateToLevel3('cinnamon');
     } else if (hash === '#product-details' || hash === '#all') {
       navigateToLevel3('all');
     } else {
@@ -2129,6 +2221,23 @@ document.addEventListener('DOMContentLoaded', () => {
       renderBlogGrid('all');
     }
   };
+
+  // Blog Back Button Handler — navigate from article view back to grid
+  const btnBlogBack = document.getElementById('btnBlogBack');
+  if (btnBlogBack) {
+    btnBlogBack.addEventListener('click', () => {
+      const blogGrid = document.getElementById('blogCardGrid');
+      const blogSingleView = document.getElementById('blogSingleView');
+      if (blogGrid) blogGrid.style.display = 'grid';
+      if (blogSingleView) blogSingleView.style.display = 'none';
+      currentBlogPost = null;
+      // Remove the blog-article hash to reflect navigation state
+      if (window.location.hash === '#blog-article') {
+        history.pushState(null, '', window.location.pathname + window.location.search);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
   
   window.addEventListener('hashchange', () => {
     handleProductsRouting();

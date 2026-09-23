@@ -4214,5 +4214,427 @@ body {
 .reveal-delay-5 { transition-delay: 0.5s; }
 
 
+/* ==========================================================================
+   Enhanced Responsive Overrides
+   ========================================================================== */
 
+/* --- Tablet & Small Desktop (1024px and below) --- */
+@media (max-width: 1024px) {
+  .hero-section {
+    padding: 5rem 0;
+  }
 
+  .hero-title {
+    font-size: 2.6rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  /* Commodity filter tabs: horizontal scroll on narrow screens */
+  .commodity-filter-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    scrollbar-width: thin;
+    padding-bottom: 0.5rem;
+  }
+
+  .commodity-filter-tabs::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .commodity-filter-tabs::-webkit-scrollbar-thumb {
+    background: hsl(220, 30%, 80%);
+    border-radius: var(--radius-full);
+  }
+
+  .filter-tab-btn {
+    flex-shrink: 0;
+  }
+
+  /* Blog filter toolbar: scrollable on tablet */
+  .blog-filter-toolbar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+  }
+
+  .blog-filter-toolbar::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .blog-filter-toolbar::-webkit-scrollbar-thumb {
+    background: hsl(220, 30%, 80%);
+    border-radius: var(--radius-full);
+  }
+
+  .blog-filter-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+/* --- Mobile (768px and below) --- */
+@media (max-width: 768px) {
+  /* Header actions layout: prevent overflow */
+  .header .container {
+    gap: 0.5rem;
+    padding: 0 1rem;
+  }
+
+  /* Shrink lang button on mobile */
+  .lang-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .lang-btn .fa-globe {
+    font-size: 0.9rem;
+  }
+
+  .lang-chevron {
+    font-size: 0.5rem;
+  }
+
+  /* Fix language dropdown position on mobile — prevent off-screen */
+  .lang-dropdown {
+    right: -10px;
+    min-width: 200px;
+    max-height: 320px;
+  }
+
+  /* Ensure header flex-center wrapper doesn't overflow */
+  .header .flex-center {
+    gap: 0.6rem !important;
+  }
+
+  /* Hero section mobile adjustments */
+  .hero-section {
+    padding: 4rem 0 3rem;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .hero-badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Section header scaling */
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .section-desc {
+    font-size: 0.95rem;
+  }
+
+  /* Blog grid — already 1fr in existing code, just ensure filter bar is scrollable */
+  .blog-filter-toolbar {
+    gap: 0.6rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Blog reader card mobile */
+  .blog-article-cover-wrapper {
+    margin: 0 -1.5rem;
+    border-radius: 0;
+  }
+
+  /* Footer grid — stack on mobile */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem;
+  }
+
+  .footer {
+    padding: 3rem 0 1.5rem;
+    text-align: center;
+  }
+
+  .footer-brand,
+  .footer-links-col,
+  .footer-contact-col {
+    text-align: center;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3rem 1.5rem;
+  }
+
+  .footer-contact-item {
+    justify-content: center;
+  }
+
+  .contact-socials {
+    justify-content: center;
+  }
+
+  /* Trade terms section mobile */
+  .terms-group-title {
+    font-size: 1.35rem;
+  }
+
+  /* Inquiry form mobile */
+  .inquiry-left-accent {
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .inquiry-left-accent h3 {
+    font-size: 1.8rem;
+  }
+
+  /* Certificates grid mobile */
+  .certificates-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+
+  /* About intro grid */
+  .about-intro-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem;
+  }
+
+  /* Contact grid */
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem;
+  }
+}
+
+/* --- Small Mobile (480px and below) --- */
+@media (max-width: 480px) {
+  /* Language button — compact mode, hide text label */
+  .lang-btn-label {
+    display: none;
+  }
+
+  .lang-btn {
+    padding: 0.4rem 0.55rem;
+    min-width: 36px;
+    justify-content: center;
+  }
+
+  .lang-btn .fa-globe {
+    font-size: 1rem;
+  }
+
+  .lang-chevron {
+    display: none;
+  }
+
+  /* Language dropdown mobile fullwidth */
+  .lang-dropdown {
+    position: fixed;
+    right: 1rem;
+    left: auto;
+    top: 80px;
+    min-width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem);
+    max-height: 60vh;
+    z-index: 9999;
+  }
+
+  /* Commodity filter tabs — tighter on small screens */
+  .commodity-filter-tabs {
+    padding: 0.5rem 0.6rem;
+    gap: 0.4rem !important;
+  }
+
+  .filter-tab-btn {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.85rem;
+  }
+
+  /* Blog filter buttons smaller */
+  .blog-filter-btn {
+    font-size: 0.8rem;
+    padding: 0.55rem 1.1rem;
+  }
+
+  /* Stats section — tighter spacing */
+  .stats-section {
+    padding: 3rem 0;
+  }
+
+  /* Hero actions full width */
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Product card actions */
+  .product-actions .btn {
+    font-size: 0.85rem;
+    padding: 0.7rem 1rem;
+  }
+
+  /* Blog reader — tighter padding */
+  .blog-reader-card {
+    padding: 1.5rem;
+  }
+
+  .blog-article-title {
+    font-size: 1.5rem;
+  }
+
+  .blog-article-content {
+    font-size: 0.95rem;
+  }
+
+  /* Footer padding */
+  .footer {
+    padding: 2.5rem 0 1rem;
+  }
+
+  .footer-grid {
+    gap: 2rem;
+  }
+
+  /* Trade terms icon sizing */
+  .term-icon-circle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .term-icon-circle svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .term-title {
+    font-size: 0.88rem;
+  }
+
+  .term-subtitle {
+    font-size: 0.78rem;
+  }
+
+  /* Certificates hero */
+  .certificates-hero .section-title {
+    font-size: 2rem !important;
+  }
+}
+
+/* --- Very Small Mobile (380px and below) --- */
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-description {
+    font-size: 0.88rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .stats-counters-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .stat-number-wrapper {
+    font-size: 2.2rem;
+  }
+
+  .stat-counter-card {
+    padding: 1.2rem 0.8rem 1rem;
+  }
+
+  .stat-icon-circle {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stat-label-text {
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* Footer items tighter */
+  .footer-brand h4 {
+    font-size: 1.3rem;
+  }
+}
+
+/* ==========================================================================
+   All-Device & Mobile Touch Target Optimizations
+   ========================================================================== */
+
+/* 1. Touch Target Accessibility (Min 44px height for interactive elements) */
+.nav-link,
+.lang-btn,
+.nav-cta,
+.btn,
+.float-bubble,
+.filter-tab-btn,
+.blog-filter-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2. Horizontal Scroll Momentum on Mobile Filters */
+.commodity-filter-tabs,
+.blog-filter-toolbar {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+}
+
+/* Custom horizontal scrollbar for desktop & mobile touch feedback */
+.commodity-filter-tabs::-webkit-scrollbar,
+.blog-filter-toolbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.commodity-filter-tabs::-webkit-scrollbar-track,
+.blog-filter-toolbar::-webkit-scrollbar-track {
+  background: rgba(19, 73, 160, 0.05);
+  border-radius: 4px;
+}
+
+.commodity-filter-tabs::-webkit-scrollbar-thumb,
+.blog-filter-toolbar::-webkit-scrollbar-thumb {
+  background: rgba(19, 73, 160, 0.25);
+  border-radius: 4px;
+}
+
+/* 3. iPhone / Modern Android Notch & Home Bar Safe Area Insets */
+.floating-cta-container {
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+  right: calc(2rem + env(safe-area-inset-right, 0px));
+}
+
+.footer {
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 480px) {
+  .floating-cta-container {
+    bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
+    right: calc(1.2rem + env(safe-area-inset-right, 0px));
+  }
+}
