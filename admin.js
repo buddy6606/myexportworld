@@ -43,7 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let blogPosts = [];
   let products = [];
   let certificates = [];
-  const correctAccessKey = "MYEXPORTWORLD9601343577";
+  // --- Cryptographic Authentication Config (SHA-256 with Salt - Zero Plaintext) ---
+  const AUTH_SALT = "mew_salt_2026_auth_v1";
+  const AUTH_HASH = "e7b7477d9968c69714d38724fd36c9e02d177c4553bf906fadd5742f75f991a5";
+  const MAX_FAILED_ATTEMPTS = 3;
+  const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15-minute anti-brute-force lockout
 
   const defaultCertificates = [
     {
@@ -608,7 +612,105 @@ document.addEventListener('DOMContentLoaded', () => {
   const adminStatCertsGovt = document.getElementById('adminStatCertsGovt');
   const adminStatCertsSafety = document.getElementById('adminStatCertsSafety');
 
-  // --- 1. Authorization Controls ---
+  // --- 1. Authorization Controls & Cryptographic Security ---
+  const computeSHA256 = async (str) => {
+    try {
+      if (window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) {
+      console.warn("Subtle crypto error:", e);
+    }
+    return '';
+  };
+
+  const getLockoutRemainingMs = () => {
+    try {
+      const lockUntil = parseInt(localStorage.getItem('mew_admin_lock_until') || '0', 10);
+      const now = Date.now();
+      return lockUntil > now ? (lockUntil - now) : 0;
+    } catch (e) {
+      return 0;
+    }
+  };
+
+  const getFailedAttempts = () => {
+    try {
+      return parseInt(localStorage.getItem('mew_admin_failed_attempts') || '0', 10);
+    } catch (e) {
+      return 0;
+    }
+  };
+
+  const recordFailedAttempt = () => {
+    const attempts = getFailedAttempts() + 1;
+    localStorage.setItem('mew_admin_failed_attempts', attempts.toString());
+    if (attempts >= MAX_FAILED_ATTEMPTS) {
+      const lockUntil = Date.now() + LOCKOUT_DURATION_MS;
+      localStorage.setItem('mew_admin_lock_until', lockUntil.toString());
+    }
+    return attempts;
+  };
+
+  const resetFailedAttempts = () => {
+    try {
+      localStorage.removeItem('mew_admin_failed_attempts');
+      localStorage.removeItem('mew_admin_lock_until');
+    } catch (e) {}
+  };
+
+  let lockoutTimerInterval = null;
+  const updateLockoutUI = () => {
+    const remainingMs = getLockoutRemainingMs();
+    const lockoutMsgEl = document.getElementById('authLockoutMsg');
+    const authSubmitBtn = authForm ? authForm.querySelector('button[type="submit"]') : null;
+
+    if (remainingMs > 0) {
+      const totalSec = Math.ceil(remainingMs / 1000);
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+      if (accessKeyInput) accessKeyInput.disabled = true;
+      if (authSubmitBtn) authSubmitBtn.disabled = true;
+
+      if (lockoutMsgEl) {
+        lockoutMsgEl.style.display = 'block';
+        lockoutMsgEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Security Lockout: 3 failed attempts.<br>Try again in <strong>${timeStr}</strong>`;
+      }
+
+      if (!lockoutTimerInterval) {
+        lockoutTimerInterval = setInterval(() => {
+          updateLockoutUI();
+        }, 1000);
+      }
+    } else {
+      if (lockoutTimerInterval) {
+        clearInterval(lockoutTimerInterval);
+        lockoutTimerInterval = null;
+      }
+      if (accessKeyInput) accessKeyInput.disabled = false;
+      if (authSubmitBtn) authSubmitBtn.disabled = false;
+      if (lockoutMsgEl) lockoutMsgEl.style.display = 'none';
+    }
+  };
+
+  // Password visibility eye toggle
+  const btnToggleAuthPass = document.getElementById('btnToggleAuthPass');
+  const iconToggleAuthPass = document.getElementById('iconToggleAuthPass');
+  if (btnToggleAuthPass && accessKeyInput && iconToggleAuthPass) {
+    btnToggleAuthPass.addEventListener('click', () => {
+      const isPass = accessKeyInput.type === 'password';
+      accessKeyInput.type = isPass ? 'text' : 'password';
+      iconToggleAuthPass.className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+      accessKeyInput.focus();
+    });
+  }
+
   const checkSessionAuth = () => {
     const isAuth = sessionStorage.getItem('myexportworld_admin_authorized');
     if (isAuth === 'true') {
@@ -632,29 +734,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const showLockScreen = () => {
     authContainer.style.display = 'flex';
     dashboardContainer.style.display = 'none';
-    accessKeyInput.value = '';
-    accessKeyInput.focus();
+    if (accessKeyInput) {
+      accessKeyInput.value = '';
+      accessKeyInput.focus();
+    }
+    updateLockoutUI();
   };
 
-  // Auth form submission
+  // Secure Cryptographic Auth form submission
   if (authForm) {
-    authForm.addEventListener('submit', (e) => {
+    authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const enteredKey = accessKeyInput.value.trim();
 
-      if (enteredKey === correctAccessKey) {
+      // Check lockout status
+      const remainingMs = getLockoutRemainingMs();
+      if (remainingMs > 0) {
+        const mins = Math.ceil(remainingMs / 60000);
+        showToast(`Security lockout active. Please wait ${mins} minutes.`, "warning");
+        updateLockoutUI();
+        return;
+      }
+
+      const enteredKey = accessKeyInput ? accessKeyInput.value : '';
+      if (!enteredKey) return;
+
+      // Compute salted SHA-256 hash client-side
+      const computedHash = await computeSHA256(enteredKey + ':' + AUTH_SALT);
+
+      if (computedHash === AUTH_HASH) {
+        resetFailedAttempts();
         sessionStorage.setItem('myexportworld_admin_authorized', 'true');
         showToast("Administrative Desk Unlocked", "success");
         showDashboard();
       } else {
-        // Play error shake animation
+        const failedCount = recordFailedAttempt();
         authCard.classList.add('shake');
-        showToast("Invalid Access Key. Please try again.", "warning");
         setTimeout(() => {
           authCard.classList.remove('shake');
         }, 500);
-        accessKeyInput.value = '';
-        accessKeyInput.focus();
+
+        if (failedCount >= MAX_FAILED_ATTEMPTS) {
+          showToast("Maximum attempts exceeded. Desk locked for 15 minutes.", "warning");
+          updateLockoutUI();
+        } else {
+          const remainingAttempts = MAX_FAILED_ATTEMPTS - failedCount;
+          showToast(`Invalid Key. ${remainingAttempts} attempt${remainingAttempts > 1 ? 's' : ''} left before 15-min lockout.`, "warning");
+        }
+
+        if (accessKeyInput) {
+          accessKeyInput.value = '';
+          accessKeyInput.focus();
+        }
       }
     });
   }
