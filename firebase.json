@@ -15,7 +15,7 @@
       { "source": "/contact", "destination": "/contact.html" },
       { "source": "/blog", "destination": "/blog.html" },
       { "source": "/inquiry", "destination": "/inquiry.html" },
-      { "source": "/admin", "destination": "/admin.html" }
+      { "source": "/mew6157", "destination": "/mew6157.html" }
     ]
   }
 }

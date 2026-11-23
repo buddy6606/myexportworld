@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>MY EXPORT WORLD - Administrative Console</title>
+  
+  <!-- Favicons and Device App Icons (Google Search Standard) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+  <link rel="shortcut icon" href="./favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+  
+  <!-- Base website styles & variables -->
+  <link rel="stylesheet" href="style.css?v=20260923-03">
+  
+  <!-- Standalone admin styles -->
+  <link rel="stylesheet" href="admin.css">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-body">
+
+  <!-- ==========================================================================
+       1. Lock Screen (Authorization Required)
+       ========================================================================== -->
+  <div class="auth-container" id="authContainer">
+    <div class="auth-card" id="authCard">
+      <div class="auth-logo">
+        <img src="images/logo.png" alt="MY EXPORT WORLD Logo">
+        <h2>MY EXPORT <span>WORLD</span></h2>
+      </div>
+      <p class="auth-desc">
+        This is a restricted, secure system workspace. Please enter your Administrative Access Key to enter the console.
+      </p>
+      
+      <form id="authForm">
+        <div class="auth-form-group">
+          <label for="accessKeyInput" class="form-label" style="text-align: center; display: block; font-weight:700;">Security Access Key <span>*</span></label>
+          <div class="auth-input-wrapper" style="position: relative;">
+            <input type="password" id="accessKeyInput" class="auth-input" maxlength="64" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 40px;">
+            <i class="fa-solid fa-lock"></i>
+            <button type="button" id="btnToggleAuthPass" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;" title="Show / Hide Password">
+              <i class="fa-solid fa-eye" id="iconToggleAuthPass"></i>
+            </button>
+          </div>
+          <div id="authLockoutMsg" style="display: none; margin-top: 10px; padding: 8px 12px; background: rgba(220, 38, 38, 0.08); border-radius: 6px; color: #dc2626; font-size: 0.85rem; font-weight: 600; text-align: center;"></div>
+        </div>
+        
+        <button type="submit" class="auth-btn">
+          Unlock Desk <i class="fa-solid fa-unlock-keyhole"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. Administrative Console Dashboard (Unlocked State)
+       ========================================================================== -->
+  <div class="dashboard-container" id="dashboardContainer">
+    
+    <!-- Top Dashboard Navigation Bar -->
+    <header class="dash-header">
+      <div class="dash-logo-area">
+        <img src="images/logo.png" alt="MY EXPORT WORLD Logo">
+        <h1>MY EXPORT <span>WORLD</span> <span style="font-size: 0.9rem; font-weight: 500; text-transform: uppercase; color: var(--accent-yellow); margin-left: 0.5rem;">Console</span></h1>
+      </div>
+      <div class="dash-header-actions">
+        <a href="./" class="btn-back-home">
+          <i class="fa-solid fa-arrow-left"></i> View Live Site
+        </a>
+        <button class="btn-logout" id="btnLogout" title="Log Out / Lock Console">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="dash-main">
+      
+      <!-- Tab Control Navigation -->
+      <nav class="dash-tab-bar">
+        <button class="dash-tab-btn active" id="tabBtnProducts">
+          <i class="fa-solid fa-wheat-awn"></i> Product Catalog
+        </button>
+        <button class="dash-tab-btn" id="tabBtnBlog">
+          <i class="fa-solid fa-pen-nib"></i> Blog Management
+        </button>
+        <button class="dash-tab-btn" id="tabBtnCertificates">
+          <i class="fa-solid fa-certificate"></i> Certificates Registry
+        </button>
+        <button class="dash-tab-btn" id="tabBtnInquiries">
+          <i class="fa-solid fa-envelope-open-text"></i> Inquiry Tickets
+        </button>
+      </nav>
+
+      <!-- TAB 1: Inquiries Management Desk -->
+      <section class="dash-panel active" id="panelInquiries">
+        <!-- Inquiry Stats widgets -->
+        <div class="stats-grid">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-inbox"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatInquiriesTotal">0</span>
+              <span class="stat-lbl">Total Tickets</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-fire-flame-curved"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatInquiriesToday">0</span>
+              <span class="stat-lbl">Received Today</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-database"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" style="font-size: 1.15rem; font-weight:700; margin-top: 0.3rem;">Local Secure</span>
+              <span class="stat-lbl">Database Registry</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toolbar operations -->
+        <div class="dash-toolbar">
+          <div class="dash-search-box">
+            <input type="text" id="inquirySearchInput" class="dash-search-input" placeholder="Search by Buyer, Company, Product, or text...">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <div class="toolbar-buttons">
+            <button class="btn-dash btn-dash-primary" id="adminExportBtn">
+              <i class="fa-regular fa-file-excel"></i> Export Spreadsheet (.csv)
+            </button>
+            <button class="btn-dash btn-dash-danger" id="adminClearBtn">
+              <i class="fa-regular fa-trash-can"></i> Clear All Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Inquiries Table Card -->
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 14%;">Date / Time</th>
+                  <th style="width: 14%;">Company Name</th>
+                  <th style="width: 12%;">Contact Name</th>
+                  <th style="width: 11%;">Contact No</th>
+                  <th style="width: 13%;">Email Address</th>
+                  <th style="width: 12%;">Physical Address</th>
+                  <th style="width: 12%;">Product Selected</th>
+                  <th style="width: 16%;">Buyer Specifics</th>
+                  <th style="width: 6%; text-align: center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody">
+                <!-- Javascript populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Sourcing Insights Editorial Panel -->
+      <section class="dash-panel" id="panelBlog">
+        <!-- Blog Stats widget -->
+        <div class="stats-grid" style="margin-bottom: 2.5rem;">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-newspaper"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatBlogsTotal">0</span>
+              <span class="stat-lbl">Articles Published</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-globe"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" style="font-size: 1.15rem; font-weight:700; margin-top: 0.3rem;">Live Synchronized</span>
+              <span class="stat-lbl">Publishing Mode</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Automated Daily Blog System (100% Free - Official Data Engine) -->
+        <div class="dash-form-wrapper" style="margin-bottom: 2.5rem; background: linear-gradient(135deg, rgba(5, 25, 59, 0.03) 0%, rgba(214, 28, 44, 0.03) 100%); border: 1px solid rgba(5, 25, 59, 0.15);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h4 class="dash-form-title" style="margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.6rem;">
+                <i class="fa-solid fa-robot" style="color: var(--primary-blue);"></i> Official Data Daily Auto-Blog System
+                <span class="badge-product" style="background: rgba(46, 204, 113, 0.15); color: #27ae60; border-color: rgba(46, 204, 113, 0.3); font-size: 0.75rem;">100% FREE AUTOMATION</span>
+              </h4>
+              <p class="dash-form-desc" style="margin-bottom: 1rem; max-width: 750px;">
+                Generates and uploads daily data-backed articles sourced directly from official standards: <strong>Spices Board of India</strong>, <strong>DGFT</strong>, <strong>APEDA</strong>, and <strong>CBIC Customs</strong>.
+              </p>
+            </div>
+            
+            <!-- Quick Actions Stack -->
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: #ffffff; padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border-light);">
+                <input type="checkbox" id="autoBlogToggleCheck" checked style="width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer;">
+                <span>Daily Auto-Publishing ON</span>
+              </label>
+
+              <button class="btn btn-primary" id="btnTriggerAutoBlog" style="background: var(--primary-blue); border-color: var(--primary-blue); color: #ffffff; font-weight: 600; padding: 0.65rem 1.4rem; font-size: 0.85rem;">
+                <i class="fa-solid fa-bolt" style="color: var(--accent-yellow);"></i> Generate & Publish Official Report Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Official Data Badges -->
+          <div style="display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; padding-top: 0.8rem; border-top: 1px dashed rgba(0,0,0,0.1); font-size: 0.8rem; color: var(--text-muted);">
+            <span style="font-weight: 700; color: var(--primary-blue-dark);"><i class="fa-solid fa-link"></i> Verified Data Endpoints:</span>
+            <a href="http://www.indianspices.com/quality/quality-standards.html" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Spices Board Specs</a>
+            <span>â€¢</span>
+            <a href="https://www.dgft.gov.in/CP/?opt=itc-hs-code" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> DGFT HS Codes</a>
+            <span>â€¢</span>
+            <a href="https://agriexchange.apeda.gov.in/" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> APEDA Standards</a>
+            <span>â€¢</span>
+            <a href="https://www.cbic.gov.in/htdocs-cbec/customs/cst-manual/manual-toc" target="_blank" rel="noopener" style="color: var(--primary-blue); text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> CBIC Customs Rules</a>
+          </div>
+        </div>
+
+        <!-- Blog Form Card -->
+        <div class="dash-form-wrapper">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
+            <h4 class="dash-form-title" style="margin: 0;">
+              <i class="fa-solid fa-pen-nib" style="color: var(--accent-red);"></i> Create Sourcing Insight
+            </h4>
+            <button type="button" class="btn btn-secondary" id="btnTriggerLiveGovBlog" style="padding: 0.55rem 1.1rem; font-size: 0.85rem; border-color: #16a34a; color: #16a34a; background: rgba(22, 163, 74, 0.08);">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Generate Live Govt Data Blog Now
+            </button>
+          </div>
+          <p class="dash-form-desc">Draft and publish standard international logistics, compliance, and trade finance advice for buyers. Or click the button above to generate a 100% real government-grounded report instantly.</p>
+          
+          <form class="inquiry-form" id="adminBlogForm" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+            <!-- Title -->
+            <div class="form-group full-width">
+              <label for="blogTitle" class="form-label">Article Title <span>*</span></label>
+              <input type="text" id="blogTitle" class="form-input" placeholder="e.g. Navigating Maritime Freight: Essential Guide..." required>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label for="blogCategory" class="form-label">Trade Category <span>*</span></label>
+              <select id="blogCategory" class="form-select" required>
+                <option value="" disabled selected>-- Select Category --</option>
+                <option value="Logistics & Shipping">Logistics & Shipping</option>
+                <option value="Customs & Compliance">Customs & Compliance</option>
+                <option value="Trade Finance & Laws">Trade Finance & Laws</option>
+                <option value="custom">-- Custom Trade Category --</option>
+              </select>
+              <input type="text" id="blogCategoryCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter Custom Trade Category">
+            </div>
+
+            <!-- Read Time -->
+            <div class="form-group">
+              <label for="blogReadTime" class="form-label">Estimated Read Time <span>*</span></label>
+              <input type="text" id="blogReadTime" class="form-input" placeholder="e.g. 5 min read" required>
+            </div>
+
+            <!-- Cover Image Selector -->
+            <div class="form-group">
+              <label for="blogImage" class="form-label">Cover Sourcing Visual (Article Header) <span>*</span></label>
+              <select id="blogImage" class="form-select" required>
+                <option value="images/blog_freight.png" selected>Ocean Freight Container Logistics (Default)</option>
+                <option value="images/blog_finance.png">Global Trade Finance & Letters of Credit</option>
+                <option value="images/blog_customs.png">Customs Clearances Papers & flatlay</option>
+                <option value="images/blog_turmeric.png">Golden Organic Spices & Turmeric</option>
+                <option value="images/blog_psyllium.png">Fibers & High-Purity Psyllium Husk</option>
+                <option value="images/blog_honey.png">Acacia Single-Flora Golden Honey</option>
+                <option value="custom">-- Use Custom URL --</option>
+                <option value="upload">-- Upload Local Image --</option>
+              </select>
+              <input type="text" id="blogImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste cover image URL (e.g. images/my_image.png)">
+              <input type="file" id="blogImageFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Thumbnail Image Selector -->
+            <div class="form-group">
+              <label for="blogThumbnail" class="form-label">Grid Card Thumbnail <span>*</span></label>
+              <select id="blogThumbnail" class="form-select" required>
+                <option value="images/blog_freight.png" selected>Ocean Freight Container Logistics (Default)</option>
+                <option value="images/blog_finance.png">Global Trade Finance & Letters of Credit</option>
+                <option value="images/blog_customs.png">Customs Clearances Papers & flatlay</option>
+                <option value="images/blog_turmeric.png">Golden Organic Spices & Turmeric</option>
+                <option value="images/blog_psyllium.png">Fibers & High-Purity Psyllium Husk</option>
+                <option value="images/blog_honey.png">Acacia Single-Flora Golden Honey</option>
+                <option value="custom">-- Use Custom URL --</option>
+                <option value="upload">-- Upload Local Image --</option>
+              </select>
+              <input type="text" id="blogThumbnailCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste card thumbnail URL (e.g. images/my_thumb.png)">
+              <input type="file" id="blogThumbnailFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Teaser Summary -->
+            <div class="form-group full-width">
+              <label for="blogSummary" class="form-label">Teaser Summary (Grid Card Teaser) <span>*</span></label>
+              <input type="text" id="blogSummary" class="form-input" placeholder="A brief 1-2 sentence teaser to hook readers inside the blog card grid..." required>
+            </div>
+
+            <!-- Full Article Body -->
+            <div class="form-group full-width">
+              <label for="blogBody" class="form-label">Article Body Content (HTML / Paragraphs supported) <span>*</span></label>
+              <textarea id="blogBody" class="form-textarea" style="min-height: 180px;" placeholder="Write your full daily trade insight article here. Use double line breaks for paragraph breaks. Standard HTML tags like <ul>, <li>, and <strong> are fully supported..." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-submit-wrapper">
+              <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.8rem 2.2rem; font-size: 0.9rem;">
+                <i class="fa-solid fa-paper-plane"></i> Publish Live Now
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manage Blog Posts List -->
+        <div style="margin-top: 4rem;">
+          <h4 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
+            <i class="fa-solid fa-trash-can" style="color: var(--accent-red);"></i> Currently Active Insights
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Below is the list of all active trade insights on your website. You can instantly remove any outdated articles from this panel.</p>
+          
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="dash-table" style="min-width: 800px;">
+                <thead>
+                  <tr>
+                    <th style="width: 50%;">Title</th>
+                    <th style="width: 20%;">Category</th>
+                    <th style="width: 12%;">Read Time</th>
+                    <th style="width: 12%;">Date</th>
+                    <th style="width: 6%; text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminBlogTableBody">
+                  <!-- Javascript populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- TAB 3: Product Catalog Management Panel -->
+      <section class="dash-panel" id="panelProducts">
+        <!-- Product Stats widget -->
+        <div class="stats-grid" style="margin-bottom: 2.5rem;">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsTotal">0</span>
+              <span class="stat-lbl">Active Commodities</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-wheat-awn"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsTurmeric">0</span>
+              <span class="stat-lbl">Turmeric Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsPsyllium">0</span>
+              <span class="stat-lbl">Psyllium Husk Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-seedling"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsCumin">0</span>
+              <span class="stat-lbl">Cumin Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-pepper-hot"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsChilli">0</span>
+              <span class="stat-lbl">Red Chilli Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon green"><i class="fa-solid fa-seedling"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsFennel">0</span>
+              <span class="stat-lbl">Fennel Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon yellow"><i class="fa-solid fa-leaf"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsCoriander">0</span>
+              <span class="stat-lbl">Coriander Products</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-cubes"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatProductsCinnamon">0</span>
+              <span class="stat-lbl">Cinnamon Products</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Form Card -->
+        <div class="dash-form-wrapper">
+          <h4 class="dash-form-title">
+            <i class="fa-solid fa-wheat-awn" style="color: var(--accent-red);"></i> Add Product to Catalog
+          </h4>
+          <p class="dash-form-desc">Create and publish active agricultural commodities to the live catalog categories. All catalog items sync instantly with the public homepage.</p>
+          
+          <form class="inquiry-form" id="adminProductForm" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+            <!-- Step 1: Commodity Division -->
+            <div class="form-group">
+              <label for="prodCommodity" class="form-label">Commodity (Division) <span>*</span></label>
+              <select id="prodCommodity" class="form-select" required>
+                <option value="" disabled selected>-- Select Commodity Division --</option>
+                <option value="spices">Spices, Seasonings &amp; Herbs</option>
+                <option value="vegetables">Fresh Vegetables</option>
+                <option value="custom">+ Add New Commodity Division...</option>
+              </select>
+              <input type="text" id="prodCommodityCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter New Commodity Name (e.g. Grains, Oilseeds, Pulses)">
+            </div>
+
+            <!-- Step 2: Category / Group (Filtered by Commodity) -->
+            <div class="form-group">
+              <label for="prodCategory" class="form-label">Category / Group <span>*</span></label>
+              <select id="prodCategory" class="form-select" required>
+                <option value="" disabled selected>-- First Select Commodity Above --</option>
+              </select>
+              <input type="text" id="prodCategoryCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter New Category Name (e.g. Chilli, Garlic, Ginger)">
+            </div>
+
+            <!-- Step 3: Product Name / Variety in that Category -->
+            <div class="form-group">
+              <label for="prodTitle" class="form-label">Product Variety / Name <span>*</span></label>
+              <input type="text" id="prodTitle" class="form-input" placeholder="e.g. Chilli Powder, Whole Finger, Red Onion 45mm+" required>
+            </div>
+
+            <!-- HS Code -->
+            <div class="form-group">
+              <label for="prodHsCode" class="form-label">HS Code <span>*</span></label>
+              <input type="text" id="prodHsCode" class="form-input" placeholder="e.g. 09103030" required>
+            </div>
+
+            <!-- Badge -->
+            <div class="form-group">
+              <label for="prodBadge" class="form-label">Card Badge / Grade Tag (Auto from 1st Word)</label>
+              <input type="text" id="prodBadge" class="form-input" placeholder="e.g. TURMERIC EXPORTER FROM INDIA">
+            </div>
+
+            <!-- Logo / Category Icon -->
+            <div class="form-group">
+              <label for="prodIcon" class="form-label">Product / Category Logo Icon</label>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div id="prodIconPreview" style="width: 42px; height: 42px; border-radius: 8px; background: rgba(22, 163, 74, 0.1); color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; border: 1px solid rgba(22, 163, 74, 0.2);">
+                  <i class="fa-solid fa-leaf" id="prodIconPreviewI"></i>
+                </div>
+                <select id="prodIcon" class="form-select" style="flex: 1;">
+                  <option value="fa-solid fa-leaf" selected>🌿 Green Leaf (Herbs, Turmeric, Natural)</option>
+                  <option value="fa-solid fa-pepper-hot">🌶️ Red Hot Pepper / Chilli</option>
+                  <option value="fa-solid fa-seedling">🌱 Seedling (Cumin, Fennel, Spices)</option>
+                  <option value="fa-solid fa-carrot">🥕 Fresh Vegetables / Roots</option>
+                  <option value="fa-solid fa-wheat-awn">🌾 Wheat / Grains &amp; Agriculture</option>
+                  <option value="fa-solid fa-spa">🪷 Botanical / Wellness</option>
+                  <option value="fa-solid fa-cubes-stacked">📦 Bulk Cargo / Commodity</option>
+                  <option value="fa-solid fa-shield-halved">🛡️ Verified Export Quality</option>
+                  <option value="custom">+ Custom FontAwesome Icon...</option>
+                </select>
+              </div>
+              <input type="text" id="prodIconCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="e.g. fa-solid fa-lemon">
+            </div>
+
+            <!-- Image Selector -->
+            <div class="form-group full-width">
+              <label for="prodImage" class="form-label">Product Showcase Image <span>*</span></label>
+              <select id="prodImage" class="form-select" required>
+                <option value="images/onion.png">Fresh Red Onion (Preset)</option>
+                <option value="images/turmeric_finger.jpg" selected>Dried Turmeric Finger (Preset)</option>
+                <option value="images/turmeric_powder.jpg">Turmeric Powder (Preset)</option>
+                <option value="images/turmeric_fresh.jpg">Fresh Organic Turmeric (Preset)</option>
+                <option value="images/psyllium_husk.png">Psyllium Husk Whole (Preset)</option>
+                <option value="images/psyllium_powder.png">Psyllium Husk Powder (Preset)</option>
+                <option value="images/cumin_seeds.png">Cumin Seeds (Preset)</option>
+                <option value="images/cumin_powder.png">Cumin Powder (Preset)</option>
+                <option value="images/chilli_whole.png">Dried Whole Red Chilli (Preset)</option>
+                <option value="images/chilli_powder.png">Red Chilli Powder (Preset)</option>
+                <option value="images/cardamom_whole.jpg">Cardamom Whole (Preset)</option>
+                <option value="images/cardamom_powder.jpg">Cardamom Powder (Preset)</option>
+                <option value="images/black_pepper.jpg">Black Pepper Whole (Preset)</option>
+                <option value="images/black_pepper_powder.jpg">Black Pepper Powder (Preset)</option>
+                <option value="images/ajwain_seeds.jpg">Ajwain Seeds (Preset)</option>
+                <option value="images/ajwain_powder.jpg">Ajwain Powder (Preset)</option>
+                <option value="images/curry_leaves_crushed.jpg">Curry Leaves Crushed (Preset)</option>
+                <option value="images/curry_leaves_powder.jpg">Curry Leaves Powder (Preset)</option>
+                <option value="images/clove_whole.jpg">Clove Whole (Preset)</option>
+                <option value="images/clove_powder.jpg">Clove Powder (Preset)</option>
+                <option value="images/mustard_seeds.jpg">Mustard Seeds (Preset)</option>
+                <option value="images/fennel_seeds.png">Fennel Seeds (Saunf Whole Preset)</option>
+                <option value="images/fennel_powder.png">Fennel Powder (Saunf Powder Preset)</option>
+                <option value="images/coriander_seeds.png">Coriander Seeds (Dhana Whole Preset)</option>
+                <option value="images/coriander_powder.png">Coriander Powder (Dhana Powder Preset)</option>
+                <option value="images/cinnamon_sticks.png">Cinnamon Quills (Dalchini Sticks Preset)</option>
+                <option value="images/cinnamon_powder.png">Cinnamon Powder (Dalchini Powder Preset)</option>
+                <option value="custom">-- Use Custom URL --</option>
+                <option value="upload">-- Upload Local Image --</option>
+              </select>
+              <input type="text" id="prodImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste image URL (e.g. images/my_image.png)">
+              <input type="file" id="prodImageFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label for="prodDescription" class="form-label">Product Short Description <span>*</span></label>
+              <textarea id="prodDescription" class="form-textarea" style="min-height: 80px;" placeholder="Write a short summary card description..." required></textarea>
+            </div>
+
+            <!-- Specifications Heading -->
+            <div class="form-group full-width" style="margin-top: 0.5rem; margin-bottom: -0.5rem;">
+              <h5 style="font-size: 1rem; color: var(--primary-blue-dark); font-weight: 700;">Product Technical Specifications (Up to 5)</h5>
+              <p style="color: var(--text-muted); font-size: 0.8rem;">Enter technical properties to display on the product card (e.g., Origin, Packing, Purity, Curcumin value).</p>
+            </div>
+
+            <!-- Spec Pair 1 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 1: Name</label>
+              <input type="text" id="prodSpecName1" class="form-input" placeholder="e.g. Origin">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 1: Value</label>
+              <input type="text" id="prodSpecVal1" class="form-input" placeholder="e.g. Nizamabad, India">
+            </div>
+
+            <!-- Spec Pair 2 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 2: Name</label>
+              <input type="text" id="prodSpecName2" class="form-input" placeholder="e.g. Curcumin">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 2: Value</label>
+              <input type="text" id="prodSpecVal2" class="form-input" placeholder="e.g. Min 3.5%">
+            </div>
+
+            <!-- Spec Pair 3 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 3: Name</label>
+              <input type="text" id="prodSpecName3" class="form-input" placeholder="e.g. Packing">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 3: Value</label>
+              <input type="text" id="prodSpecVal3" class="form-input" placeholder="e.g. 25/50 kg PP Bags">
+            </div>
+
+            <!-- Spec Pair 4 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 4: Name</label>
+              <input type="text" id="prodSpecName4" class="form-input" placeholder="e.g. Purity">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 4: Value</label>
+              <input type="text" id="prodSpecVal4" class="form-input" placeholder="e.g. Min 99%">
+            </div>
+
+            <!-- Spec Pair 5 -->
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 5: Name</label>
+              <input type="text" id="prodSpecName5" class="form-input" placeholder="e.g. Moisture">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.8rem; color: var(--text-muted);">Spec 5: Value</label>
+              <input type="text" id="prodSpecVal5" class="form-input" placeholder="e.g. Max 10%">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-submit-wrapper full-width">
+              <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.8rem 2.2rem; font-size: 0.9rem;">
+                <i class="fa-solid fa-paper-plane"></i> Add to Catalog
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manage Catalog List -->
+        <div style="margin-top: 4rem;">
+          <h4 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
+            <i class="fa-solid fa-list-check" style="color: var(--accent-red);"></i> Active Catalog Commodities
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Below is the list of all active commodities on your public website catalog. You can instantly remove items from the live feed.</p>
+          
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="dash-table" style="min-width: 800px;">
+                <thead>
+                  <tr>
+                    <th style="width: 8%;">Image</th>
+                    <th style="width: 24%;">Product Variety / Name</th>
+                    <th style="width: 18%;">Commodity Division</th>
+                    <th style="width: 18%;">Category / Group</th>
+                    <th style="width: 12%;">HS Code</th>
+                    <th style="width: 10%;">Grade Badge</th>
+                    <th style="width: 10%; text-align: center;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminProductTableBody">
+                  <!-- Javascript populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: Certificates Management Panel -->
+      <section class="dash-panel" id="panelCertificates">
+        <!-- Certificate Stats widget -->
+        <div class="stats-grid" style="margin-bottom: 2.5rem;">
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-certificate"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatCertsTotal">0</span>
+              <span class="stat-lbl">Total Certificates</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatCertsActive">0</span>
+              <span class="stat-lbl">Active &amp; Verified</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatCertsGovt">0</span>
+              <span class="stat-lbl">Govt Statutory Bodies</span>
+            </div>
+          </div>
+          <div class="stat-pill-card">
+            <div class="stat-icon red"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="stat-details">
+              <span class="stat-val" id="adminStatCertsSafety">0</span>
+              <span class="stat-lbl">Food Safety Standards</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certificate Form Card -->
+        <div class="dash-form-wrapper">
+          <h4 class="dash-form-title">
+            <i class="fa-solid fa-file-circle-plus" style="color: var(--primary-blue);"></i> Add Certificate to Registry
+          </h4>
+          <p class="dash-form-desc">Publish statutory export licenses, quality standard approvals, and trade accreditations. Instantly syncs with the public certificates page.</p>
+          
+          <form class="inquiry-form" id="adminCertForm" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+            <!-- Certificate Title -->
+            <div class="form-group">
+              <label for="certTitle" class="form-label">Certificate / Accreditation Name <span>*</span></label>
+              <input type="text" id="certTitle" class="form-input" placeholder="e.g. APEDA Export Registration Certificate" required>
+            </div>
+
+            <!-- Issuing Authority -->
+            <div class="form-group">
+              <label for="certAuthority" class="form-label">Issuing Authority / Ministry <span>*</span></label>
+              <input type="text" id="certAuthority" class="form-input" placeholder="e.g. Ministry of Commerce &amp; Industry, Govt. of India" required>
+            </div>
+
+            <!-- License Type -->
+            <div class="form-group">
+              <label for="certLabel" class="form-label">License Type <span>*</span></label>
+              <input type="text" id="certLabel" class="form-input" placeholder="e.g. Merchant Exporter, Food Grade, ISO 22000" required>
+            </div>
+
+            <!-- Registry Status -->
+            <div class="form-group">
+              <label for="certStatus" class="form-label">Registry Status <span>*</span></label>
+              <select id="certStatus" class="form-select" required>
+                <option value="Active &amp; Verified" selected>Active &amp; Verified</option>
+                <option value="Valid &amp; Renewable">Valid &amp; Renewable</option>
+                <option value="Renewal in Progress">Renewal in Progress</option>
+              </select>
+            </div>
+
+            <!-- Classification Category / Theme -->
+            <div class="form-group">
+              <label for="certTheme" class="form-label">Category Theme / Color <span>*</span></label>
+              <select id="certTheme" class="form-select" required>
+                <option value="blue" selected>Government Trade Authority (Blue Stripe)</option>
+                <option value="red">Spices &amp; Agriculture Board (Red Stripe)</option>
+                <option value="gold">Food Safety &amp; Quality ISO (Gold Stripe)</option>
+              </select>
+            </div>
+
+            <!-- Certificate Image -->
+            <div class="form-group full-width">
+              <label for="certImage" class="form-label">Certificate Image / Document Scan <span>*</span></label>
+              <select id="certImage" class="form-select" required>
+                <option value="images/certificate_sample.jpg" selected>Certificate Document Scan (Sample)</option>
+                <option value="images/logo.png">Official Corporate Seal / Logo (Preset)</option>
+                <option value="custom">-- Paste Custom Image URL --</option>
+                <option value="upload">-- Upload Local Image File --</option>
+              </select>
+              <input type="text" id="certImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste certificate image URL (e.g. images/my_certificate.jpg)">
+              <input type="file" id="certImageFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+            </div>
+
+            <!-- Detailed Description / Scope -->
+            <div class="form-group full-width">
+              <label for="certDesc" class="form-label">Scope &amp; Compliance Description <span>*</span></label>
+              <textarea id="certDesc" class="form-textarea" style="min-height: 80px;" placeholder="Describe what this certificate validates, covered products, and regulatory standards..." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-submit-wrapper full-width">
+              <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.8rem 2.2rem; font-size: 0.9rem;">
+                <i class="fa-solid fa-shield-check"></i> Add Certificate to Registry
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manage Certificates List -->
+        <div style="margin-top: 4rem;">
+          <h4 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary-blue-dark); display: flex; align-items: center; gap: 0.6rem;">
+            <i class="fa-solid fa-certificate" style="color: var(--primary-blue);"></i> Active Certificates &amp; Licenses
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Below is the list of active export compliance accreditations shown on your public certificates page.</p>
+          
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="dash-table" style="min-width: 800px;">
+                <thead>
+                  <tr>
+                    <th style="width: 8%;">Image</th>
+                    <th style="width: 24%;">Certificate Name</th>
+                    <th style="width: 22%;">Issuing Authority</th>
+                    <th style="width: 16%;">License Type</th>
+                    <th style="width: 14%;">Registry Status</th>
+                    <th style="width: 10%;">Theme</th>
+                    <th style="width: 6%; text-align: center;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminCertTableBody">
+                  <!-- Javascript populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal: Edit Product -->
+  <div class="admin-modal-overlay" id="modalEditProduct">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title"><i class="fa-solid fa-pen-to-square" style="color: var(--accent-red);"></i> Edit Product</h3>
+        <button type="button" class="admin-modal-close" id="closeModalEditProduct">&times;</button>
+      </div>
+      <form class="inquiry-form" id="formEditProduct" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+        <input type="hidden" id="editProdIndex">
+        
+        <div class="form-group">
+          <label class="form-label">Commodity (Division) <span>*</span></label>
+          <select id="editProdCommodity" class="form-select" required>
+            <option value="spices">Spices, Seasonings &amp; Herbs</option>
+            <option value="vegetables">Fresh Vegetables</option>
+            <option value="custom">+ Add New Commodity...</option>
+          </select>
+          <input type="text" id="editProdCommodityCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter Custom Commodity Name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category / Group <span>*</span></label>
+          <select id="editProdCategory" class="form-select" required></select>
+          <input type="text" id="editProdCategoryCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Enter Custom Category Name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Product Name / Variety <span>*</span></label>
+          <input type="text" id="editProdTitle" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">HS Code <span>*</span></label>
+          <input type="text" id="editProdHsCode" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Grade Badge Tag (Auto from 1st Word)</label>
+          <input type="text" id="editProdBadge" class="form-input" placeholder="e.g. TURMERIC EXPORTER FROM INDIA">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Product / Category Logo Icon</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div id="editProdIconPreview" style="width: 42px; height: 42px; border-radius: 8px; background: rgba(22, 163, 74, 0.1); color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; border: 1px solid rgba(22, 163, 74, 0.2);">
+              <i class="fa-solid fa-leaf" id="editProdIconPreviewI"></i>
+            </div>
+            <select id="editProdIcon" class="form-select" style="flex: 1;">
+              <option value="fa-solid fa-leaf">🌿 Green Leaf (Herbs, Turmeric, Natural)</option>
+              <option value="fa-solid fa-pepper-hot">🌶️ Red Hot Pepper / Chilli</option>
+              <option value="fa-solid fa-seedling">🌱 Seedling (Cumin, Fennel, Spices)</option>
+              <option value="fa-solid fa-carrot">🥕 Fresh Vegetables / Roots</option>
+              <option value="fa-solid fa-wheat-awn">🌾 Wheat / Grains &amp; Agriculture</option>
+              <option value="fa-solid fa-spa">🪷 Botanical / Wellness</option>
+              <option value="fa-solid fa-cubes-stacked">📦 Bulk Cargo / Commodity</option>
+              <option value="fa-solid fa-shield-halved">🛡️ Verified Export Quality</option>
+              <option value="custom">+ Custom FontAwesome Icon...</option>
+            </select>
+          </div>
+          <input type="text" id="editProdIconCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="e.g. fa-solid fa-lemon">
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label">Product Image (URL or Upload from Device) <span>*</span></label>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="editProdImage" class="form-input" style="flex: 1; min-width: 200px;" placeholder="Image URL or uploaded file" required>
+            <label for="editProdImageFile" class="btn btn-secondary" style="margin: 0; padding: 0.55rem 1.1rem; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload from Device
+            </label>
+            <input type="file" id="editProdImageFile" accept="image/*" style="display: none;">
+          </div>
+          <div id="editProdImagePreview" style="margin-top: 0.6rem; display: none;">
+            <img id="editProdImagePreviewImg" src="" alt="Preview" style="max-height: 80px; border-radius: 6px; border: 1px solid var(--border-light);">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label">Short Description <span>*</span></label>
+          <textarea id="editProdDesc" class="form-textarea" style="min-height: 80px;" required></textarea>
+        </div>
+
+        <div class="form-submit-wrapper full-width" style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" id="cancelModalEditProduct">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Product Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Blog Post -->
+  <div class="admin-modal-overlay" id="modalEditBlog">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title"><i class="fa-solid fa-pen-nib" style="color: var(--primary-blue);"></i> Edit Sourcing Article</h3>
+        <button type="button" class="admin-modal-close" id="closeModalEditBlog">&times;</button>
+      </div>
+      <form class="inquiry-form" id="formEditBlog" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+        <input type="hidden" id="editBlogIndex">
+        <div class="form-group full-width">
+          <label class="form-label">Article Title <span>*</span></label>
+          <input type="text" id="editBlogTitle" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category <span>*</span></label>
+          <input type="text" id="editBlogCategory" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Read Time <span>*</span></label>
+          <input type="text" id="editBlogReadTime" class="form-input" required>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Cover Image (URL or Upload from Device) <span>*</span></label>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="editBlogImage" class="form-input" style="flex: 1; min-width: 200px;" placeholder="Cover image URL or uploaded file" required>
+            <label for="editBlogImageFile" class="btn btn-secondary" style="margin: 0; padding: 0.55rem 1.1rem; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload from Device
+            </label>
+            <input type="file" id="editBlogImageFile" accept="image/*" style="display: none;">
+          </div>
+          <div id="editBlogImagePreview" style="margin-top: 0.6rem; display: none;">
+            <img id="editBlogImagePreviewImg" src="" alt="Preview" style="max-height: 80px; border-radius: 6px; border: 1px solid var(--border-light);">
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Article Summary / Excerpt <span>*</span></label>
+          <textarea id="editBlogExcerpt" class="form-textarea" style="min-height: 70px;" required></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Full Article Content (HTML allowed) <span>*</span></label>
+          <textarea id="editBlogContent" class="form-textarea" style="min-height: 140px;" required></textarea>
+        </div>
+        <div class="form-submit-wrapper full-width" style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" id="cancelModalEditBlog">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Update Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Certificate -->
+  <div class="admin-modal-overlay" id="modalEditCert">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title"><i class="fa-solid fa-certificate" style="color: var(--primary-blue);"></i> Edit Certificate</h3>
+        <button type="button" class="admin-modal-close" id="closeModalEditCert">&times;</button>
+      </div>
+      <form class="inquiry-form" id="formEditCert" style="grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+        <input type="hidden" id="editCertIndex">
+        <div class="form-group">
+          <label class="form-label">Certificate / Accreditation Name <span>*</span></label>
+          <input type="text" id="editCertTitle" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issuing Authority / Ministry <span>*</span></label>
+          <input type="text" id="editCertAuthority" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">License Type <span>*</span></label>
+          <input type="text" id="editCertLabel" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Registry Status <span>*</span></label>
+          <select id="editCertStatus" class="form-select" required>
+            <option value="Active &amp; Verified">Active &amp; Verified</option>
+            <option value="Valid &amp; Renewable">Valid &amp; Renewable</option>
+            <option value="Renewal in Progress">Renewal in Progress</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category Theme / Color <span>*</span></label>
+          <select id="editCertTheme" class="form-select" required>
+            <option value="blue">Government Trade Authority (Blue Stripe)</option>
+            <option value="red">Spices &amp; Agriculture Board (Red Stripe)</option>
+            <option value="gold">Food Safety &amp; Quality ISO (Gold Stripe)</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Certificate Image (URL or Upload from Device) <span>*</span></label>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="editCertImage" class="form-input" style="flex: 1; min-width: 200px;" placeholder="Certificate scan URL or uploaded file" required>
+            <label for="editCertImageFile" class="btn btn-secondary" style="margin: 0; padding: 0.55rem 1.1rem; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload from Device
+            </label>
+            <input type="file" id="editCertImageFile" accept="image/*" style="display: none;">
+          </div>
+          <div id="editCertImagePreview" style="margin-top: 0.6rem; display: none;">
+            <img id="editCertImagePreviewImg" src="" alt="Preview" style="max-height: 80px; border-radius: 6px; border: 1px solid var(--border-light);">
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Scope &amp; Compliance Description <span>*</span></label>
+          <textarea id="editCertDesc" class="form-textarea" style="min-height: 80px;" required></textarea>
+        </div>
+        <div class="form-submit-wrapper full-width" style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" id="cancelModalEditCert">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Update Certificate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    </main>
+  </div>
+
+  <!-- Floating Toast Messages Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Firebase Cloud Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Javascript Dashboard Logics -->
+  <script src="auto-blog-engine.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
