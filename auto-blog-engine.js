@@ -624,6 +624,38 @@
 </div>`;
       };
 
+      const autoLinkStatutorySources = (html, cfg) => {
+        let processed = html;
+        const autoLinkTerm = (text, regex, href, title = "") => {
+          const parts = text.split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi);
+          for (let i = 0; i < parts.length; i += 2) {
+            parts[i] = parts[i].replace(regex, (match) => {
+              return `<a href="${href}" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 500;" title="${title || match}">${match}</a>`;
+            });
+          }
+          return parts.join('');
+        };
+
+        processed = autoLinkTerm(processed, /\b(Spices Board of India|Spices Board)\b/g, 'https://www.indianspices.com', 'Spices Board of India (Official Portal)');
+        processed = autoLinkTerm(processed, /\b(DGCIS Kolkata|DGCIS|DGCI&S)\b/g, 'https://www.dgciskol.gov.in', 'DGCIS Kolkata (Ministry of Commerce)');
+        processed = autoLinkTerm(processed, /\b(NCDEX)\b/g, 'https://www.ncdex.com', 'NCDEX National Commodity Exchange');
+        processed = autoLinkTerm(processed, /\b(Nizamabad APMC|Nizamabad Mandi|Nizamabad\s+(?:and|\/)\s+Sangli APMC)\b/gi, 'https://tsmarketing.in', 'Telangana APMC Mandi Benchmark');
+        processed = autoLinkTerm(processed, /\b(Sangli APMC|Sangli Mandi)\b/gi, 'https://www.ncdex.com', 'Sangli APMC Spot Benchmark');
+        processed = autoLinkTerm(processed, /\b(Lasalgaon APMC|Lasalgaon Mandi|Lasalgaon)\b/gi, 'https://www.msamb.com', 'MSAMB Lasalgaon Onion Yard');
+        processed = autoLinkTerm(processed, /\b(Unjha APMC|Unjha Mandi|Unjha)\b/gi, 'https://gsamb.gujarat.gov.in', 'APMC Unjha Benchmark Yard');
+        processed = autoLinkTerm(processed, /\b(Guntur APMC|Guntur Yard)\b/gi, 'https://market.ap.nic.in', 'Guntur Chilli Market Yard');
+        processed = autoLinkTerm(processed, /\b(Sidhpur & Mehsana Belt|Sidhpur Mandi)\b/gi, 'https://gsamb.gujarat.gov.in', 'Gujarat APMC Sidhpur');
+        processed = autoLinkTerm(processed, /\b(APEDA AgriExchange|APEDA)\b/g, 'https://agriexchange.apeda.gov.in', 'APEDA Ministry of Commerce');
+        processed = autoLinkTerm(processed, /\b(NAFED)\b/g, 'https://www.nafed-india.com', 'NAFED National Agricultural Cooperative');
+        processed = autoLinkTerm(processed, /\b(Agmarknet)\b/g, 'https://agmarknet.gov.in', 'Agmarknet Ministry of Agriculture');
+        processed = autoLinkTerm(processed, /\b(Nhava Sheva \(JNPT\)|Nhava Sheva|JNPT)\b/g, 'https://www.jnport.gov.in', 'Jawaharlal Nehru Port Authority (JNPT)');
+        processed = autoLinkTerm(processed, /\b(Mundra Port)\b/g, 'https://www.adaniports.com/ports-and-terminals/mundra-port', 'Adani Ports Mundra');
+        processed = autoLinkTerm(processed, /\b(CBIC Customs|CBIC)\b/g, 'https://www.cbic.gov.in', 'CBIC Customs Tariff Portal');
+        processed = autoLinkTerm(processed, /\b(FSSAI)\b/g, 'https://www.fssai.gov.in', 'Food Safety and Standards Authority of India');
+
+        return processed;
+      };
+
       const config = rotationConfig[dayIndex] || rotationConfig[1];
       const dateFormatted = getFormattedDate(date);
       const isoDate = getISODateKey(date);
@@ -634,14 +666,30 @@
       }
 
       try {
+        const primaryUrl = (config.sourcesList && config.sourcesList[0]) ? config.sourcesList[0].url : 'https://www.indianspices.com';
+        const mandiUrl = (config.sourcesList && config.sourcesList[2]) ? config.sourcesList[2].url : ((config.sourcesList && config.sourcesList[1]) ? config.sourcesList[1].url : 'https://www.ncdex.com');
+
         const prompt = `Act as an independent, authoritative international agricultural trade and commodity research analyst. Write an objective, purely informational B2B Trade Intelligence Report for foreign buyers, food processors, commodity brokers, and agricultural importers.
 
-CRITICAL REQUIREMENT:
-- This blog post is strictly for factual industry information and educational trade intelligence.
-- Do NOT mention the company name "My Export World" anywhere in the title, body, headers, or text!
-- Keep the writing completely objective, professional, and third-person (refer to "Indian exporters", "the Indian agricultural sector", "commercial trade channels", "procurement teams").
+CRITICAL REQUIREMENTS:
+1. NO BRAND MENTIONS: This blog post is strictly for factual industry information and educational trade intelligence. Do NOT mention "My Export World" or any business/company name anywhere in the title, body, headers, or text! Keep the tone completely objective, professional, and third-person.
+2. INLINE SOURCE HYPERLINKS ON ALL STATUTORY DATA:
+   Every time you mention official statistics, shipment volumes, APMC mandi rates, HS codes, port hubs, or compliance guidelines in paragraphs and in the summary table, you MUST turn the data phrase or agency name into a direct clickable HTML link (<a href="..." target="_blank" rel="noopener noreferrer">...</a>) leading directly to its official source!
+   
+   Verified URLs to embed inline:
+   - Export Shipment Volumes & Primary Data (${config.source}): Link to "${primaryUrl}"
+   - APMC Mandi Benchmark Pricing & Price Discovery (${config.mandi}): Link to "${mandiUrl}"
+   - Customs Tariff (HS Code ${config.hsCode}): Link to "https://www.cbic.gov.in"
+   - Sea Gateways & Port Logistics: Link Nhava Sheva (JNPT) to "https://www.jnport.gov.in" and Mundra Port to "https://www.adaniports.com/ports-and-terminals/mundra-port"
+   
+   Examples of inline linking in text:
+   - "According to official data recorded by the <a href=\"${primaryUrl}\" target=\"_blank\" rel=\"noopener noreferrer\">Spices Board of India and DGCIS Kolkata</a>, aggregate monthly export shipment volumes have stabilized at ${config.volume}..."
+   - "Price discovery is anchored to <a href=\"${mandiUrl}\" target=\"_blank\" rel=\"noopener noreferrer\">${config.mandi}</a>, where spot transactions register benchmark valuations..."
+   - "Consignments are classified under customs tariff <a href=\"https://www.cbic.gov.in\" target=\"_blank\" rel=\"noopener noreferrer\">ITC-HS Code ${config.hsCode}</a>..."
+   
+   In the summary table: Include clickable source links in the parameter or detail cells so readers can click directly to verify!
 
-Use this EXACT official Indian Government data from ${config.source}:
+Official Data Payload:
 - Focus Commodity: ${config.commodity}
 - Tariff Classification (HS Code): ${config.hsCode}
 - Monthly Export Shipment Volume: ${config.volume}
@@ -652,8 +700,8 @@ Use this EXACT official Indian Government data from ${config.source}:
 - Date of Intelligence: ${dateFormatted}
 
 Instructions:
-1. Provide a professional, informational headline in an <h2> tag (e.g. "Indian Dried Turmeric: Export Trade Intelligence & Market Analysis"). Do NOT include "My Export World" in the title.
-2. Structure the body using clean HTML tags: <h3> subheadings, <p> explanatory paragraphs, <ul>/<li> lists, and an informative <table> summarizing export volume, HS code, benchmark price, and port routes.
+1. Provide a professional, informational headline in an <h2> tag (e.g. "Indian Dried Turmeric: Export Trade Intelligence & Sourcing Analysis"). Do NOT include any company name.
+2. Structure the body using clean HTML tags: <h3> subheadings, <p> explanatory paragraphs, <ul>/<li> lists, and an informative <table> summarizing export volume, HS code, benchmark price, and port routes (with clickable source links in the table cells).
 3. Include sections:
    - Executive Market Sourcing Summary
    - Official Mandi Price Discovery & Origin Supply Update
@@ -679,6 +727,9 @@ Instructions:
 
           // Ensure zero mentions of "My Export World" (pure informational tone)
           rawHtml = rawHtml.replace(/my\s*export\s*world\s*:?/gi, 'Indian export channels');
+
+          // Auto-link any unlinked statutory agencies and data terms
+          rawHtml = autoLinkStatutorySources(rawHtml, config);
 
           // Extract title from <h2> or <h1>
           let title = `${config.commodity} Export Market Intelligence & Pricing`;
