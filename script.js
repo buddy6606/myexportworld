@@ -1109,46 +1109,41 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const loadBlogPosts = () => {
+    const deleted = JSON.parse(localStorage.getItem('myexportworld_deleted_blogs') || '[]');
+
     // 1. Synchronous instant initialization (0ms render)
     try {
       const stored = localStorage.getItem('myexportworld_blog_posts');
       if (stored) {
-        blogPosts = ensureTodayPost(JSON.parse(stored));
+        blogPosts = ensureTodayPost(JSON.parse(stored).filter(p => !deleted.includes(p.id)));
       } else {
-        blogPosts = ensureTodayPost([...sampleBlogPosts]);
+        blogPosts = ensureTodayPost(sampleBlogPosts.filter(p => !deleted.includes(p.id)));
       }
     } catch (e) {
-      blogPosts = ensureTodayPost([...sampleBlogPosts]);
+      blogPosts = ensureTodayPost(sampleBlogPosts.filter(p => !deleted.includes(p.id)));
     }
 
     // Render grid immediately on load
     renderBlogFilters();
     renderBlogGrid('all');
 
-    // 2. Asynchronous Firestore background sync with safe merging
+    // 2. Asynchronous Firestore background sync
     if (db) {
       db.collection('blog_posts').onSnapshot(snapshot => {
+        const currentDeleted = JSON.parse(localStorage.getItem('myexportworld_deleted_blogs') || '[]');
         const postsMap = new Map();
-        // 1. Seed map with default sampleBlogPosts
-        sampleBlogPosts.forEach(sp => postsMap.set(sp.id, sp));
+        sampleBlogPosts.filter(p => !currentDeleted.includes(p.id)).forEach(sp => postsMap.set(sp.id, sp));
 
-        // 2. Overlay documents received from Firestore
         if (snapshot && !snapshot.empty) {
           snapshot.docs.forEach(doc => {
-            postsMap.set(doc.id, { id: doc.id, ...doc.data() });
+            if (!currentDeleted.includes(doc.id)) {
+              postsMap.set(doc.id, { id: doc.id, ...doc.data() });
+            }
           });
         }
 
-        // 3. Combine into final list with today's post guaranteed
         const mergedPosts = Array.from(postsMap.values());
         blogPosts = ensureTodayPost(mergedPosts);
-
-        // Seed missing sample posts into Firestore in background
-        if (!snapshot || snapshot.empty || snapshot.docs.length < sampleBlogPosts.length) {
-          sampleBlogPosts.forEach(sp => {
-            db.collection('blog_posts').doc(sp.id).set(sp).catch(() => {});
-          });
-        }
 
         try {
           localStorage.setItem('myexportworld_blog_posts', JSON.stringify(blogPosts));
@@ -1604,6 +1599,24 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Purity", value: "100% Pure Natural" },
         { name: "Moisture", value: "Max 10%" }
       ]
+    },
+
+    // --- 14. Fresh Vegetables ---
+    {
+      id: "prod_fresh_red_onion",
+      title: "Fresh Red Onion (Nashik Export Quality)",
+      hsCode: "07031019",
+      category: "vegetables",
+      badge: "A-Grade Export",
+      image: "images/onion.png",
+      description: "Premium export-grade fresh Indian red onions from Nashik & Mahuva regions, packed in ventilated mesh bags for extended shelf life. Phytosanitary & fumigation certified for global markets.",
+      specs: [
+        { name: "Origin", value: "Nashik / Mahuva, India" },
+        { name: "Size Grade", value: "45-65 mm / 55-75 mm / 75+ mm" },
+        { name: "Moisture", value: "Max 6-8%" },
+        { name: "Packing", value: "5 / 10 / 25 / 50 kg Mesh Bags" },
+        { name: "Season", value: "Year-round (Peak: Dec - May)" }
+      ]
     }
   ];
 
@@ -1612,16 +1625,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const productDropdown = document.getElementById('productSelected');
     if (!productDropdown) return;
 
-    productDropdown.innerHTML = '<option value="" disabled selected>-- Select a Commodity --</option>';
+    productDropdown.innerHTML = '<option value="" disabled selected>-- Select a Commodity or Product --</option>';
+
+    const spiceKeywords = ['spices', 'turmeric', 'cumin', 'chilli', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard', 'fennel', 'coriander', 'cinnamon', 'psyllium'];
 
     products.forEach(prod => {
       let match = false;
-      if (categoryFilter === 'all') {
+      const cat = (prod.category || '').toLowerCase();
+      const filter = (categoryFilter || 'all').toLowerCase();
+
+      if (filter === 'all') {
         match = true;
-      } else if (categoryFilter.toLowerCase() === 'spices') {
-        match = ['turmeric', 'cumin', 'chilli', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard', 'fennel', 'coriander', 'cinnamon'].includes(prod.category.toLowerCase());
+      } else if (filter === 'spices') {
+        match = spiceKeywords.includes(cat);
+      } else if (filter === 'vegetables') {
+        match = cat === 'vegetables';
       } else {
-        match = prod.category.toLowerCase() === categoryFilter.toLowerCase();
+        match = cat === filter;
       }
 
       if (match) {
@@ -1633,8 +1653,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const fallbackOpt = document.createElement('option');
-    fallbackOpt.value = "Other Agricultural Inquiry";
-    fallbackOpt.textContent = "Other / Bulk Spices Inquiry";
+    fallbackOpt.value = "Custom Product Sourcing / Other Inquiry";
+    fallbackOpt.textContent = "Custom Product Sourcing / Other Inquiry";
     productDropdown.appendChild(fallbackOpt);
   };
 
@@ -1643,33 +1663,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const productCategorySelect = document.getElementById('productCategory');
     if (!productCategorySelect) return;
 
-    const categories = new Set();
-    categories.add("Spices");
-    categories.add("Psyllium");
-
-    products.forEach(p => {
-      const cat = p.category;
-      if (cat && !['turmeric', 'cumin', 'chilli', 'psyllium', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard', 'fennel', 'coriander', 'cinnamon'].includes(cat.toLowerCase())) {
-        const formattedCat = cat.charAt(0).toUpperCase() + cat.slice(1);
-        categories.add(formattedCat);
-      }
-    });
-
-    productCategorySelect.innerHTML = '<option value="all">All Categories</option>';
-    categories.forEach(cat => {
-      const opt = document.createElement('option');
-      if (cat === "Spices") {
-        opt.value = "Spices";
-        opt.textContent = "Spices (All Spice Commodities)";
-      } else if (cat === "Psyllium") {
-        opt.value = "Psyllium";
-        opt.textContent = "Dietary Fiber (Psyllium)";
-      } else {
-        opt.value = cat;
-        opt.textContent = cat;
-      }
-      productCategorySelect.appendChild(opt);
-    });
+    productCategorySelect.innerHTML = `
+      <option value="all">All Categories &amp; Export Divisions</option>
+      <option value="spices">Spices, Seasonings &amp; Herbs</option>
+      <option value="vegetables">Fresh Vegetables</option>
+      <option value="custom">Bespoke Contract Sourcing / Other</option>
+    `;
   };
 
   // Filter products when category changes
@@ -1696,6 +1695,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridFennel = document.getElementById('gridFennel');
     const gridCoriander = document.getElementById('gridCoriander');
     const gridCinnamon = document.getElementById('gridCinnamon');
+    const gridVegetables = document.getElementById('gridVegetables');
 
     if (!gridsWrapper) return;
 
@@ -1712,27 +1712,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gridFennel) gridFennel.innerHTML = '';
     if (gridCoriander) gridCoriander.innerHTML = '';
     if (gridCinnamon) gridCinnamon.innerHTML = '';
+    if (gridVegetables) gridVegetables.innerHTML = '';
 
     // Remove any previously generated custom category sections
     document.querySelectorAll('.commodity-section-custom').forEach(el => el.remove());
 
+    const getProdIcon = (prod) => {
+      if (prod.icon && prod.icon.trim()) return prod.icon.trim();
+      const cat = (prod.category || '').toLowerCase();
+      if (cat.includes('chilli') || cat.includes('pepper_hot')) return 'fa-solid fa-pepper-hot';
+      if (cat.includes('onion') || cat.includes('vegetable')) return 'fa-solid fa-carrot';
+      if (cat.includes('cumin') || cat.includes('fennel') || cat.includes('coriander') || cat.includes('mustard') || cat.includes('ajwain')) return 'fa-solid fa-seedling';
+      if (cat.includes('psyllium')) return 'fa-solid fa-spa';
+      return 'fa-solid fa-leaf';
+    };
+
     products.forEach(prod => {
       const card = document.createElement('div');
       card.className = 'product-card';
-
-      let specRowsHTML = '';
-      if (prod.specs && Array.isArray(prod.specs)) {
-        prod.specs.forEach(spec => {
-          if (spec.name && spec.value) {
-            specRowsHTML += `
-              <li class="spec-row">
-                <span class="spec-name">${escapeHTML(spec.name)}</span>
-                <span class="spec-value">${escapeHTML(spec.value)}</span>
-              </li>
-            `;
-          }
-        });
-      }
 
       card.innerHTML = `
         <div class="product-img-wrapper">
@@ -1740,12 +1737,14 @@ document.addEventListener('DOMContentLoaded', () => {
           ${prod.badge ? `<span class="product-badge">${escapeHTML(prod.badge)}</span>` : ''}
         </div>
         <div class="product-info">
-          <span class="hs-code-tag">HS CODE: ${escapeHTML(prod.hsCode)}</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.8rem;">
+            <span class="hs-code-tag" style="margin-bottom: 0;">HS CODE: ${escapeHTML(prod.hsCode)}</span>
+            <span class="product-icon-pill" title="${escapeHTML(prod.categoryName || 'Commodity Logo')}">
+              <i class="${escapeHTML(getProdIcon(prod))}"></i>
+            </span>
+          </div>
           <h3 class="product-title">${escapeHTML(prod.title)}</h3>
           <p class="product-desc">${escapeHTML(prod.description)}</p>
-          <ul class="product-specs">
-            ${specRowsHTML}
-          </ul>
           <div class="product-actions">
             <button class="btn btn-primary quick-inquire-btn" data-product="${escapeHTML(prod.title)} (${escapeHTML(prod.hsCode)})" aria-label="Inquire now from ${escapeHTML(prod.title)} supplier and exporter">Inquire Now</button>
           </div>
@@ -1779,19 +1778,25 @@ document.addEventListener('DOMContentLoaded', () => {
         gridCoriander.appendChild(card);
       } else if (cat === 'cinnamon' && gridCinnamon) {
         gridCinnamon.appendChild(card);
+      } else if ((cat === 'vegetables' || cat === 'onion' || cat === 'white_onion' || prod.commodity === 'vegetables') && gridVegetables) {
+        gridVegetables.appendChild(card);
       } else {
-        // Render Custom Commodity Group Grid
+        // Fallback for any custom dynamic categories
         const categoryId = `section_custom_${cat.replace(/[^a-z0-9]/g, '_')}`;
         let customSection = document.getElementById(categoryId);
         if (!customSection) {
           customSection = document.createElement('div');
           customSection.className = 'commodity-section commodity-section-custom';
           customSection.id = categoryId;
-
-          const catTitle = prod.category.charAt(0).toUpperCase() + prod.category.slice(1);
+          const catHeading = prod.categoryName || (prod.category.charAt(0).toUpperCase() + prod.category.slice(1));
+          const firstWord = prod.title ? prod.title.trim().split(/\s+/)[0].toUpperCase() : catHeading.split(' ')[0].toUpperCase();
+          const autoCatBadge = prod.badge && prod.badge.endsWith('EXPORTER FROM INDIA') ? prod.badge : `${firstWord} EXPORTER FROM INDIA`;
           customSection.innerHTML = `
-            <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
-              <i class="fa-solid fa-cubes-stacked" style="color: var(--accent-yellow);"></i> ${escapeHTML(catTitle)}
+            <h3 class="commodity-section-title" style="font-size: 2rem; color: var(--primary-blue-dark); margin-bottom: 1.5rem; font-weight: 800; border-bottom: 2px solid rgba(214, 28, 44, 0.1); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+              <i class="${escapeHTML(getProdIcon(prod))}" style="color: #16a34a;"></i> ${escapeHTML(catHeading)}
+              <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; background: #fffbeb; padding: 0.35rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid #fef3c7; color: #d97706; margin-left: auto; letter-spacing: 0.5px;">
+                ${escapeHTML(autoCatBadge)}
+              </span>
             </h3>
             <div class="sub-products-grid" id="grid_${categoryId}"></div>
           `;
@@ -1828,58 +1833,46 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gridFennel) checkEmptyGrid(gridFennel);
     if (gridCoriander) checkEmptyGrid(gridCoriander);
     if (gridCinnamon) checkEmptyGrid(gridCinnamon);
+    if (gridVegetables) checkEmptyGrid(gridVegetables);
   };
 
   const loadProducts = () => {
-    // 1. Synchronous instant initialization with force update key check
+    const deleted = JSON.parse(localStorage.getItem('myexportworld_deleted_products') || '[]');
+
+    // 1. Synchronous instant initialization
     try {
-      const stored = localStorage.getItem('myexportworld_products_v5');
+      const stored = localStorage.getItem('myexportworld_products_v17');
       if (stored) {
-        products = JSON.parse(stored);
+        products = JSON.parse(stored).filter(p => !deleted.includes(p.id));
       } else {
-        products = [...sampleProducts];
-        localStorage.setItem('myexportworld_products_v5', JSON.stringify(products));
+        products = sampleProducts.filter(p => !deleted.includes(p.id));
+        localStorage.setItem('myexportworld_products_v17', JSON.stringify(products));
       }
     } catch (e) {
-      products = [...sampleProducts];
-    }
-
-    // Double check if products contains Fresh Turmeric or lacks new items
-    if (products.some(p => p.id === 'prod_turmeric_fresh') || !products.some(p => p.id === 'prod_clove_whole')) {
-      products = [...sampleProducts];
-      try {
-        localStorage.setItem('myexportworld_products_v5', JSON.stringify(products));
-      } catch (e) {}
+      products = sampleProducts.filter(p => !deleted.includes(p.id));
     }
 
     renderPublicProducts();
     populateProductDropdown();
     populateProductCategorySelect();
 
-    // 2. Asynchronous Firestore background sync with safe map merge
+    // 2. Asynchronous Firestore background sync
     if (db) {
       db.collection('products').onSnapshot(snapshot => {
         let remoteProducts = [];
         if (!snapshot.empty) {
-          remoteProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(p => p.id !== 'prod_turmeric_fresh');
+          remoteProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
 
-        // Merge sampleProducts with remote products so default commodities are NEVER deleted
+        const currentDeleted = JSON.parse(localStorage.getItem('myexportworld_deleted_products') || '[]');
         const productMap = new Map();
-        sampleProducts.forEach(p => productMap.set(p.id, p));
-        remoteProducts.forEach(p => productMap.set(p.id, p));
+        sampleProducts.filter(p => !currentDeleted.includes(p.id)).forEach(p => productMap.set(p.id, p));
+        remoteProducts.filter(p => !currentDeleted.includes(p.id)).forEach(p => productMap.set(p.id, p));
 
         products = Array.from(productMap.values());
 
-        // Sync any missing sample products to Firestore doc collection
-        if (remoteProducts.length < sampleProducts.length) {
-          sampleProducts.forEach(p => {
-            db.collection('products').doc(p.id).set(p).catch(() => {});
-          });
-        }
-
         try {
-          localStorage.setItem('myexportworld_products_v5', JSON.stringify(products));
+          localStorage.setItem('myexportworld_products_v17', JSON.stringify(products));
         } catch (e) {}
         renderPublicProducts();
         populateProductDropdown();
@@ -1910,6 +1903,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (l2) l2.classList.add('hidden');
     if (l3) l3.classList.add('hidden');
 
+    const heroTitle = document.getElementById('catalogHeroTitle');
+    if (heroTitle) heroTitle.textContent = "Agricultural Commodities";
+
     // Reset breadcrumbs
     const breadHome = document.getElementById('breadHome');
     const breadCategory = document.getElementById('breadCategory');
@@ -1918,8 +1914,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (breadHome) breadHome.classList.add('active');
     if (breadCategory) {
+      breadCategory.textContent = "Export Divisions";
       breadCategory.classList.remove('active');
-      breadCategory.classList.add('hidden');
+      breadCategory.classList.remove('hidden');
     }
     if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
     if (breadCommodity) breadCommodity.classList.add('hidden');
@@ -1941,7 +1938,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Breadcrumbs: Catalog > Spices
     if (breadHome) breadHome.classList.remove('active');
     if (breadCategory) {
-      breadCategory.textContent = "Spices";
+      breadCategory.textContent = "Spices & Herbs";
       breadCategory.classList.remove('hidden');
       breadCategory.classList.add('active');
     }
@@ -1950,7 +1947,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const categoryTitleMap = {
-    'all': 'All Commodities',
+    'all': 'All Commodities & Divisions',
+    'spices': 'Spices, Seasonings & Herbs',
+    'vegetables': 'Fresh Vegetables',
+    'onion': 'Fresh Red Onion',
     'turmeric': 'Turmeric (Haldi)',
     'psyllium': 'Psyllium Husk (Isabgol)',
     'cumin': 'Cumin Seeds & Powder',
@@ -1975,94 +1975,168 @@ document.addEventListener('DOMContentLoaded', () => {
     if (l3) l3.classList.remove('hidden');
 
     const catLower = (filterCategory || 'all').toLowerCase();
+    const spiceList = ['turmeric', 'psyllium', 'cumin', 'chilli', 'cardamom', 'black_pepper', 'ajwain', 'curry_leaves', 'clove', 'mustard', 'fennel', 'coriander', 'cinnamon'];
+    const isVegetable = (catLower === 'vegetables' || catLower === 'onion');
 
+    const heroTitle = document.getElementById('catalogHeroTitle');
     const breadHome = document.getElementById('breadHome');
     const breadCategory = document.getElementById('breadCategory');
     const breadCommoditySep = document.getElementById('breadCommoditySep');
     const breadCommodity = document.getElementById('breadCommodity');
 
-    // Breadcrumbs
+    // Breadcrumbs & Hero Title
     if (breadHome) breadHome.classList.remove('active');
-    if (breadCategory) {
-      breadCategory.textContent = "Spices";
-      breadCategory.classList.remove('hidden');
-      if (catLower === 'all') {
-        breadCategory.classList.add('active');
-        if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
-        if (breadCommodity) breadCommodity.classList.add('hidden');
-      } else {
-        breadCategory.classList.remove('active');
-        if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
-        if (breadCommodity) {
-          breadCommodity.textContent = categoryTitleMap[catLower] || (catLower.charAt(0).toUpperCase() + catLower.slice(1));
-          breadCommodity.classList.remove('hidden');
-          breadCommodity.classList.add('active');
+    if (isVegetable) {
+      if (heroTitle) heroTitle.textContent = "Fresh Vegetables";
+      if (breadCategory) {
+        breadCategory.textContent = "Fresh Vegetables";
+        breadCategory.classList.remove('hidden');
+        if (catLower === 'vegetables') {
+          breadCategory.classList.add('active');
+          if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
+          if (breadCommodity) breadCommodity.classList.add('hidden');
+        } else {
+          breadCategory.classList.remove('active');
+          if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+          if (breadCommodity) {
+            breadCommodity.textContent = categoryTitleMap[catLower] || "Fresh Red Onion";
+            breadCommodity.classList.remove('hidden');
+            breadCommodity.classList.add('active');
+          }
+        }
+      }
+    } else {
+      if (heroTitle) heroTitle.textContent = "Agricultural Commodities";
+      if (breadCategory) {
+        breadCategory.textContent = "Spices";
+        breadCategory.classList.remove('hidden');
+        if (catLower === 'all' || catLower === 'spices') {
+          breadCategory.classList.add('active');
+          if (breadCommoditySep) breadCommoditySep.classList.add('hidden');
+          if (breadCommodity) breadCommodity.classList.add('hidden');
+        } else if (spiceList.includes(catLower)) {
+          breadCategory.classList.remove('active');
+          if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+          if (breadCommodity) {
+            breadCommodity.textContent = categoryTitleMap[catLower] || (catLower.charAt(0).toUpperCase() + catLower.slice(1));
+            breadCommodity.classList.remove('hidden');
+            breadCommodity.classList.add('active');
+          }
+        } else {
+          breadCategory.classList.remove('active');
+          if (breadCommoditySep) breadCommoditySep.classList.remove('hidden');
+          if (breadCommodity) {
+            breadCommodity.textContent = categoryTitleMap[catLower] || (catLower.charAt(0).toUpperCase() + catLower.slice(1));
+            breadCommodity.classList.remove('hidden');
+            breadCommodity.classList.add('active');
+          }
         }
       }
     }
 
-    // Update filter tab active state
-    document.querySelectorAll('.filter-tab-btn').forEach(btn => {
-      if (btn.getAttribute('data-category') === catLower) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
+    // Toggle filter bars based on division (Spices vs Vegetables)
+    const tabsSpices = document.getElementById('catalogFilterTabsSpices');
+    const tabsVegetables = document.getElementById('catalogFilterTabsVegetables');
+
+    if (isVegetable) {
+      if (tabsSpices) {
+        tabsSpices.style.setProperty('display', 'none', 'important');
+        tabsSpices.classList.add('hidden');
       }
-    });
-
-    // Toggle Visibility of Sections
-    const sectionTurmeric = document.getElementById('sectionTurmeric');
-    const sectionPsyllium = document.getElementById('sectionPsyllium');
-    const sectionCumin = document.getElementById('sectionCumin');
-    const sectionChilli = document.getElementById('sectionChilli');
-    const sectionCardamom = document.getElementById('sectionCardamom');
-    const sectionBlackPepper = document.getElementById('sectionBlackPepper');
-    const sectionAjwain = document.getElementById('sectionAjwain');
-    const sectionCurryLeaves = document.getElementById('sectionCurryLeaves');
-    const sectionClove = document.getElementById('sectionClove');
-    const sectionMustard = document.getElementById('sectionMustard');
-    const sectionFennel = document.getElementById('sectionFennel');
-    const sectionCoriander = document.getElementById('sectionCoriander');
-    const sectionCinnamon = document.getElementById('sectionCinnamon');
-    const customSections = document.querySelectorAll('.commodity-section-custom');
-
-    if (catLower === 'all') {
-      if (sectionTurmeric) sectionTurmeric.classList.remove('hidden');
-      if (sectionPsyllium) sectionPsyllium.classList.remove('hidden');
-      if (sectionCumin) sectionCumin.classList.remove('hidden');
-      if (sectionChilli) sectionChilli.classList.remove('hidden');
-      if (sectionCardamom) sectionCardamom.classList.remove('hidden');
-      if (sectionBlackPepper) sectionBlackPepper.classList.remove('hidden');
-      if (sectionAjwain) sectionAjwain.classList.remove('hidden');
-      if (sectionCurryLeaves) sectionCurryLeaves.classList.remove('hidden');
-      if (sectionClove) sectionClove.classList.remove('hidden');
-      if (sectionMustard) sectionMustard.classList.remove('hidden');
-      if (sectionFennel) sectionFennel.classList.remove('hidden');
-      if (sectionCoriander) sectionCoriander.classList.remove('hidden');
-      if (sectionCinnamon) sectionCinnamon.classList.remove('hidden');
-      customSections.forEach(sec => sec.classList.remove('hidden'));
+      if (tabsVegetables) {
+        tabsVegetables.style.setProperty('display', 'flex', 'important');
+        tabsVegetables.classList.remove('hidden');
+      }
+      // Set active button in vegetables bar
+      document.querySelectorAll('#catalogFilterTabsVegetables .filter-tab-btn').forEach(btn => {
+        const btnCat = btn.getAttribute('data-category');
+        if (btnCat === catLower) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     } else {
-      if (sectionTurmeric) sectionTurmeric.classList.toggle('hidden', catLower !== 'turmeric');
-      if (sectionPsyllium) sectionPsyllium.classList.toggle('hidden', catLower !== 'psyllium');
-      if (sectionCumin) sectionCumin.classList.toggle('hidden', catLower !== 'cumin');
-      if (sectionChilli) sectionChilli.classList.toggle('hidden', catLower !== 'chilli');
-      if (sectionCardamom) sectionCardamom.classList.toggle('hidden', catLower !== 'cardamom');
-      if (sectionBlackPepper) sectionBlackPepper.classList.toggle('hidden', catLower !== 'black_pepper');
-      if (sectionAjwain) sectionAjwain.classList.toggle('hidden', catLower !== 'ajwain');
-      if (sectionCurryLeaves) sectionCurryLeaves.classList.toggle('hidden', catLower !== 'curry_leaves');
-      if (sectionClove) sectionClove.classList.toggle('hidden', catLower !== 'clove');
-      if (sectionMustard) sectionMustard.classList.toggle('hidden', catLower !== 'mustard');
-      if (sectionFennel) sectionFennel.classList.toggle('hidden', catLower !== 'fennel');
-      if (sectionCoriander) sectionCoriander.classList.toggle('hidden', catLower !== 'coriander');
-      if (sectionCinnamon) sectionCinnamon.classList.toggle('hidden', catLower !== 'cinnamon');
-      customSections.forEach(sec => {
+      if (tabsSpices) {
+        tabsSpices.style.setProperty('display', 'flex', 'important');
+        tabsSpices.classList.remove('hidden');
+      }
+      if (tabsVegetables) {
+        tabsVegetables.style.setProperty('display', 'none', 'important');
+        tabsVegetables.classList.add('hidden');
+      }
+      // Set active button in spices bar
+      document.querySelectorAll('#catalogFilterTabsSpices .filter-tab-btn').forEach(btn => {
+        const btnCat = btn.getAttribute('data-category');
+        if (btnCat === catLower || (catLower === 'spices' && btnCat === 'all')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // Complete mapping of all commodity sections
+    const allSections = [
+      { id: 'sectionTurmeric', cat: 'turmeric' },
+      { id: 'sectionPsyllium', cat: 'psyllium' },
+      { id: 'sectionCumin', cat: 'cumin' },
+      { id: 'sectionChilli', cat: 'chilli' },
+      { id: 'sectionCardamom', cat: 'cardamom' },
+      { id: 'sectionBlackPepper', cat: 'black_pepper' },
+      { id: 'sectionAjwain', cat: 'ajwain' },
+      { id: 'sectionCurryLeaves', cat: 'curry_leaves' },
+      { id: 'sectionClove', cat: 'clove' },
+      { id: 'sectionMustard', cat: 'mustard' },
+      { id: 'sectionFennel', cat: 'fennel' },
+      { id: 'sectionCoriander', cat: 'coriander' },
+      { id: 'sectionCinnamon', cat: 'cinnamon' },
+      { id: 'sectionVegetables', cat: 'vegetables' }
+    ];
+
+    if (isVegetable) {
+      // In Fresh Vegetables: strictly show sectionVegetables and hide all 13 spice sections
+      allSections.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el) {
+          if (s.cat === 'vegetables') {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+      document.querySelectorAll('.commodity-section-custom').forEach(sec => sec.classList.add('hidden'));
+    } else if (catLower === 'all' || catLower === 'spices') {
+      // In Spices Commodities: Show all 13 spice sections, strictly hide vegetables
+      allSections.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el) {
+          if (s.cat === 'vegetables') {
+            el.classList.add('hidden');
+          } else {
+            el.classList.remove('hidden');
+          }
+        }
+      });
+      document.querySelectorAll('.commodity-section-custom').forEach(sec => sec.classList.add('hidden'));
+    } else {
+      // Show ONLY the selected spice category, hide everything else!
+      allSections.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el) {
+          if (s.cat === catLower) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+      document.querySelectorAll('.commodity-section-custom').forEach(sec => {
         const customCat = sec.id.replace('section_custom_', '');
         sec.classList.toggle('hidden', customCat !== catLower);
       });
     }
-
-    // Render active products dynamically
-    renderPublicProducts();
   };
 
   window.navigateToLevel3 = navigateToLevel3;
@@ -2070,11 +2144,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.navigateToLevel1 = navigateToLevel1;
 
   // Event bindings
-  // Level 1 Card/Action clicks -> Directly open list of products (Level 3)
+  // Level 1 Card/Action clicks -> Navigate to Level 2 (Spices) or Level 3 (Division)
   const btnExploreAgri = document.getElementById('btnExploreAgri');
   const categoryCardAgri = document.getElementById('categoryCardAgri');
 
-  const handleBrowseCommoditiesClick = (e) => {
+  const handleSpicesDivisionClick = (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -2085,11 +2159,29 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   if (btnExploreAgri) {
-    btnExploreAgri.addEventListener('click', handleBrowseCommoditiesClick);
+    btnExploreAgri.addEventListener('click', handleSpicesDivisionClick);
   }
   if (categoryCardAgri) {
-    categoryCardAgri.addEventListener('click', handleBrowseCommoditiesClick);
+    categoryCardAgri.addEventListener('click', handleSpicesDivisionClick);
   }
+
+  const bindDivisionClick = (btnId, cardId, category) => {
+    const btn = document.getElementById(btnId);
+    const card = document.getElementById(cardId);
+    const handler = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      navigateToLevel3(category);
+      window.location.hash = category;
+      document.getElementById('catalogLevel3')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    if (btn) btn.addEventListener('click', handler);
+    if (card) card.addEventListener('click', handler);
+  };
+
+  bindDivisionClick('btnExploreVegetables', 'categoryCardVegetables', 'vegetables');
 
   // Level 2 Spotlight Cards / Action clicks -> Navigate to Level 3 filtered by commodity
   const bindSpotlightClick = (btnId, cardId, categoryHash) => {
@@ -2145,6 +2237,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cat = btn.getAttribute('data-category');
       navigateToLevel3(cat);
       window.location.hash = cat === 'all' ? 'product-details' : cat;
+      document.getElementById('catalogLevel3')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 
@@ -2172,8 +2265,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!level1) return;
     
     const hash = (window.location.hash || '').toLowerCase();
-    if (hash === '#spices') {
-      navigateToLevel2();
+    if (hash === '#spices' || hash === '#product-details' || hash === '#all') {
+      navigateToLevel3('all');
+    } else if (hash === '#vegetables' || hash === '#fresh-vegetables') {
+      navigateToLevel3('vegetables');
+    } else if (hash === '#onion' || hash === '#red-onion') {
+      navigateToLevel3('onion');
     } else if (hash === '#turmeric') {
       navigateToLevel3('turmeric');
     } else if (hash === '#psyllium') {
@@ -2492,6 +2589,61 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!statsAnimated) triggerStatsAnimation();
     }, 600);
   }
+
+  // --- Dynamic Certificates Loader ---
+  const loadPublicCertificates = () => {
+    const container = document.getElementById('certificatesContainer');
+    if (!container) return;
+
+    const deleted = JSON.parse(localStorage.getItem('myexportworld_deleted_certs') || '[]');
+    let certs = [];
+    try {
+      const stored = localStorage.getItem('myexportworld_certificates');
+      if (stored) {
+        certs = JSON.parse(stored).filter(c => !deleted.includes(c.id));
+      }
+    } catch (e) {
+      certs = [];
+    }
+
+    if (!certs || certs.length === 0) return;
+
+    container.innerHTML = certs.map(c => `
+      <div class="cert-card">
+        <div class="cert-top-stripe ${escapeHTML(c.theme || 'blue')}"></div>
+        ${c.image ? `
+          <div style="padding: 1.25rem 1.5rem 0 1.5rem; text-align: center;">
+            <img src="${escapeHTML(c.image)}" alt="${escapeHTML(c.title)}" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: #fff;" onerror="this.style.display='none';">
+          </div>
+        ` : ''}
+        <div class="cert-body">
+          <div class="cert-icon-wrapper flex-center ${escapeHTML(c.theme || 'blue')}">
+            <i class="${escapeHTML(c.icon || 'fa-solid fa-certificate')}"></i>
+          </div>
+          <div class="cert-content">
+            <span class="cert-authority">${escapeHTML(c.authority || 'Govt. Recognized')}</span>
+            <h3 class="cert-title">${escapeHTML(c.title)}</h3>
+            <p class="cert-desc">${escapeHTML(c.desc)}</p>
+            <div class="cert-meta">
+              <span class="cert-label">License Type</span>
+              <span class="cert-value">${escapeHTML(c.label || 'Certified')}</span>
+            </div>
+            <div class="cert-meta">
+              <span class="cert-label">Registry Status</span>
+              <span class="cert-value active"><span class="status-dot"></span> Active &amp; Verified</span>
+            </div>
+          </div>
+        </div>
+        <div class="cert-footer">
+          <button class="btn btn-cert" onclick="${c.image ? `window.open('${escapeHTML(c.image)}', '_blank')` : `alert('${escapeHTML(c.title)}: Verified export compliance registration.')`}">
+            <i class="fa-regular fa-file-pdf"></i> View Certificate
+          </button>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  loadPublicCertificates();
 
   // Prevent leaving the site directly without confirmation ONLY if form is dirty
   window.addEventListener('beforeunload', (e) => {
