@@ -1,45 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.myexportworld.com/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/logo.png</image:loc>
+      <image:title>MY EXPORT WORLD - Premier Spices &amp; Agricultural Commodities Exporter India</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.myexportworld.com/products</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/turmeric_finger.jpg</image:loc>
+      <image:title>Dried Turmeric Finger &amp; Powder (Curcuma Longa) Export Grade</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/onion.png</image:loc>
+      <image:title>Fresh Red Onions (Nashik &amp; Lasalgaon Grade 45mm+ / 55mm+)</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/cumin_seeds.png</image:loc>
+      <image:title>Machine Cleaned Cumin Seeds (Jeera) 99.5% Sortex</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/chilli_whole.png</image:loc>
+      <image:title>Guntur S17 Teja Dry Red Chilli Whole Stemless</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/psyllium_husk.png</image:loc>
+      <image:title>Psyllium Husk (Isabgol) 99% &amp; 98% Purity</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.myexportworld.com/images/fennel_seeds.png</image:loc>
+      <image:title>Fennel Seeds (Saunf) Machine Cleaned Green Bold</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.myexportworld.com/blog</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
   </url>
   <url>
     <loc>https://www.myexportworld.com/certificates</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.myexportworld.com/inquiry</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.myexportworld.com/about</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://www.myexportworld.com/contact</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://www.myexportworld.com/blog</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.90</priority>
-  </url>
-  <url>
-    <loc>https://www.myexportworld.com/inquiry</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
   </url>
 </urlset>
