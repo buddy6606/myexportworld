@@ -857,3 +857,44 @@ body.admin-body {
     font-size: 1.5rem;
   }
 }
+
+/* Distinct Verified Source & Reference Hyperlinks */
+.blog-article-content a,
+.gov-source-pill,
+.modal-body a,
+#modalViewBlogContent a {
+  color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.08);
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  border-bottom: 2px solid #0284c7;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.35;
+  transition: all 0.2s ease-in-out;
+}
+
+.blog-article-content a::after,
+.gov-source-pill::after,
+.modal-body a::after,
+#modalViewBlogContent a::after {
+  content: " \2197"; /* Visible external arrow icon ↗ */
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #0284c7;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.blog-article-content a:hover,
+.gov-source-pill:hover,
+.modal-body a:hover,
+#modalViewBlogContent a:hover {
+  background: rgba(2, 132, 199, 0.18);
+  color: #0369a1 !important;
+  border-bottom-color: #0369a1;
+  transform: translateY(-1px);
+}

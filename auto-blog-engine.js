@@ -630,13 +630,13 @@
           const parts = text.split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi);
           for (let i = 0; i < parts.length; i += 2) {
             parts[i] = parts[i].replace(regex, (match) => {
-              return `<a href="${href}" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 500;" title="${title || match}">${match}</a>`;
+              return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="gov-source-link" style="color: #0284c7; font-weight: 600; text-decoration: underline; background: rgba(2, 132, 199, 0.08); padding: 1px 5px; border-radius: 4px; border-bottom: 2px solid #0284c7;" title="${title || match}">${match} &#x2197;</a>`;
             });
           }
           return parts.join('');
         };
 
-        processed = autoLinkTerm(processed, /\b(Spices Board of India|Spices Board)\b/g, 'https://www.indianspices.com', 'Spices Board of India (Official Portal)');
+        processed = autoLinkTerm(processed, /\b(Spices Board of India and DGCIS Kolkata|Spices Board of India|Spices Board)\b/g, 'https://www.indianspices.com', 'Spices Board of India (Official Portal)');
         processed = autoLinkTerm(processed, /\b(DGCIS Kolkata|DGCIS|DGCI&S)\b/g, 'https://www.dgciskol.gov.in', 'DGCIS Kolkata (Ministry of Commerce)');
         processed = autoLinkTerm(processed, /\b(NCDEX)\b/g, 'https://www.ncdex.com', 'NCDEX National Commodity Exchange');
         processed = autoLinkTerm(processed, /\b(Nizamabad APMC|Nizamabad Mandi|Nizamabad\s+(?:and|\/)\s+Sangli APMC)\b/gi, 'https://tsmarketing.in', 'Telangana APMC Mandi Benchmark');
@@ -652,6 +652,19 @@
         processed = autoLinkTerm(processed, /\b(Mundra Port)\b/g, 'https://www.adaniports.com/ports-and-terminals/mundra-port', 'Adani Ports Mundra');
         processed = autoLinkTerm(processed, /\b(CBIC Customs|CBIC)\b/g, 'https://www.cbic.gov.in', 'CBIC Customs Tariff Portal');
         processed = autoLinkTerm(processed, /\b(FSSAI)\b/g, 'https://www.fssai.gov.in', 'Food Safety and Standards Authority of India');
+
+        // Style all existing <a> tags so they visually pop out as links with the ↗ icon
+        processed = processed.replace(/<a\s+([^>]*?)>([\s\S]*?)<\/a>/gi, (match, attrs, text) => {
+          if (text.includes('&#x2197;') || text.includes('↗')) return match;
+          let newAttrs = attrs;
+          if (!newAttrs.includes('style=')) {
+            newAttrs += ' style="color: #0284c7; font-weight: 600; text-decoration: underline; background: rgba(2, 132, 199, 0.08); padding: 1px 5px; border-radius: 4px; border-bottom: 2px solid #0284c7;"';
+          }
+          if (!newAttrs.includes('class=')) {
+            newAttrs += ' class="gov-source-link"';
+          }
+          return `<a ${newAttrs}>${text} &#x2197;</a>`;
+        });
 
         return processed;
       };
