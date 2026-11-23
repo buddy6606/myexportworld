@@ -37,12 +37,15 @@ async function runDailyPublish() {
         postsArchive = JSON.parse(fs.readFileSync(archivePath, 'utf8'));
       } catch(e) { postsArchive = []; }
     }
-    // Prepend if not already present
-    if (!postsArchive.some(p => p.id === post.id)) {
+    // Update existing or prepend new
+    const existingIdx = postsArchive.findIndex(p => p && p.id === post.id);
+    if (existingIdx >= 0) {
+      postsArchive[existingIdx] = post;
+    } else {
       postsArchive.unshift(post);
-      fs.writeFileSync(archivePath, JSON.stringify(postsArchive, null, 2), 'utf8');
-      console.log(`SUCCESS: Appended to repository archive: ${archivePath}`);
     }
+    fs.writeFileSync(archivePath, JSON.stringify(postsArchive, null, 2), 'utf8');
+    console.log(`SUCCESS: Updated repository archive: ${archivePath}`);
   } catch(e) {
     console.warn("Could not save to local archive:", e.message);
   }

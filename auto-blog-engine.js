@@ -102,7 +102,7 @@
         <p>As of <strong>${dateStr}</strong>, global demand for high-curcumin Indian Turmeric (<em>Curcuma longa</em>) continues to surge across pharmaceutical, nutraceutical, and bulk food processing sectors. To successfully navigate international customs clearance in the European Union (EFSA) and North America (FDA), global importers must verify that bulk consignments adhere to official <strong>Spices Board of India</strong> quality parameters.</p>
         
         <h3>Official Spices Board Quality Benchmarks</h3>
-        <p>Sourcing from an authorized Indian exporter like <strong>MY EXPORT WORLD</strong> guarantees adherence to the statutory grade specifications established under the Indian Export Quality Control and Inspection Act:</p>
+        <p>Sourcing from authorized Indian spice export channels guarantees adherence to statutory grade specifications established under the Indian Export Quality Control and Inspection Act:</p>
         
         <table>
           <thead>
@@ -204,7 +204,7 @@
         </table>
 
         <h3>Biosecurity & Heavy Metal Laboratory Testing</h3>
-        <p>At <strong>MY EXPORT WORLD</strong>, every Psyllium Husk export consignment is tested under strict ISO 17025 laboratory protocols to guarantee compliance:</p>
+        <p>In standard certified export trade, every Psyllium Husk consignment is tested under strict ISO 17025 laboratory protocols to guarantee compliance:</p>
         <ul>
           <li><strong>Heavy Metals Screening:</strong> ICP-MS testing verifying Lead (&lt; 1.0 ppm), Arsenic (&lt; 1.0 ppm), and Cadmium (&lt; 0.5 ppm).</li>
           <li><strong>Microbiological Safety:</strong> Certified 100% negative for <em>Salmonella</em> and <em>E. coli</em> per 25-gram sample.</li>
@@ -263,8 +263,8 @@
         <h3>FOB Nhava Sheva vs. CIF Destination Port Incoterms</h3>
         <p>Understanding ownership hand-off points protects buyers from unexpected landed cost inflation:</p>
         <ul>
-          <li><strong>FOB (Free On Board - Nhava Sheva / Mundra):</strong> MY EXPORT WORLD covers export packaging, inland transport, origin port customs clearance, and container loading. The buyer selects the ocean carrier and marine insurance.</li>
-          <li><strong>CIF (Cost, Insurance & Freight):</strong> MY EXPORT WORLD manages the sea freight and transit insurance all the way to your named destination port (e.g. Port of Hamburg, Rotterdam, Felixstowe, New York, Jebel Ali).</li>
+          <li><strong>FOB (Free On Board - Nhava Sheva / Mundra):</strong> The seller/exporter covers export packaging, inland transport, origin port customs clearance, and container loading. The buyer selects the ocean carrier and marine insurance.</li>
+          <li><strong>CIF (Cost, Insurance & Freight):</strong> The exporter manages and prepays the sea freight and marine transit insurance all the way to the destination discharge port (e.g. Port of Hamburg, Rotterdam, Felixstowe, New York, Jebel Ali).</li>
         </ul>
 
         <div class="official-citation-box" style="background: rgba(5, 25, 59, 0.04); border-left: 4px solid #D61C2C; padding: 1.2rem 1.5rem; border-radius: 8px; margin: 2rem 0;">
@@ -482,7 +482,7 @@
       const apiKey = resolvedKey;
       const dayIndex = date.getDay();
 
-      // Official commodity matrix by day
+      // Official commodity matrix by day with verified statutory sources
       const rotationConfig = [
         {
           key: "spices_macro",
@@ -493,7 +493,12 @@
           volume: "48,200 MT Monthly Port Dispatches",
           mandi: "Nhava Sheva (JNPT) & Mundra Port Hubs",
           destinations: "USA, UAE, Vietnam, UK, Saudi Arabia, Germany",
-          source: "Ministry of Commerce & Industry (DGCIS) & CBIC Customs"
+          source: "Ministry of Commerce & Industry (DGCIS) & CBIC Customs",
+          sourcesList: [
+            { name: "Directorate General of Commercial Intelligence and Statistics (DGCIS)", url: "https://www.dgciskol.gov.in", type: "Official Statutory Export Data" },
+            { name: "Ministry of Commerce & Industry (Govt of India)", url: "https://commerce.gov.in", type: "National Foreign Trade Policies & Manifests" },
+            { name: "Central Board of Indirect Taxes & Customs (CBIC Tariff)", url: "https://www.cbic.gov.in", type: "Customs Tariff Chapter 09 / Shipping Schedules" }
+          ]
         },
         {
           key: "turmeric",
@@ -504,7 +509,13 @@
           volume: "12,450 MT",
           mandi: "Nizamabad / Sangli APMC (Rs 14,250/Qtl Benchmark)",
           destinations: "USA, UAE, Bangladesh, Vietnam, Germany",
-          source: "Spices Board of India & DGCIS Kolkata"
+          source: "Spices Board of India & DGCIS Kolkata",
+          sourcesList: [
+            { name: "Spices Board of India (Ministry of Commerce)", url: "https://www.indianspices.com", type: "Quality Standards & Export Statistics" },
+            { name: "DGCIS Kolkata Trade Directorate", url: "https://www.dgciskol.gov.in", type: "Official Shipping Bill Statistics" },
+            { name: "NCDEX National Commodity Exchange (TMCFGRNZM Spot Pricing)", url: "https://www.ncdex.com", type: "Nizamabad & Sangli APMC Spot Benchmarks" },
+            { name: "Telangana Agricultural Marketing Department (Nizamabad)", url: "https://tsmarketing.in", type: "Official APMC Yard Trade Bulletin" }
+          ]
         },
         {
           key: "onion",
@@ -515,7 +526,12 @@
           volume: "35,800 MT",
           mandi: "Lasalgaon & Nashik Mandis (Rs 2,650/Qtl Benchmark)",
           destinations: "UAE, Malaysia, Bangladesh, Sri Lanka, Qatar",
-          source: "APEDA & NAFED Ministry of Agriculture"
+          source: "APEDA & NAFED Ministry of Agriculture",
+          sourcesList: [
+            { name: "APEDA AgriExchange Portal (Govt of India)", url: "https://agriexchange.apeda.gov.in", type: "Fresh Produce Export Manifests" },
+            { name: "NAFED (National Agricultural Cooperative Marketing Federation)", url: "https://www.nafed-india.com", type: "Buffer Procurement & Minimum Export Pricing" },
+            { name: "Maharashtra State Agricultural Marketing Board (MSAMB)", url: "https://www.msamb.com", type: "Lasalgaon & Nashik APMC Yard Dispatches" }
+          ]
         },
         {
           key: "cumin",
@@ -526,7 +542,12 @@
           volume: "9,800 MT",
           mandi: "Unjha APMC Mandi (Rs 28,400/Qtl Benchmark)",
           destinations: "China, USA, Bangladesh, UAE, Egypt",
-          source: "Spices Board of India & DGCIS"
+          source: "Spices Board of India & DGCIS",
+          sourcesList: [
+            { name: "Spices Board of India", url: "https://www.indianspices.com", type: "Cumin Seed Quality & Sampling Norms" },
+            { name: "Gujarat State Agricultural Marketing Board (APMC Unjha)", url: "https://gsamb.gujarat.gov.in", type: "National Cumin Benchmark Spot Pricing" },
+            { name: "DGCIS Kolkata Trade Analytics", url: "https://www.dgciskol.gov.in", type: "Customs Sea Freight Cargo Records" }
+          ]
         },
         {
           key: "chilli",
@@ -537,7 +558,12 @@
           volume: "21,600 MT",
           mandi: "Guntur APMC Yard (Rs 18,200/Qtl Benchmark, 75,000-100,000 SHU)",
           destinations: "China, Vietnam, Thailand, Sri Lanka, USA",
-          source: "Spices Board of India & Ministry of Commerce"
+          source: "Spices Board of India & Ministry of Commerce",
+          sourcesList: [
+            { name: "Spices Board Regional Office (Guntur Division)", url: "https://www.indianspices.com", type: "Quality & Aflatoxin Testing Norms" },
+            { name: "Andhra Pradesh Marketing Department (Guntur APMC Yard)", url: "https://market.ap.nic.in", type: "Asia's Largest Dry Chilli Yard Prices" },
+            { name: "DGCIS Customs Export Analytics (HS 0904)", url: "https://www.dgciskol.gov.in", type: "Statutory Export Container Filings" }
+          ]
         },
         {
           key: "psyllium",
@@ -548,7 +574,12 @@
           volume: "6,400 MT",
           mandi: "Sidhpur & Mehsana Belt (Rs 16,800/Qtl Benchmark)",
           destinations: "USA, Germany, UK, Australia, Japan",
-          source: "APEDA & Food Safety Standards Authority (FSSAI)"
+          source: "APEDA & Food Safety Standards Authority (FSSAI)",
+          sourcesList: [
+            { name: "APEDA Medicinal & Botanical Plants Directorate", url: "https://apeda.gov.in", type: "Phytosanitary & Export Guidelines" },
+            { name: "Food Safety and Standards Authority of India (FSSAI)", url: "https://www.fssai.gov.in", type: "Purity & Microbiological Tolerance Standards" },
+            { name: "Gujarat APMC Sidhpur & Mehsana Mandis", url: "https://gsamb.gujarat.gov.in", type: "Isabgol Farm-gate Pricing Records" }
+          ]
         },
         {
           key: "fennel_coriander",
@@ -559,9 +590,39 @@
           volume: "8,100 MT",
           mandi: "Unjha & Ramganj Mandi Benchmarks",
           destinations: "UAE, USA, Singapore, UK, Saudi Arabia",
-          source: "Spices Board of India & Agmarknet"
+          source: "Spices Board of India & Agmarknet",
+          sourcesList: [
+            { name: "Spices Board of India", url: "https://www.indianspices.com", type: "Seed Spices Export Review" },
+            { name: "Agmarknet (Ministry of Agriculture)", url: "https://agmarknet.gov.in", type: "National Mandi Price Discovery" },
+            { name: "Rajasthan State Agricultural Marketing Board (RSAMB)", url: "https://agriculture.rajasthan.gov.in", type: "Ramganj Mandi Coriander Benchmarks" }
+          ]
         }
       ];
+
+      const buildSourceAttributionHTML = (cfg) => {
+        const sources = cfg.sourcesList || [];
+        const listItems = sources.map(s => 
+          `<li style="margin-bottom: 8px;"><strong>${s.type}:</strong> <a href="${s.url}" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 600;">${s.name}</a> &mdash; <span style="font-size: 0.82rem; color: #64748b;">${s.url}</span></li>`
+        ).join('');
+
+        return `
+<div class="gov-source-attribution" style="margin-top: 32px; padding: 22px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid #16a34a; border-radius: 8px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+    <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 15px; font-weight: bold;">&#10003;</span>
+    <h4 style="margin: 0; font-size: 1.05rem; color: #0f172a; font-weight: 700;">Verified Government Data Sources &amp; Verification References</h4>
+  </div>
+  <p style="margin: 0 0 12px 0; font-size: 0.92rem; color: #334155; line-height: 1.6;">
+    This trade intelligence briefing is derived from statutory port manifests, export registrations, and public agricultural market bulletins. Importers and procurement analysts can independently verify these statistics, tariff classifications, and mandi rates via the following official portals:
+  </p>
+  <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; color: #1e293b; line-height: 1.7;">
+    ${listItems}
+  </ul>
+  <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 0.82rem; color: #64748b; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+    <span><strong>Primary Regulatory Authority:</strong> ${cfg.source}</span>
+    <span><strong>HS Tariff Schedule:</strong> CBIC Customs Chapter 09 / APEDA Schedule</span>
+  </div>
+</div>`;
+      };
 
       const config = rotationConfig[dayIndex] || rotationConfig[1];
       const dateFormatted = getFormattedDate(date);
@@ -573,7 +634,12 @@
       }
 
       try {
-        const prompt = `Act as an elite international agricultural export trade analyst for 'My Export World' (top Indian merchant exporter). Write an authoritative, professional B2B Trade Intelligence Report for foreign buyers, procurement managers, and food processors.
+        const prompt = `Act as an independent, authoritative international agricultural trade and commodity research analyst. Write an objective, purely informational B2B Trade Intelligence Report for foreign buyers, food processors, commodity brokers, and agricultural importers.
+
+CRITICAL REQUIREMENT:
+- This blog post is strictly for factual industry information and educational trade intelligence.
+- Do NOT mention the company name "My Export World" anywhere in the title, body, headers, or text!
+- Keep the writing completely objective, professional, and third-person (refer to "Indian exporters", "the Indian agricultural sector", "commercial trade channels", "procurement teams").
 
 Use this EXACT official Indian Government data from ${config.source}:
 - Focus Commodity: ${config.commodity}
@@ -586,7 +652,7 @@ Use this EXACT official Indian Government data from ${config.source}:
 - Date of Intelligence: ${dateFormatted}
 
 Instructions:
-1. Provide a professional headline in an <h2> tag.
+1. Provide a professional, informational headline in an <h2> tag (e.g. "Indian Dried Turmeric: Export Trade Intelligence & Market Analysis"). Do NOT include "My Export World" in the title.
 2. Structure the body using clean HTML tags: <h3> subheadings, <p> explanatory paragraphs, <ul>/<li> lists, and an informative <table> summarizing export volume, HS code, benchmark price, and port routes.
 3. Include sections:
    - Executive Market Sourcing Summary
@@ -611,12 +677,16 @@ Instructions:
           // Clean any markdown code blocks
           rawHtml = rawHtml.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
 
+          // Ensure zero mentions of "My Export World" (pure informational tone)
+          rawHtml = rawHtml.replace(/my\s*export\s*world\s*:?/gi, 'Indian export channels');
+
           // Extract title from <h2> or <h1>
           let title = `${config.commodity} Export Market Intelligence & Pricing`;
           const titleMatch = rawHtml.match(/<h[12][^>]*>(.*?)<\/h[12]>/i);
           if (titleMatch && titleMatch[1]) {
             title = titleMatch[1].replace(/<[^>]+>/g, '').trim();
           }
+          title = title.replace(/my\s*export\s*world\s*:?/gi, '').replace(/\bmy export world\b/gi, '').trim();
 
           // Extract teaser summary
           let teaser = `Official ${config.source} market report for ${config.commodity}. Benchmark rates, export volumes (${config.volume}), and container shipping intelligence.`;
@@ -627,6 +697,10 @@ Instructions:
               teaser = cleanP.slice(0, 180) + '...';
             }
           }
+          teaser = teaser.replace(/my\s*export\s*world\s*:?/gi, '').replace(/\bmy export world\b/gi, '').trim();
+
+          // Append verified official government source attribution box
+          const finalBodyContent = rawHtml + buildSourceAttributionHTML(config);
 
           return {
             id: `gov_post_ai_${isoDate.replace(/-/g, '')}_${config.key}`,
@@ -636,13 +710,14 @@ Instructions:
             isAutoGenerated: true,
             isAIGrounded: true,
             officialSource: config.source,
+            sourcesList: config.sourcesList || [],
             title: title,
             category: config.category,
             readTime: "5 min read",
             coverImage: config.image,
             thumbnailImage: config.image,
             teaserSummary: teaser,
-            bodyContent: rawHtml
+            bodyContent: finalBodyContent
           };
         } else {
           console.warn("Gemini API returned error or empty response:", data);
