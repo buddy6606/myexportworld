@@ -477,7 +477,7 @@
               resolvedKey = Buffer.from(p.join(""), "base64").toString("utf-8");
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       const apiKey = resolvedKey;
       const dayIndex = date.getDay();
@@ -504,7 +504,7 @@
           key: "turmeric",
           commodity: "Dried Turmeric Finger & Powder (Curcuma Longa)",
           category: "Sourcing Guides",
-          hsCode: "09103020 / 09103030",
+          hsCode: "09103020 (Dried Finger) / 09103030 (Turmeric Powder)",
           image: "images/turmeric_finger.jpg",
           volume: "12,450 MT",
           mandi: "Nizamabad / Sangli APMC (Rs 14,250/Qtl Benchmark)",
@@ -601,7 +601,7 @@
 
       const buildSourceAttributionHTML = (cfg) => {
         const sources = cfg.sourcesList || [];
-        const listItems = sources.map(s => 
+        const listItems = sources.map(s =>
           `<li style="margin-bottom: 8px;"><strong>${s.type}:</strong> <a href="${s.url}" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 600;">${s.name}</a> &mdash; <span style="font-size: 0.82rem; color: #64748b;">${s.url}</span></li>`
         ).join('');
 

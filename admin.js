@@ -621,10 +621,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const showDashboard = () => {
     authContainer.style.display = 'none';
     dashboardContainer.style.display = 'flex';
-    
+
     // Initial Data Sync
     loadDatabase();
-    
+
     // Check url hash/params for tab selection
     handleTabRouting();
   };
@@ -789,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminStatInquiriesTotal) {
       adminStatInquiriesTotal.textContent = inquiries.length;
     }
-    
+
     if (adminStatInquiriesToday) {
       const todayPrefix = getFormattedDate(); // "YYYY-MM-DD"
       const todayCount = inquiries.filter(inq => inq && inq.timestamp && typeof inq.timestamp === 'string' && inq.timestamp.startsWith(todayPrefix)).length;
@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 4. Inquiries Operations ---
   const renderInquiriesTable = (filteredData = null) => {
     if (!adminTableBody) return;
-    
+
     const dataToRender = filteredData !== null ? filteredData : inquiries;
     adminTableBody.innerHTML = '';
 
@@ -920,7 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dataToRender.forEach((inq, index) => {
       // Find absolute index in main array
       const absoluteIndex = inquiries.findIndex(item => item && inq && item.timestamp === inq.timestamp && item.buyerEmail === inq.buyerEmail);
-      
+
       const row = document.createElement('tr');
       row.innerHTML = `
         <td data-label="Date / Time"><strong>${inq.timestamp}</strong></td>
@@ -950,12 +950,12 @@ document.addEventListener('DOMContentLoaded', () => {
           inquiries.splice(targetIdx, 1);
           saveInquiries();
           loadDatabase(); // Re-sync and re-render
-          
+
           // Re-apply current search query if exists
           if (inquirySearchInput && inquirySearchInput.value.trim()) {
             filterInquiries();
           }
-          
+
           showToast("Inquiry ticket deleted", "warning");
         }
       });
@@ -1040,9 +1040,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const csvString = csvRows.join("\r\n");
-      const BOM = "\uFEFF"; 
+      const BOM = "\uFEFF";
       const blob = new Blob([BOM + csvString], { type: "text/csv;charset=utf-8;" });
-      
+
       const link = document.createElement("a");
       if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
@@ -1052,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         showToast("Excel spreadsheet downloaded successfully!", "success");
       }
     });
@@ -1153,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
               localStorage.setItem('myexportworld_deleted_blogs', JSON.stringify(deleted));
             }
             if (db) {
-              db.collection('blog_posts').doc(targetPost.id).delete().catch(() => {});
+              db.collection('blog_posts').doc(targetPost.id).delete().catch(() => { });
             }
           }
           blogPosts.splice(targetIdx, 1);
@@ -1325,7 +1325,7 @@ document.addEventListener('DOMContentLoaded', () => {
         category = blogCategoryCustom.value.trim();
       }
       const readTime = document.getElementById('blogReadTime').value.trim();
-      
+
       let coverImage = blogImageSelect ? blogImageSelect.value : '';
       let thumbnailImage = blogThumbnailSelect ? blogThumbnailSelect.value : '';
 
@@ -1359,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Format Body Content to HTML
         const formatBodyToHTML = (text) => {
           if (text.includes('<p>') || text.includes('<h3>') || text.includes('<ul>')) {
-            return text; 
+            return text;
           }
           return text
             .split(/\n\s*\n/)
@@ -1368,7 +1368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const dateFormatted = getFormattedArticleDate();
-        
+
         const newPost = {
           id: "post_" + Date.now(),
           timestamp: new Date().toISOString(),
@@ -1389,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add to beginning of database
         blogPosts.unshift(newPost);
         saveBlogPosts();
-        
+
         // Reset fields
         adminBlogForm.reset();
         if (blogImageCustom) blogImageCustom.style.display = 'none';
@@ -1397,7 +1397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (blogCategoryCustom) blogCategoryCustom.style.display = 'none';
         if (blogImageFile) blogImageFile.style.display = 'none';
         if (blogThumbnailFile) blogThumbnailFile.style.display = 'none';
-        
+
         // Re-load and switch focus to active blog management list
         loadDatabase();
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -1862,7 +1862,7 @@ document.addEventListener('DOMContentLoaded', () => {
               localStorage.setItem('myexportworld_deleted_products', JSON.stringify(deleted));
             }
             if (db) {
-              db.collection('products').doc(targetProd.id).delete().catch(() => {});
+              db.collection('products').doc(targetProd.id).delete().catch(() => { });
             }
           }
           products.splice(targetIdx, 1);
@@ -1988,7 +1988,7 @@ document.addEventListener('DOMContentLoaded', () => {
         products[idx].description = document.getElementById('editProdDesc').value.trim();
 
         if (db && products[idx].id) {
-          db.collection('products').doc(products[idx].id).set(products[idx], { merge: true }).catch(() => {});
+          db.collection('products').doc(products[idx].id).set(products[idx], { merge: true }).catch(() => { });
         }
         saveProducts();
         renderProductsTable();
@@ -2076,7 +2076,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (db) {
-          db.collection('products').doc(newProduct.id).set(newProduct).catch(() => {});
+          db.collection('products').doc(newProduct.id).set(newProduct).catch(() => { });
         }
 
         // Add to active products array
@@ -2324,7 +2324,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 6. Helper Utilities ---
   const escapeHTML = (str) => {
     if (!str) return '';
-    return str.replace(/[&<>'"]/g, 
+    return str.replace(/[&<>'"]/g,
       tag => ({
         '&': '&amp;',
         '<': '&lt;',
@@ -2353,7 +2353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
+
     let iconClass = "fa-info-circle";
     if (type === "success") iconClass = "fa-circle-check";
     if (type === "warning") iconClass = "fa-triangle-exclamation";
