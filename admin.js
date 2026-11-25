@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const prodImageSelect = document.getElementById('prodImage');
   const prodImageCustom = document.getElementById('prodImageCustom');
   const prodImageFile = document.getElementById('prodImageFile');
-  const adminProductTableBody = document.getElementById('adminProductTableBody');
+  const adminProductTableBody = document.getElementById('adminProductTabremoveleBody');
 
   // Certificate Elements
   const adminCertForm = document.getElementById('adminCertForm');
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       localStorage.removeItem('mew_admin_failed_attempts');
       localStorage.removeItem('mew_admin_lock_until');
-    } catch (e) {}
+    } catch (e) { }
   };
 
   let lockoutTimerInterval = null;
