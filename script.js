@@ -2591,6 +2591,42 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Dynamic Certificates Loader ---
+  const isPdfCert = (src) => {
+    if (!src || typeof src !== 'string') return false;
+    const lower = src.trim().toLowerCase();
+    return lower.startsWith('data:application/pdf') || lower.endsWith('.pdf') || lower.includes('.pdf?');
+  };
+
+  window.openCertificateDocument = (certIndex) => {
+    try {
+      const deleted = JSON.parse(localStorage.getItem('myexportworld_deleted_certs') || '[]');
+      const stored = localStorage.getItem('myexportworld_certificates');
+      const certs = stored ? JSON.parse(stored).filter(c => !deleted.includes(c.id)) : [];
+      const cert = certs[certIndex];
+      if (!cert || !cert.image) {
+        alert(`${cert ? cert.title : 'Certificate'}: Verified export compliance registration.`);
+        return;
+      }
+      const src = cert.image.trim();
+      if (src.startsWith('data:application/pdf')) {
+        const base64Part = src.split(',')[1];
+        const byteCharacters = atob(base64Part);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+      } else {
+        window.open(src, '_blank');
+      }
+    } catch (e) {
+      console.error("Failed to open certificate document:", e);
+    }
+  };
+
   const loadPublicCertificates = () => {
     const container = document.getElementById('certificatesContainer');
     if (!container) return;
@@ -2608,14 +2644,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!certs || certs.length === 0) return;
 
-    container.innerHTML = certs.map(c => `
+    container.innerHTML = certs.map((c, idx) => {
+      const pdfDoc = isPdfCert(c.image);
+      const previewHTML = c.image ? (
+        pdfDoc
+          ? `<div onclick="openCertificateDocument(${idx})" style="margin: 1.25rem 1.5rem 0 1.5rem; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-sm); color: #dc2626; cursor: pointer; gap: 8px;">
+               <i class="fa-solid fa-file-pdf" style="font-size: 2.5rem;"></i>
+               <span style="font-size: 0.85rem; font-weight: 600;">Official PDF Document</span>
+             </div>`
+          : `<div style="padding: 1.25rem 1.5rem 0 1.5rem; text-align: center;">
+               <img src="${escapeHTML(c.image)}" alt="${escapeHTML(c.title)}" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: #fff; cursor: pointer;" onclick="openCertificateDocument(${idx})" onerror="this.style.display='none';">
+             </div>`
+      ) : '';
+
+      return `
       <div class="cert-card">
         <div class="cert-top-stripe ${escapeHTML(c.theme || 'blue')}"></div>
-        ${c.image ? `
-          <div style="padding: 1.25rem 1.5rem 0 1.5rem; text-align: center;">
-            <img src="${escapeHTML(c.image)}" alt="${escapeHTML(c.title)}" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: #fff;" onerror="this.style.display='none';">
-          </div>
-        ` : ''}
+        ${previewHTML}
         <div class="cert-body">
           <div class="cert-icon-wrapper flex-center ${escapeHTML(c.theme || 'blue')}">
             <i class="${escapeHTML(c.icon || 'fa-solid fa-certificate')}"></i>
@@ -2635,12 +2680,13 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div class="cert-footer">
-          <button class="btn btn-cert" onclick="${c.image ? `window.open('${escapeHTML(c.image)}', '_blank')` : `alert('${escapeHTML(c.title)}: Verified export compliance registration.')`}">
+          <button class="btn btn-cert" onclick="openCertificateDocument(${idx})">
             <i class="fa-regular fa-file-pdf"></i> View Certificate
           </button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   };
 
   loadPublicCertificates();

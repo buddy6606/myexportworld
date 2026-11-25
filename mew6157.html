@@ -696,17 +696,17 @@
               </select>
             </div>
 
-            <!-- Certificate Image -->
+            <!-- Certificate Image or PDF -->
             <div class="form-group full-width">
-              <label for="certImage" class="form-label">Certificate Image / Document Scan <span>*</span></label>
+              <label for="certImage" class="form-label">Certificate Image or PDF Document <span>*</span></label>
               <select id="certImage" class="form-select" required>
                 <option value="images/certificate_sample.jpg" selected>Certificate Document Scan (Sample)</option>
                 <option value="images/logo.png">Official Corporate Seal / Logo (Preset)</option>
-                <option value="custom">-- Paste Custom Image URL --</option>
-                <option value="upload">-- Upload Local Image File --</option>
+                <option value="custom">-- Paste Custom Image or PDF URL --</option>
+                <option value="upload">-- Upload Local Image or PDF File --</option>
               </select>
-              <input type="text" id="certImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste certificate image URL (e.g. images/my_certificate.jpg)">
-              <input type="file" id="certImageFile" accept="image/*" class="form-input" style="display: none; margin-top: 0.5rem;">
+              <input type="text" id="certImageCustom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Paste certificate image or PDF URL (e.g. images/my_certificate.pdf)">
+              <input type="file" id="certImageFile" accept="image/*,application/pdf,.pdf" class="form-input" style="display: none; margin-top: 0.5rem;">
             </div>
 
             <!-- Detailed Description / Scope -->
@@ -934,16 +934,20 @@
           </select>
         </div>
         <div class="form-group full-width">
-          <label class="form-label">Certificate Image (URL or Upload from Device) <span>*</span></label>
+          <label class="form-label">Certificate Image or PDF (URL or Upload from Device) <span>*</span></label>
           <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-            <input type="text" id="editCertImage" class="form-input" style="flex: 1; min-width: 200px;" placeholder="Certificate scan URL or uploaded file" required>
+            <input type="text" id="editCertImage" class="form-input" style="flex: 1; min-width: 200px;" placeholder="Certificate image/PDF URL or uploaded file" required>
             <label for="editCertImageFile" class="btn btn-secondary" style="margin: 0; padding: 0.55rem 1.1rem; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
-              <i class="fa-solid fa-cloud-arrow-up"></i> Upload from Device
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload Image / PDF
             </label>
-            <input type="file" id="editCertImageFile" accept="image/*" style="display: none;">
+            <input type="file" id="editCertImageFile" accept="image/*,application/pdf,.pdf" style="display: none;">
           </div>
           <div id="editCertImagePreview" style="margin-top: 0.6rem; display: none;">
             <img id="editCertImagePreviewImg" src="" alt="Preview" style="max-height: 80px; border-radius: 6px; border: 1px solid var(--border-light);">
+            <div id="editCertPdfPreviewBadge" style="display: none; align-items: center; gap: 8px; padding: 8px 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #dc2626; font-size: 0.85rem; font-weight: 600;">
+              <i class="fa-solid fa-file-pdf" style="font-size: 1.2rem;"></i>
+              <span>PDF Certificate Document Ready</span>
+            </div>
           </div>
         </div>
         <div class="form-group full-width">

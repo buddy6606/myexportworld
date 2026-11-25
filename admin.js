@@ -1399,50 +1399,89 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Helper for Upload from Device in Edit Modals
-  const setupEditImageUpload = (fileInputId, textInputId, previewContainerId, previewImgId) => {
+  // Helper: Check if URL or Data URI is a PDF
+  const isPdfSource = (src) => {
+    if (!src || typeof src !== 'string') return false;
+    const lower = src.trim().toLowerCase();
+    return lower.startsWith('data:application/pdf') || lower.endsWith('.pdf') || lower.includes('.pdf?');
+  };
+
+  // Helper: Read file (like PDF) directly as Base64 Data URL
+  const readFileAsDataURL = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Helper for Upload from Device in Edit Modals (Supports Images & PDFs)
+  const setupEditImageUpload = (fileInputId, textInputId, previewContainerId, previewImgId, pdfBadgeId = null) => {
     const fileInput = document.getElementById(fileInputId);
     const textInput = document.getElementById(textInputId);
     const previewContainer = document.getElementById(previewContainerId);
     const previewImg = document.getElementById(previewImgId);
+    const pdfBadge = pdfBadgeId ? document.getElementById(pdfBadgeId) : null;
+
+    const updatePreview = (val) => {
+      if (!previewContainer) return;
+      if (!val) {
+        previewContainer.style.display = 'none';
+        return;
+      }
+      previewContainer.style.display = 'block';
+      if (isPdfSource(val)) {
+        if (previewImg) previewImg.style.display = 'none';
+        if (pdfBadge) pdfBadge.style.display = 'inline-flex';
+      } else {
+        if (pdfBadge) pdfBadge.style.display = 'none';
+        if (previewImg) {
+          previewImg.src = val;
+          previewImg.style.display = 'block';
+        }
+      }
+    };
 
     if (fileInput) {
       fileInput.addEventListener('change', async () => {
         if (fileInput.files && fileInput.files.length > 0) {
-          showToast("Processing image from device...", "info");
+          const file = fileInput.files[0];
+          const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+          showToast(isPdf ? "Processing PDF document..." : "Processing image from device...", "info");
           try {
-            const base64 = await compressImage(fileInput.files[0]);
-            if (textInput) textInput.value = base64;
-            if (previewContainer && previewImg) {
-              previewImg.src = base64;
-              previewContainer.style.display = 'block';
+            let base64;
+            if (isPdf) {
+              if (file.size > 3 * 1024 * 1024) {
+                showToast("PDF file is too large (max 3MB recommended).", "warning");
+                return;
+              }
+              base64 = await readFileAsDataURL(file);
+            } else {
+              base64 = await compressImage(file);
             }
-            showToast("Device image ready!", "success");
+            if (textInput) textInput.value = base64;
+            updatePreview(base64);
+            showToast(isPdf ? "PDF document ready!" : "Device image ready!", "success");
           } catch (err) {
             console.error(err);
-            showToast("Failed to process device image.", "warning");
+            showToast("Failed to process selected file.", "warning");
           }
         }
       });
     }
 
-    if (textInput && previewContainer && previewImg) {
+    if (textInput && previewContainer) {
       textInput.addEventListener('input', () => {
-        const val = textInput.value.trim();
-        if (val) {
-          previewImg.src = val;
-          previewContainer.style.display = 'block';
-        } else {
-          previewContainer.style.display = 'none';
-        }
+        updatePreview(textInput.value.trim());
       });
     }
   };
 
-  // Initialize Edit Modal image upload handlers
+  // Initialize Edit Modal image/PDF upload handlers
   setupEditImageUpload('editProdImageFile', 'editProdImage', 'editProdImagePreview', 'editProdImagePreviewImg');
   setupEditImageUpload('editBlogImageFile', 'editBlogImage', 'editBlogImagePreview', 'editBlogImagePreviewImg');
-  setupEditImageUpload('editCertImageFile', 'editCertImage', 'editCertImagePreview', 'editCertImagePreviewImg');
+  setupEditImageUpload('editCertImageFile', 'editCertImage', 'editCertImagePreview', 'editCertImagePreviewImg', 'editCertPdfPreviewBadge');
 
   // Blog submission handler
   if (adminBlogForm) {
@@ -2285,10 +2324,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cert.theme === 'gold') themeBadge = '<span class="badge-cert-gold badge-product">Gold Stripe</span>';
 
       const certImg = cert.image || 'images/certificate_sample.jpg';
+      const certMediaHTML = isPdfSource(certImg)
+        ? `<div style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: #fef2f2; color: #dc2626; border-radius: var(--radius-sm); border: 1px solid #fecaca; font-size: 1.35rem;" title="PDF Certificate"><i class="fa-solid fa-file-pdf"></i></div>`
+        : `<img src="${escapeHTML(certImg)}" alt="${escapeHTML(cert.title)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-light);" onerror="this.src='images/logo.png';">`;
 
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td data-label="Image"><img src="${escapeHTML(certImg)}" alt="${escapeHTML(cert.title)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-light);" onerror="this.src='images/logo.png';"></td>
+        <td data-label="Image">${certMediaHTML}</td>
         <td data-label="Certificate Name"><strong>${escapeHTML(cert.title)}</strong></td>
         <td data-label="Issuing Authority">${escapeHTML(cert.authority)}</td>
         <td data-label="License Type"><span style="font-size:0.85rem; font-weight:600; color:var(--primary-blue);">${escapeHTML(cert.label || 'Certified')}</span></td>
@@ -2353,8 +2395,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (image === 'custom' && certImageCustom) {
           image = certImageCustom.value.trim();
         } else if (image === 'upload' && certImageFile && certImageFile.files.length > 0) {
-          showToast("Processing certificate image...", "info");
-          image = await compressImage(certImageFile.files[0]);
+          const file = certImageFile.files[0];
+          const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+          if (isPdf) {
+            if (file.size > 3 * 1024 * 1024) {
+              showToast("PDF file is too large (max 3MB recommended).", "warning");
+              return;
+            }
+            showToast("Processing certificate PDF...", "info");
+            image = await readFileAsDataURL(file);
+          } else {
+            showToast("Processing certificate image...", "info");
+            image = await compressImage(file);
+          }
         }
 
         if (!title || !authority || !label || !theme || !desc) {
@@ -2410,10 +2463,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editCertImageFile) editCertImageFile.value = '';
     const certPrev = document.getElementById('editCertImagePreview');
     const certPrevImg = document.getElementById('editCertImagePreviewImg');
-    if (certPrev && certPrevImg) {
+    const certPdfBadge = document.getElementById('editCertPdfPreviewBadge');
+    if (certPrev) {
       if (certImgVal) {
-        certPrevImg.src = certImgVal;
         certPrev.style.display = 'block';
+        if (isPdfSource(certImgVal)) {
+          if (certPrevImg) certPrevImg.style.display = 'none';
+          if (certPdfBadge) certPdfBadge.style.display = 'inline-flex';
+        } else {
+          if (certPdfBadge) certPdfBadge.style.display = 'none';
+          if (certPrevImg) {
+            certPrevImg.src = certImgVal;
+            certPrevImg.style.display = 'block';
+          }
+        }
       } else {
         certPrev.style.display = 'none';
       }
