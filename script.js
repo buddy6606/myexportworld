@@ -2646,15 +2646,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.innerHTML = certs.map((c, idx) => {
       const pdfDoc = isPdfCert(c.image);
-      const previewHTML = c.image ? (
-        pdfDoc
-          ? `<div onclick="openCertificateDocument(${idx})" style="margin: 1.25rem 1.5rem 0 1.5rem; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fef2f2; border: 1px dashed #fca5a5; border-radius: var(--radius-sm); color: #dc2626; cursor: pointer; gap: 8px;">
-               <i class="fa-solid fa-file-pdf" style="font-size: 2.5rem;"></i>
-               <span style="font-size: 0.85rem; font-weight: 600;">Official PDF Document</span>
-             </div>`
-          : `<div style="padding: 1.25rem 1.5rem 0 1.5rem; text-align: center;">
-               <img src="${escapeHTML(c.image)}" alt="${escapeHTML(c.title)}" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: #fff; cursor: pointer;" onclick="openCertificateDocument(${idx})" onerror="this.style.display='none';">
-             </div>`
+      const previewHTML = (c.image && !pdfDoc) ? (
+        `<div style="padding: 1.25rem 1.5rem 0 1.5rem; text-align: center;">
+           <img src="${escapeHTML(c.image)}" alt="${escapeHTML(c.title)}" style="max-height: 140px; max-width: 100%; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: #fff; cursor: pointer;" onclick="openCertificateDocument(${idx})" onerror="this.style.display='none';">
+         </div>`
       ) : '';
 
       return `
